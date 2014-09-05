@@ -13,7 +13,7 @@ void update () {
 }
 
 void setup () {
-  size(screenWidth, screenHeight);
+    size(400, 300);
 }
 
 void draw() {
