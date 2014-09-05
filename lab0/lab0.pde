@@ -1,43 +1,48 @@
 int screenWidth = 400, screenHeight = 300;
-int currcolor = 0, currtext = 0, currwidth = 0, currheight = 0;
-color colors[] = {color(255, 153, 51), color(100, 0, 204)};
-String texts[] = {"Mission", "accomplished!"};
-int widths[] = {screenWidth / 2, screenWidth / 3};
-int heights[] = {screenHeight / 2, screenHeight / 3};
 
-Button button;
+int currbutton = 0;
+Button buttons[] = {new Button(screenWidth/4, screenHeight/4, screenWidth/2, screenHeight/2, 7, color(255, 153, 51), "Hello world."),
+                    new Button(screenWidth/3, screenHeight/3, screenWidth/3, screenHeight/3, 7, color(100, 0, 204), "Mission"),
+                    new Button(3 * screenWidth/8, 3 * screenHeight/8, screenWidth/4, screenHeight/4, 7, color(100, 140, 0), "accomplished.")};
+
+float widthdelta = 0, heightdelta = 0;
 
 void update () {
-  button.setColor(colors[(++currcolor) % colors.length]);
-  button.setText(texts[(++currtext) % texts.length]);
-  button.setSize(widths[(++currwidth) % widths.length], heights[(++currheight) % heights.length]);
+  int prevbutton = currbutton;
+  currbutton = (currbutton + 1) % buttons.length;
 }
 
 void setup () {
   size(screenWidth, screenHeight);
-  button = new Button(screenWidth/4, screenHeight/4, screenWidth/2, screenHeight/2, 7, colors[currcolor]);
-  button.setText(texts[currtext]);
 }
 
 void draw() {
   background(255, 255, 255);
+  Button button = buttons[currbutton];
+  
   boolean click = button.getIsect();
   if (click) {
     update();
     button.setSelected(false);
   } 
   fill(button.getColor()); 
-  rect(button.getPosX(), button.getPosY(), button.getWidth(), button.getHeight(), button.getRoundness());
+  if (widthdelta < 0) {
+     rect(button.getPosX(), button.getPosY(), button.getWidth(), button.getHeight(), button.getRoundness()); 
+  } else if (widthdelta > 0) {
+    
+  } else {
+     rect(button.getPosX(), button.getPosY(), button.getWidth(), button.getHeight(), button.getRoundness()); 
+  }
+  
   
   fill(255);
+  textSize(12); 
   textAlign(CENTER, CENTER); /* hacky solution --> should be based on rectangle rather than canvas */
   text(button.getText(), button.getCenterX(), button.getCenterY());
- 
- 
 }
 
 void mouseClicked() {
-  System.out.println("click");
+  Button button = buttons[currbutton];
   button.intersect(mouseX, mouseY);
 }
 

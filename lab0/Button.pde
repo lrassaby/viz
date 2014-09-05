@@ -13,7 +13,7 @@ class Button {
 
 
   
-  Button(float x, float y, float w, float h, float roundness, color c) { /* height and width of button */
+  Button(float x, float y, float w, float h, float roundness, color c, String text) { /* height and width of button */
      this.isect = false;
      this.x = x;
      this.y = y;
@@ -23,12 +23,13 @@ class Button {
      this.c = c;
      this.center.x = x + w/2;
      this.center.y = y + h/2;
+     this.text = text;
   }
 
   
   void intersect (int mousex, int mousey) {
     /* if it's within x + width and y + height */
-    if (mousex <= (x + w) && mousey <= (y + h)) {
+    if (mousex <= (x + w) && mousex >= x && mousey <= (y + h) && mousey >= y) {
       isect = true;
     }
     else {
