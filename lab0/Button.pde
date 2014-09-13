@@ -73,5 +73,4 @@ class Button {
   color getColor() {return c;}
   float getRoundness() {return roundness;}
   String getText() {return text;}
-}
-
+};
