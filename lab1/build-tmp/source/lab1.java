@@ -293,7 +293,7 @@ public class Chart {
         float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
         int increment;
         try {
-            increment = PApplet.parseInt(35/abs(ratio));
+            increment = PApplet.parseInt(25/abs(ratio));
         } catch (Exception e) {
             increment = 30;
         }

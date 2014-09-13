@@ -60,7 +60,7 @@ public class Chart {
         float ratio = float((topyaxis.y - origin.y)) / maxY;
         int increment;
         try {
-            increment = int(35/abs(ratio));
+            increment = int(25/abs(ratio));
         } catch (Exception e) {
             increment = 30;
         }
