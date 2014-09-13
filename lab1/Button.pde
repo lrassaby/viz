@@ -13,6 +13,7 @@ public class Button {
          // DO SOMETHING
          button.setSelected(false);
       } 
+
       fill(button.getColor()); 
 
       fill(255);
@@ -52,9 +53,8 @@ public class Button {
     this.pos = pos;
   }
   
-  void setSize (float w, float h) {
-    this.dim.w = w;
-    this.dim.h = h;
+  void setSize (Dimensions dim) {
+    this.dim = dim;
   }
   
   void setColor (int r, int g, int b) {
