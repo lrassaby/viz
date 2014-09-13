@@ -3,9 +3,11 @@ Point origin,
       topyaxis, 
       rightxaxis,
       buttonpos;
+String hovertext;
 Dimensions buttondim;
 Chart chart;
 Button button;
+boolean hover;
 
 void setup () {
   frame.setResizable(true);
@@ -19,6 +21,7 @@ void setup () {
   buttonpos = new Point(width - buttondim.w - margins[2], margins[1]);
 
   button = new Button(buttonpos, buttondim, 7, color(255, 153, 51), "Bar Chart");
+
   Table data = loadTable("data.csv", "header");
   chart.setup(data, origin, topyaxis, rightxaxis);
 }
@@ -37,6 +40,18 @@ void draw() {
 
   buttonpos.setXY(width - buttondim.w - margins[2], margins[1]);
   button.draw();
+
+  if (hover) {
+    fill(255, 0, 0);
+    textSize(20);
+    if (mouseX < (width/2)) {
+      textAlign(LEFT, CENTER);
+      text(hovertext, mouseX, mouseY - 20);
+    } else {
+      textAlign(RIGHT, CENTER);
+      text(hovertext, mouseX, mouseY - 20);
+    }
+  }
 }
 
 void mouseClicked() {
@@ -55,7 +70,13 @@ void mouseClicked() {
 }
 
 void mouseMoved() {
-  
+  String str = chart.mouseOver(mouseX, mouseY);
+  if (str != "") { // BAD BAD BAD!
+    hover = true;
+    hovertext = str;
+  } else {
+    hover = false;
+  }
 }
 
 

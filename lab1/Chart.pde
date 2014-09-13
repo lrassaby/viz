@@ -84,6 +84,14 @@ public class Chart {
         }
     }
 
+    String mouseOver(int x, int y) {
+        if (barchartSelected) {
+            return barchart.intersect(x, y);
+        } else {
+            return linechart.intersect(x, y);
+        }
+    }
+
     void setup(Table data, Point origin, Point topyaxis, Point rightxaxis) {
         /* get data */
         int i = 0;

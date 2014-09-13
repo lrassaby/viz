@@ -19,9 +19,11 @@ Point origin,
       topyaxis, 
       rightxaxis,
       buttonpos;
+String hovertext;
 Dimensions buttondim;
 Chart chart;
 Button button;
+boolean hover;
 
 public void setup () {
   frame.setResizable(true);
@@ -35,6 +37,7 @@ public void setup () {
   buttonpos = new Point(width - buttondim.w - margins[2], margins[1]);
 
   button = new Button(buttonpos, buttondim, 7, color(255, 153, 51), "Bar Chart");
+
   Table data = loadTable("data.csv", "header");
   chart.setup(data, origin, topyaxis, rightxaxis);
 }
@@ -53,6 +56,18 @@ public void draw() {
 
   buttonpos.setXY(width - buttondim.w - margins[2], margins[1]);
   button.draw();
+
+  if (hover) {
+    fill(255, 0, 0);
+    textSize(20);
+    if (mouseX < (width/2)) {
+      textAlign(LEFT, CENTER);
+      text(hovertext, mouseX, mouseY - 20);
+    } else {
+      textAlign(RIGHT, CENTER);
+      text(hovertext, mouseX, mouseY - 20);
+    }
+  }
 }
 
 public void mouseClicked() {
@@ -69,7 +84,15 @@ public void mouseClicked() {
     button.setSelected(false);
   } 
 }
+
 public void mouseMoved() {
+  String str = chart.mouseOver(mouseX, mouseY);
+  if (str != "") { // BAD BAD BAD!
+    hover = true;
+    hovertext = str;
+  } else {
+    hover = false;
+  }
 }
 
 
@@ -80,6 +103,28 @@ public class Barchart {
     int minY, maxY;
     Point origin, topyaxis, rightxaxis;
     FruitCount[] datapoints;
+    boolean isect;
+
+    public String intersect (int mousex, int mousey) {
+        int ratio = (topyaxis.y - origin.y) / maxY;
+        int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
+        strokeWeight(sectionWidth * 0.8f);
+        
+        for (int i = 0; i < datapoints.length; i++) {
+            int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+            int y = datapoints[i].count * ratio + origin.y;
+            
+            if (mousex > x - sectionWidth * 0.4f && mousex < x + sectionWidth * 0.4f) {
+                // within the x range
+                if (mousey > y && mousey < origin.y) {
+                    // within the y range
+                    return "(" + datapoints[i].fruit + ", " + datapoints[i].count + ")";
+                }
+            }
+        }
+        return "";
+    }
+
     Barchart(FruitCount[] datapoints, Point origin, Point topyaxis, Point rightxaxis) {
         setData(datapoints, origin, topyaxis, rightxaxis);
     }
@@ -272,6 +317,14 @@ public class Chart {
         }
     }
 
+    public String mouseOver(int x, int y) {
+        if (barchartSelected) {
+            return barchart.intersect(x, y);
+        } else {
+            return linechart.intersect(x, y);
+        }
+    }
+
     public void setup(Table data, Point origin, Point topyaxis, Point rightxaxis) {
         /* get data */
         int i = 0;
@@ -353,6 +406,12 @@ public class Linechart {
     int minY, maxY;
     Point origin, topyaxis, rightxaxis;
     FruitCount[] datapoints;
+    boolean isect;
+
+    public String intersect (int x, int y) {
+        return "";
+    }
+
     Linechart(FruitCount[] datapoints, Point origin, Point topyaxis, Point rightxaxis) {
         setData(datapoints, origin, topyaxis, rightxaxis);
     }

@@ -2,6 +2,12 @@ public class Linechart {
     int minY, maxY;
     Point origin, topyaxis, rightxaxis;
     FruitCount[] datapoints;
+    boolean isect;
+
+    String intersect (int x, int y) {
+        return "";
+    }
+
     Linechart(FruitCount[] datapoints, Point origin, Point topyaxis, Point rightxaxis) {
         setData(datapoints, origin, topyaxis, rightxaxis);
     }
