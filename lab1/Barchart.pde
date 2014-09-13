@@ -5,13 +5,13 @@ public class Barchart {
     boolean isect;
 
     String intersect (int mousex, int mousey) {
-        int ratio = (topyaxis.y - origin.y) / maxY;
+        float ratio = float((topyaxis.y - origin.y)) / maxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
         strokeWeight(sectionWidth * 0.8);
         
         for (int i = 0; i < datapoints.length; i++) {
             int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-            int y = datapoints[i].count * ratio + origin.y;
+            int y = int(datapoints[i].count * ratio) + origin.y;
             
             if (mousex > x - sectionWidth * 0.4 && mousex < x + sectionWidth * 0.4) {
                 // within the x range
@@ -40,13 +40,13 @@ public class Barchart {
         }
     }
     void draw () {
-        int ratio = (topyaxis.y - origin.y) / maxY;
+        float ratio = float((topyaxis.y - origin.y)) / maxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
         strokeWeight(sectionWidth * 0.8);
         strokeCap(SQUARE);
         for (int i = 0; i < datapoints.length; i++) {
             int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-            int y = datapoints[i].count * ratio + origin.y;
+            int y = int(datapoints[i].count * ratio) + origin.y;
             line(x, origin.y, x, y);
         }
     }

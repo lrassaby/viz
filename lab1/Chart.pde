@@ -57,18 +57,15 @@ public class Chart {
 
         // Y value labels
         textSize(12);
-        int ratio = (topyaxis.y - origin.y) / maxY;
+        float ratio = float((topyaxis.y - origin.y)) / maxY;
         int increment;
-        if (ratio > -8) {
-            increment = 8;
-        } else if (ratio > -16) {
-            increment = 4;
-        } else {
-            increment = 2;
+        try {
+            increment = int(35/abs(ratio));
+        } catch (Exception e) {
+            increment = 30;
         }
-
         for (int i = 0; i <= maxY; i+= increment) {
-            makeText(Integer.toString(i), origin.x - 10, i * ratio + origin.y, false);
+            makeText(Integer.toString(i), origin.x - 10, int(i * ratio + origin.y), false);
         }
     }
     void makeText(String str, int x, int y, boolean vert) {      

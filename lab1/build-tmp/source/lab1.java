@@ -106,13 +106,13 @@ public class Barchart {
     boolean isect;
 
     public String intersect (int mousex, int mousey) {
-        int ratio = (topyaxis.y - origin.y) / maxY;
+        float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
         strokeWeight(sectionWidth * 0.8f);
         
         for (int i = 0; i < datapoints.length; i++) {
             int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-            int y = datapoints[i].count * ratio + origin.y;
+            int y = PApplet.parseInt(datapoints[i].count * ratio) + origin.y;
             
             if (mousex > x - sectionWidth * 0.4f && mousex < x + sectionWidth * 0.4f) {
                 // within the x range
@@ -141,13 +141,13 @@ public class Barchart {
         }
     }
     public void draw () {
-        int ratio = (topyaxis.y - origin.y) / maxY;
+        float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
         strokeWeight(sectionWidth * 0.8f);
         strokeCap(SQUARE);
         for (int i = 0; i < datapoints.length; i++) {
             int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-            int y = datapoints[i].count * ratio + origin.y;
+            int y = PApplet.parseInt(datapoints[i].count * ratio) + origin.y;
             line(x, origin.y, x, y);
         }
     }
@@ -290,18 +290,15 @@ public class Chart {
 
         // Y value labels
         textSize(12);
-        int ratio = (topyaxis.y - origin.y) / maxY;
+        float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
         int increment;
-        if (ratio > -8) {
-            increment = 8;
-        } else if (ratio > -16) {
-            increment = 4;
-        } else {
-            increment = 2;
+        try {
+            increment = PApplet.parseInt(35/abs(ratio));
+        } catch (Exception e) {
+            increment = 30;
         }
-
         for (int i = 0; i <= maxY; i+= increment) {
-            makeText(Integer.toString(i), origin.x - 10, i * ratio + origin.y, false);
+            makeText(Integer.toString(i), origin.x - 10, PApplet.parseInt(i * ratio + origin.y), false);
         }
     }
     public void makeText(String str, int x, int y, boolean vert) {      
@@ -410,13 +407,13 @@ public class Linechart {
     int radius = 5;
 
     public String intersect (int mousex, int mousey) {
-        int ratio = (topyaxis.y - origin.y) / maxY;
+        float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
         strokeWeight(sectionWidth * 0.8f);
         
         for (int i = 0; i < datapoints.length; i++) {
             int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-            int y = datapoints[i].count * ratio + origin.y + 4;
+            int y = PApplet.parseInt(datapoints[i].count * ratio) + origin.y + 4;
             
             if ((mousex - x) * (mousex - x) + (mousey - y) * (mousey - y) < (radius + 1) * (radius + 1)) {
                 return "(" + datapoints[i].fruit + ", " + datapoints[i].count + ")";
@@ -443,13 +440,13 @@ public class Linechart {
 
     public void draw () {
         strokeWeight(2);
-        int ratio = (topyaxis.y - origin.y) / maxY;
+        float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
-        Point prev = new Point(origin.x + sectionWidth / 2, datapoints[0].count * ratio + origin.y);
+        Point prev = new Point(origin.x + sectionWidth / 2, PApplet.parseInt(datapoints[0].count * ratio) + origin.y);
         drawCircle(prev.x, prev.y, 10);
         for (int i = 1; i < datapoints.length; i++) {
             int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-            int y = datapoints[i].count * ratio + origin.y;
+            int y = PApplet.parseInt(datapoints[i].count * ratio) + origin.y;
             line(prev.x, prev.y, x, y);
             prev.setXY(x, y);
             drawCircle(prev.x, prev.y, radius * 2);
