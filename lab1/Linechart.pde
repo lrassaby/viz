@@ -1,5 +1,5 @@
 public class Linechart {
-    int minY = 1000000, maxY = -1000000;
+    int minY, maxY;
     Point origin, topyaxis, rightxaxis;
     FruitCount[] datapoints;
     Linechart(FruitCount[] datapoints, Point origin, Point topyaxis, Point rightxaxis) {
@@ -9,16 +9,25 @@ public class Linechart {
         this.datapoints = datapoints;
         this.origin = origin;
         this.topyaxis = topyaxis;
-        for (int i = 0; i < datapoints.length; i++) {
+        this.rightxaxis = rightxaxis;
+        minY = datapoints[0].count;
+        maxY = datapoints[0].count;
+        for (int i = 1; i < datapoints.length; i++) {
             if (datapoints[i].count < minY) minY = datapoints[i].count;
             if (datapoints[i].count > maxY) maxY = datapoints[i].count;
         }
     }
+
     void draw () {
-        // Draw function
-        // Circles w/ ellipse function
-        for (int i = 0; i < datapoints.length; i++) {
-            println(datapoints[i].fruit + " " + datapoints[i].count);
+        strokeWeight(2);
+        int ratio = (topyaxis.y - origin.y) / maxY;
+        int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
+        Point prev = new Point(origin.x + sectionWidth / 2, datapoints[0].count * ratio + origin.y);
+        for (int i = 1; i < datapoints.length; i++) {
+            int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+            int y = datapoints[i].count * ratio + origin.y;
+            line(prev.x, prev.y, x, y);
+            prev.setXY(x, y);
         }
     }
 };

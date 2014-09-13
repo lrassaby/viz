@@ -18,12 +18,12 @@ public class Barchart {
         }
     }
     void draw () {
+        int ratio = (topyaxis.y - origin.y) / maxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
         strokeWeight(sectionWidth * 0.8);
         strokeCap(SQUARE);
         for (int i = 0; i < datapoints.length; i++) {
-            int x = origin.x + (sectionWidth * (i + 1)) / 2;
-            int ratio = (topyaxis.y - origin.y) / maxY;
+            int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
             int y = datapoints[i].count * ratio + origin.y;
             line(x, origin.y, x, y);
         }

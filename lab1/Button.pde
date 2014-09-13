@@ -1,6 +1,6 @@
 public class Button {
   boolean isect;
-  Point center, pos; 
+  Point pos; 
   Dimensions dim;
   float roundness;
   color c;
@@ -8,19 +8,15 @@ public class Button {
  
 
   void draw() {
-      boolean selected = button.getIsect();
-      if (selected) { 
-         // DO SOMETHING
-         button.setSelected(false);
-      } 
-
+      strokeWeight(2);
       fill(button.getColor()); 
+      rect(button.pos.x, button.pos.y, button.dim.w, button.dim.h, button.roundness); 
 
-      fill(255);
+      fill(0);
       textSize(12); 
       textAlign(CENTER, CENTER); 
 
-      text(button.getText(), button.center.x, button.center.y);
+      text(button.text, button.pos.x + dim.w / 2, button.pos.y + dim.h / 2);
   }
 
   
@@ -30,7 +26,6 @@ public class Button {
      this.dim = dim;
      this.roundness = roundness;
      this.c = c;
-     this.center = center;
      this.text = text;
   }
 
@@ -75,7 +70,6 @@ public class Button {
   }
 
   boolean getIsect() {return isect;}
-  Point getCenter() {return center;}
   Point getPos() {return pos;}
   Dimensions getDim() {return dim;}
   color getColor() {return c;}
