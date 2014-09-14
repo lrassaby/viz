@@ -1,13 +1,29 @@
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class a1 extends PApplet {
+
 HashMap tree = new HashMap();
 
-void setup () {
+public void setup () {
   frame.setResizable(true);
   size(700, 700);
   
   readInput("hierarchy2.shf");
 }
 
-void readInput(String filename) {
+public void readInput(String filename) {
   String lines[] = loadStrings(filename);
 
   /* takes in leaves */
@@ -43,7 +59,7 @@ void readInput(String filename) {
 }
 
 
-void hashTest() {
+public void hashTest() {
   Node root = null;
   for (Object value : tree.values()) {
       Node v = (Node)value;
@@ -62,8 +78,30 @@ void hashTest() {
       }
       println("");
   }
+    
 }
 
 
 
 
+public class Node {
+    public String name = null;
+    public Node parent = null;
+    public int size;
+    public ArrayList<Node> children = new ArrayList<Node>();
+    boolean isLeaf;
+    public Node(String nm, int sz, boolean lf) {
+      name = nm;
+      size = sz;
+      isLeaf = lf;
+    }
+}
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "a1" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
+    }
+  }
+}
