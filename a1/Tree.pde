@@ -1,6 +1,6 @@
-public class Tree {
-  private ArrayList<Node> leaves;
-  private String[] parents;
+/*public class Tree {
+  public ArrayList<Node> leaves;
+  private ArrayList<Parent>[] parents;
   
   public Tree(int numLeafs, int numRels, String[] leafs,
               int[] size, String[] parents, String[] children) {
@@ -22,14 +22,17 @@ public class Tree {
       }
   }
   
-}
+}*/  
 
 public class Node {
-    public String name;
-    public String parent;
+    public String name = null;
+    public Node parent = null;
     public int size;
-    public Node(String nm, int sz) {
+    public ArrayList<Node> children = new ArrayList<Node>();
+    boolean isChild;
+    public Node(String nm, int sz, boolean chld) {
       name = nm;
       size = sz;
+      isChild = chld;
     }
 }
