@@ -468,7 +468,7 @@ public class Linechart {
         strokeWeight(2);
         float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
-        Point prev = new Point(origin.x + sectionWidth / 2, PApplet.parseInt(datapoints[0].count * ratio) + origin.y);
+        Point prev = new Point(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(datapoints[0].count * ratio) + origin.y);
         drawCircle(prev.x, prev.y, 10);
         for (int i = 1; i < datapoints.length; i++) {
             int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
