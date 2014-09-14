@@ -35,7 +35,6 @@ void readInput() {
   children = new String[numRels];
   int newIndex = numLeafs + 2;
   for (int i = 0; i <= numRels-1; i++) {
-           // println(lines[i + newIndex]);
     temp = split(lines[newIndex + i], ' ');
     parents[i] = temp[0];
     children[i] = temp[1];
@@ -51,50 +50,30 @@ void readInput() {
     par.children.add(chi);
     chi.parent = par;
   }
-  /*
-  for (int i = 0; i <= 76; i++) {
-    if (i == 8) {
-      i = 10;
-    }
-    if (i > 7 && i%10 == 7) {
-      i = i + 3;
-    }
-    Node node = (Node)tree.get(Integer.toString(i));
-    println(i);
-    println("Node: " + node.name);
-    println("Size: " + node.size);
-    println("Leaf?: " + node.isChild);
-    if (i > 0) {
-    println("Parent: " + node.parent.name);}
-    println("Children:");
-    for (int j = 0; j < node.children.size(); j++) {
-      println(node.children.get(j).name);
-    }
-   */
-    
+  hashTest();
+}
+
+
+void hashTest() {
+  Node root = null;
+  for (Object value : tree.values()) {
+      Node v = (Node)value;
+      println("Name: " + v.name);
+      println("Size: " + v.size);
+      Node p = (Node)v.parent;
+      if (p != null) {
+        println("Parent: " + p.name);
+      }
+      println("Children: ");
+      if (!(v.isLeaf)) {
+        for (int i = 1; i < v.children.size(); i++) {
+          Node c = (Node)v.children.get(i);
+          println(c.name);
+        }
+      }
+      println("");
   }
-  
-  //tree = new Tree(numLeafs, numRels, leafs, size, parents, children);
-
-}
     
-
-
-  // draw 2 lines
-  // w/ labels
-  // rotate axes with matrix transforms: pushMatrix, rotate(HALF_PI)
-  // 
-  // For animataion use frameRate() to throttle frames
-  // lerp (linear interpolation)
-  // use wide line rather than rectangle
-
-void draw() {
-  background(200, 200, 200);
-
-}
-
-void mouseClicked() {
-
 }
 
 
