@@ -60,6 +60,7 @@ public void draw() {
   if (hover) {
     fill(255, 0, 0);
     textSize(20);
+    chart.highlightOnHover();
     if (mouseX < (width/2)) {
       textAlign(LEFT, CENTER);
       text(hovertext, mouseX, mouseY - 20);
@@ -104,6 +105,7 @@ public class Barchart {
     Point origin, topyaxis, rightxaxis;
     FruitCount[] datapoints;
     boolean isect;
+    int dataHovered; 
 
     public String intersect (int mousex, int mousey) {
         float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
@@ -118,6 +120,7 @@ public class Barchart {
                 // within the x range
                 if (mousey > y && mousey < origin.y) {
                     // within the y range
+                    dataHovered = i;
                     return "(" + datapoints[i].fruit + ", " + datapoints[i].count + ")";
                 }
             }
@@ -150,6 +153,19 @@ public class Barchart {
             int y = PApplet.parseInt(datapoints[i].count * ratio) + origin.y;
             line(x, origin.y, x, y);
         }
+    }
+
+    public void highlightOnHover() {
+            float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
+            int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
+            
+            int x = origin.x + sectionWidth * dataHovered + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+            int y = PApplet.parseInt(datapoints[dataHovered].count * ratio) + origin.y;
+            stroke(255, 255, 0);
+            strokeWeight(sectionWidth * 0.8f);
+            strokeCap(SQUARE);
+            line(x, origin.y, x, y);
+            stroke(0);
     }
 };
 public class Button {
@@ -301,6 +317,7 @@ public class Chart {
             makeText(Integer.toString(i), origin.x - 10, PApplet.parseInt(i * ratio + origin.y), false);
         }
     }
+
     public void makeText(String str, int x, int y, boolean vert) {      
         if (vert) {
             pushMatrix();
@@ -322,6 +339,13 @@ public class Chart {
         }
     }
 
+    public void highlightOnHover() {
+        if (barchartSelected)
+            barchart.highlightOnHover();
+        if(linechartSelected)
+            linechart.highlightOnHover();
+    }
+    
     public void setup(Table data, Point origin, Point topyaxis, Point rightxaxis) {
         /* get data */
         int i = 0;
@@ -405,6 +429,7 @@ public class Linechart {
     FruitCount[] datapoints;
     boolean isect;
     int radius = 5;
+    int dataHovered;
 
     public String intersect (int mousex, int mousey) {
         float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
@@ -416,6 +441,7 @@ public class Linechart {
             int y = PApplet.parseInt(datapoints[i].count * ratio) + origin.y + 4;
             
             if ((mousex - x) * (mousex - x) + (mousey - y) * (mousey - y) < (radius + 1) * (radius + 1)) {
+                dataHovered = i;
                 return "(" + datapoints[i].fruit + ", " + datapoints[i].count + ")";
             }
         }
@@ -455,6 +481,21 @@ public class Linechart {
 
     public void drawCircle(int x, int y, float diameter) {
         ellipse(x, y, diameter, diameter);
+    }
+
+    public void highlightOnHover() {
+        float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
+        int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
+        Point prev = new Point(origin.x + sectionWidth / 2, PApplet.parseInt(datapoints[0].count * ratio) + origin.y);
+        int x = origin.x + sectionWidth * dataHovered + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+        int y = PApplet.parseInt(datapoints[dataHovered].count * ratio) + origin.y;
+            
+        prev.setXY(x, y);
+        fill(255, 255, 0);
+        stroke(255, 255, 0);
+        drawCircle(prev.x, prev.y, radius * 2);
+        stroke(0);
+        fill(0);
     }
 };
   static public void main(String[] passedArgs) {

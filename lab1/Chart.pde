@@ -68,6 +68,7 @@ public class Chart {
             makeText(Integer.toString(i), origin.x - 10, int(i * ratio + origin.y), false);
         }
     }
+
     void makeText(String str, int x, int y, boolean vert) {      
         if (vert) {
             pushMatrix();
@@ -89,6 +90,13 @@ public class Chart {
         }
     }
 
+    void highlightOnHover() {
+        if (barchartSelected)
+            barchart.highlightOnHover();
+        if(linechartSelected)
+            linechart.highlightOnHover();
+    }
+    
     void setup(Table data, Point origin, Point topyaxis, Point rightxaxis) {
         /* get data */
         int i = 0;

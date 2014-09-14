@@ -3,6 +3,7 @@ public class Barchart {
     Point origin, topyaxis, rightxaxis;
     FruitCount[] datapoints;
     boolean isect;
+    int dataHovered; 
 
     String intersect (int mousex, int mousey) {
         float ratio = float((topyaxis.y - origin.y)) / maxY;
@@ -17,6 +18,7 @@ public class Barchart {
                 // within the x range
                 if (mousey > y && mousey < origin.y) {
                     // within the y range
+                    dataHovered = i;
                     return "(" + datapoints[i].fruit + ", " + datapoints[i].count + ")";
                 }
             }
@@ -49,5 +51,18 @@ public class Barchart {
             int y = int(datapoints[i].count * ratio) + origin.y;
             line(x, origin.y, x, y);
         }
+    }
+
+    void highlightOnHover() {
+            float ratio = float((topyaxis.y - origin.y)) / maxY;
+            int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
+            
+            int x = origin.x + sectionWidth * dataHovered + sectionWidth / 2 + int(sectionWidth * 0.1);
+            int y = int(datapoints[dataHovered].count * ratio) + origin.y;
+            stroke(255, 255, 0);
+            strokeWeight(sectionWidth * 0.8);
+            strokeCap(SQUARE);
+            line(x, origin.y, x, y);
+            stroke(0);
     }
 };
