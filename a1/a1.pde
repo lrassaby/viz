@@ -1,13 +1,29 @@
-HashMap tree = new HashMap();
+import java.util.*;
+
+int[] margins = {50, 50, 50, 50}; // left, top, right, bottom
+Node root;
+HashMap tree;
+
+void draw () {
+  background(255, 255, 255);
+  root.draw(margins[0], width - margins[2], margins[1], height - margins[3]);
+}
 
 void setup () {
   frame.setResizable(true);
   size(700, 700);
   
   readInput("hierarchy2.shf");
+  root = getRoot(tree);
+  int tree_size = preprocessTree(root);
+
+  
+  hashTest();
+  // root.draw();
 }
 
 void readInput(String filename) {
+  tree = new HashMap();
   String lines[] = loadStrings(filename);
 
   /* takes in leaves */
@@ -39,9 +55,46 @@ void readInput(String filename) {
     par.children.add(chi);
     chi.parent = par;
   }
-  hashTest();
 }
 
+
+Node getRoot(HashMap tree) {
+  Node root = null;
+  for (Object value : tree.values()) {
+      Node v = (Node)value;
+      Node p = (Node)v.parent;
+      if (p != null) {
+      } else {
+        root = v;
+      }
+  }
+  return root;
+}
+
+int preprocessTree(Node root) {
+
+  // base case: we're at a leaf
+  if (root.isLeaf) {
+    return root.size;
+  } 
+
+  // recursive case: we have children
+  int tree_size = 0;
+  for (Object childobj : root.children) {
+    Node child = (Node)childobj;
+    tree_size += preprocessTree(child);
+  }
+  root.size = tree_size;
+  // sort children by size
+  Collections.sort(root.children, new Comparator<Node>() {
+    @Override
+    public int compare(Node a, Node b) {
+      return Integer.compare(b.size, a.size);
+    }
+  });
+
+  return tree_size;
+}
 
 void hashTest() {
   Node root = null;
@@ -52,17 +105,21 @@ void hashTest() {
       Node p = (Node)v.parent;
       if (p != null) {
         println("Parent: " + p.name);
+      } else {
+        root = v;
       }
       println("Children: ");
       if (!(v.isLeaf)) {
         for (int i = 0; i < v.children.size(); i++) {
           Node c = (Node)v.children.get(i);
-          println(c.name);
+          println(c.name + " of size " + c.size);
         }
       }
       println("");
   }
 }
+
+
 
 
 

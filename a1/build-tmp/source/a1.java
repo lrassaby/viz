@@ -3,6 +3,8 @@ import processing.data.*;
 import processing.event.*; 
 import processing.opengl.*; 
 
+import java.util.*; 
+
 import java.util.HashMap; 
 import java.util.ArrayList; 
 import java.io.File; 
@@ -14,16 +16,26 @@ import java.io.IOException;
 
 public class a1 extends PApplet {
 
-HashMap tree = new HashMap();
+
+
+Node root;
+HashMap tree;
 
 public void setup () {
   frame.setResizable(true);
   size(700, 700);
   
   readInput("hierarchy2.shf");
+  root = getRoot(tree);
+  int tree_size = preprocessTree(root);
+
+  
+  hashTest();
+  // root.draw();
 }
 
 public void readInput(String filename) {
+  tree = new HashMap();
   String lines[] = loadStrings(filename);
 
   /* takes in leaves */
@@ -55,9 +67,46 @@ public void readInput(String filename) {
     par.children.add(chi);
     chi.parent = par;
   }
-  hashTest();
 }
 
+
+public Node getRoot(HashMap tree) {
+  Node root = null;
+  for (Object value : tree.values()) {
+      Node v = (Node)value;
+      Node p = (Node)v.parent;
+      if (p != null) {
+      } else {
+        root = v;
+      }
+  }
+  return root;
+}
+
+public int preprocessTree(Node root) {
+
+  // base case: we're at a leaf
+  if (root.isLeaf) {
+    return root.size;
+  } 
+
+  // recursive case: we have children
+  int tree_size = 0;
+  for (Object childobj : root.children) {
+    Node child = (Node)childobj;
+    tree_size += preprocessTree(child);
+  }
+  root.size = tree_size;
+  // sort children by size
+  Collections.sort(root.children, new Comparator<Node>() {
+    @Override
+    public int compare(Node a, Node b) {
+      return Integer.compare(b.size, a.size);
+    }
+  });
+
+  return tree_size;
+}
 
 public void hashTest() {
   Node root = null;
@@ -68,22 +117,68 @@ public void hashTest() {
       Node p = (Node)v.parent;
       if (p != null) {
         println("Parent: " + p.name);
+      } else {
+        root = v;
       }
       println("Children: ");
       if (!(v.isLeaf)) {
         for (int i = 0; i < v.children.size(); i++) {
           Node c = (Node)v.children.get(i);
-          println(c.name);
+          println(c.name + " of size " + c.size);
         }
       }
       println("");
   }
-    
 }
 
 
 
 
+
+
+public class Point {
+    int x, y;
+    String disp;
+    Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    public void setXY(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    public void setDisp(String disp) {
+        this.disp = disp;
+    }
+};
+
+public class Dimensions {
+    int w, h;
+    Dimensions(int w, int h) {
+        this.w = w;
+        this.h = h;
+    }
+    public void setWH(int w, int h) {
+        this.w = w;
+        this.h = h;
+    }
+};
+
+public class Line {
+    Point start, end;
+    String disp;
+    Line(Point start, Point end) {
+        this.start = start;
+        this.end = end;
+    }
+    public void draw() {
+        
+    }
+    public void setPoints(Point start, Point end) {
+        this.start = start;
+        this.end = end;
+    }
+};
 public class Node {
     public String name = null;
     public Node parent = null;
@@ -95,6 +190,7 @@ public class Node {
       size = sz;
       isLeaf = lf;
     }
+    // draw function here, recursing on children
 }
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "a1" };
