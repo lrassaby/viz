@@ -22,23 +22,23 @@ public class Node {
       float height = corners[YMAX] - corners[YMIN];
       float canvas_size = width * height;
       float VA_ratio = total_magnitude / canvas_size;
-      Node to_draw = elements[0];
+      Node to_draw = elements.get(0);
       boolean worse = false;
-      float tempheight, tempwidth;
       if (width > height) {
             dim1 = height, dim2 = (to_draw.size / total_magnitude) * width;
       } else {
             dim1 = width, dim2 = (to_draw.size / total_magnitude) * height;      
       }
       float old_aspect_ratio = dim2 / dim1;
+      if (old_aspect_ratio < 0) old_aspect_ratio = 1/old_aspect_ratio;
+      
       float old_size = to_draw.size;
       int i = 1;
       float newdim1;
       float newdim2;
       int used_magnitudes = 0;
-      ArrayList<Node> draw_boxes = new ArrayList<Node>(); //boxes to be passed into make row
+      ArrayList<Node> draw_boxes = new ArrayList<Node>(); //boxes to be passed into makeRow or makeCol
       
-      // fill row or column
       while (!worse) {
         to_draw = elements.get(i);
         newdim1 = (to_draw.size * height)/(to_draw.size + old_size);
@@ -61,8 +61,10 @@ public class Node {
 
     }
 
-    public void makeRow(ArrayList<Node> boxes, int height) {
-       
+    private void makeRow(ArrayList<Node> elements, int[] corners, int total_magnitude) { 
+    }
+
+    private void makeCol(ArrayList<Node> elements, int[] corners, int total_magnitude) {
     }
 
 
