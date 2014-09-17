@@ -23,24 +23,46 @@ public class Node {
       float canvas_size = width * height;
       float VA_ratio = total_magnitude / canvas_size;
       Node to_draw = elements[0];
-
-      // fill row or column
-      while () {
-        if (width > height) {
-            float tempheight = height, tempwidth = (to_draw.size / total_magnitude) * width;
-        } else {
-            float tempheight = height, tempwidth = (to_draw.size / total_magnitude) * width;
-            float aspect_ratio = width / height;
-        }
-        float aspect_ratio = width / height;
+      boolean worse = false;
+      float tempheight, tempwidth;
+      if (width > height) {
+            dim1 = height, dim2 = (to_draw.size / total_magnitude) * width;
+      } else {
+            dim1 = width, dim2 = (to_draw.size / total_magnitude) * height;      
       }
+      float old_aspect_ratio = dim2 / dim1;
+      float old_size = to_draw.size;
+      int i = 1;
+      float newdim1;
+      float newdim2;
+      int used_magnitudes = 0;
+      ArrayList<Node> draw_boxes = new ArrayList<Node>(); //boxes to be passed into make row
+      
+      // fill row or column
+      while (!worse) {
+        to_draw = elements.get(i);
+        newdim1 = (to_draw.size * height)/(to_draw.size + old_size);
+        newdim2 = to_draw.size/newdim1;
+        float new_aspect_ratio = newdim1/newdim2;
+        if (new_aspect_ratio > 1) {new_aspect_ratio = 1/new_aspect_ratio;}
+        if (new_aspect_ratio < old_aspect_ratio) {worse = true;}
+        else {
+          old_aspect_ratio = new_aspect_ratio;
+          used_magnitudes += to_draw.size;
+          draw_boxes.add(elements.get(i)); // add box to row
+          elements.remove(i); // deletes box??
+        }
+      }
+      
+      int[] new_corners = {newdim2, width, 0, height}
+      drawElements(elements, new_corners, total_magnitude - used_magnitudes);
 
       // recurse on the remaining elements
 
     }
 
-    public void makeRectangle() {
-
+    public void makeRow(ArrayList<Node> boxes, int height) {
+       
     }
 
 
