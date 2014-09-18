@@ -6,7 +6,8 @@ HashMap tree;
 
 void draw () {
   background(255, 255, 255);
-  root.draw(margins[0], width - margins[2], margins[1], height - margins[3]);
+  int[] corners = {margins[0], width - margins[2], margins[1], height - margins[3]};
+  root.draw(corners);
 }
 
 void setup () {
