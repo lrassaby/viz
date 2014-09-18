@@ -1,67 +1,130 @@
 public class Node {
-    public String name = null;
-    public Node parent = null;
-    public int size;
-    private static final int XMIN = 0, XMAX = 1, YMIN = 2, YMAX = 3;
-    public ArrayList<Node> children = new ArrayList<Node>();
-    boolean isLeaf;
-    public float x, y, d_short, d_long;
-    public Node(String nm, int sz, boolean lf) {
-      name = nm;
-      size = sz;
-      isLeaf = lf;
-    }
-    
-    // draw function here, recursing on children
-    void draw (Canvas canvas) { // xmin, xmax, ymin, ymax
+  public String name = null;
+  public Node parent = null;
+  public int size;
+  private static final int XMIN = 0, XMAX = 1, YMIN = 2, YMAX = 3;
+  public ArrayList<Node> children = new ArrayList<Node>();
+  boolean isLeaf;
+  public float x, y, d_short, d_long;
+  public Node(String nm, int sz, boolean lf) {
+    name = nm;
+    size = sz;
+    isLeaf = lf;
+  }
+  
+
+  // draw function for first element
+  void draw (Canvas canvas) { // xmin, xmax, ymin, ymax
+    ArrayList<Rect> root_arraylist = new ArrayList<Rect>();
+    root_arraylist.add(new Rect(canvas.getShortSide(), canvas.getLongSide(), name));
+    drawSide(root_arraylist, canvas);
+    drawChildren(canvas);
+  }
+
+
+  private void drawChildren(Canvas canvas) {
+    if (!isLeaf && children.size() > 0) {
       drawElements(children, canvas, size, 0);
     }
+  }
 
-    private void drawElements(ArrayList<Node> elements, Canvas canvas, int total_magnitude,
-                              int index) {
-      ArrayList<Node> side = new ArrayList<Node>(elements.get(0));
-      ArrayList<Rect> oldSide = NULL;
-      ArrayList<Rect> newSide = NULL;
-      boolean worse = false;
-      int i = 1;
+  private void drawElements(ArrayList<Node> elements, Canvas canvas, int total_magnitude,
+                            int index) {
+    ArrayList<Node> side = new ArrayList<Node>();
+    ArrayList<Rect> oldSide = null;
+    ArrayList<Rect> newSide = null;
+    boolean worse = false;
+    float used_magnitude = elements.get(index).size;
 
-      do {
-        oldSide = newSide;
-        newSide = assembleSide(canvas.size/total_magnitude, canvas.shortside, side);
-        if (oldSide != NULL) {
-          Rect temp_new = newSide.get(newSide.size - 2);
-          Rect temp_old = oldSide.get(oldSide.size - 1); 
-          if (temp_new.getAspectRatio() < temp_old.getAspectRatio())
-            worse = true;
-        }
-        i++;
+
+    do {
+      side.add(elements.get(index++));
+      oldSide = newSide;
+      newSide = assembleSide(canvas.size()/(float)total_magnitude, canvas.getShortSide(), side);
+      if (oldSide != null) {
+        /* does the aspect ratio get worse? */
+        Rect new_rectangle = newSide.get(newSide.size() - 1); // changed from newSide.size - 2, because we're actually comparing c2's aspect ratio to c1's according to remco
+        Rect old_rectangle = oldSide.get(oldSide.size() - 1); 
+
+        if (new_rectangle.getAspectRatio() > old_rectangle.getAspectRatio()) {
+          // keep the change
+          used_magnitude += elements.get(index - 1).size; 
+        } else {
+          index--;
+          worse = true;
+          drawSide(oldSide, canvas);
+          
+
+          // TODO: condense
+          float x = canvas.x;
+          float y = canvas.y;
+          for (int i = 0; i < side.size() - 1; i++) {
+            float w = canvas.w <= canvas.h ? oldSide.get(i).d_short : oldSide.get(i).d_long;
+            float h = canvas.w <= canvas.h ? oldSide.get(i).d_long : oldSide.get(i).d_short;
+            side.get(i).draw(new Canvas(x, y, w, h));
+            if (canvas.w <= canvas.h) {
+              x += w;
+            } else {
+              y += h;
+            }
+          }
+        } 
       }
-      while (!worse);
+      if (index >= elements.size()) { // if the last child improves the aspect ratio
+        drawSide(newSide, canvas);
 
+
+        // TODO: condense
+        float x = canvas.x;
+        float y = canvas.y;
+        for (int i = 0; i < side.size(); i++) {
+          float w = canvas.w <= canvas.h ? newSide.get(i).d_short : newSide.get(i).d_long;
+          float h = canvas.w <= canvas.h ? newSide.get(i).d_long : newSide.get(i).d_short;
+          side.get(i).draw(new Canvas(x, y, w, h));
+          if (canvas.w <= canvas.h) {
+            x += w;
+          } else {
+            y += h;
+          }
+        }
+
+        return;
+      }
     }
-    //ratio is the proportion of the canvas that the side should take up
-    private ArrayList<Rect> assembleSide(float ratio, float shortside, ArrayList<Node> nodes) {
-         
+    while (!worse);
+
+    float x_offset = canvas.w <= canvas.h ? oldSide.get(0).d_long : 0;
+    float y_offset = canvas.w <= canvas.h ? 0 : oldSide.get(0).d_long;
+
+    drawElements(elements, new Canvas(canvas.x + x_offset,
+                                      canvas.y + y_offset,
+                                      canvas.w - x_offset,
+                                      canvas.h - y_offset),
+                (int) total_magnitude - (int) used_magnitude, index);
+  }
+
+  //ratio is the proportion of the canvas that the side should take up
+  private ArrayList<Rect> assembleSide(float ratio, float short_side, ArrayList<Node> nodes) {
+    ArrayList<Rect> side = new ArrayList<Rect>();
+    for (Node n : nodes) {
+      side.add(new Rect(short_side, n.size*ratio/short_side, n.name));
     }
+    return side;
+  }
+
+  private void drawSide(ArrayList<Rect> rectangles, Canvas canvas) {
+    float x = canvas.x;
+    float y = canvas.y;
+
+    for (Rect r : rectangles) {
+      float w = canvas.w <= canvas.h ? r.d_short : r.d_long;
+      float h = canvas.w <= canvas.h ? r.d_long : r.d_short;
+      rect(x, y, w, h);
+      if (canvas.w <= canvas.h) {
+        x += w;
+      } else {
+        y += h;
+      }
+    }
+  }
 }
-
-
-      // float VA_ratio = canvas.size/total_magnitude;
-      // float used_magnitude = 0;
-      // boolean worse = false;
-      // Node c1 = elements.get(index);
-      // float c1_ratio = 0;
-      // c1.d_short = canvas.short_side;
-      // c1.d_long = (float)c1.size*VA_ratio/canvas.short_side;
-      // c1_ratio = c1.d_short/c1.d_long;
-      // used_magnitude = c1.size;
-
-      // int i = index + 1;
-      // while (!worse) {
-      //   Node c2 = elements.get(i);
-        
-        
-        
-        
-      //   i++;
-      // }

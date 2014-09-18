@@ -6,20 +6,16 @@ HashMap tree;
 
 void draw () {
   background(255, 255, 255);
-  root.draw(new Canvas(margins[0], margins[1],width - margins[2], height - margins[3]);
+  root.draw(new Canvas(margins[0], margins[1], width - margins[2] - margins[0], height - margins[3] - margins[1]));
 }
 
 void setup () {
   frame.setResizable(true);
   size(700, 700);
   
-  readInput("hierarchy2.shf");
+  readInput("hierarchy3.shf");
   root = getRoot(tree);
   int tree_size = preprocessTree(root);
-
-  
-  //hashTest();
-  root.draw();
 }
 
 void readInput(String filename) {
