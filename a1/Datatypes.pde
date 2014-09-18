@@ -41,3 +41,18 @@ public class Line {
         this.end = end;
     }
 };
+
+public class Rect {
+    float d_short, d_long;
+    float x, y; 
+    Rect(float d_short, float d_long) {
+        this.d_short = d_short;
+        this.d_long = d_long;
+    }
+    float getAspectRatio() {
+        float aspect_ratio = d_short / d_long;
+        if (aspect_ratio > 1)
+            aspect_ratio = 1 / aspect_ratio;
+        return aspect_ratio;
+    }
+};

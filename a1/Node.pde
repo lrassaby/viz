@@ -19,63 +19,49 @@ public class Node {
 
     private void drawElements(ArrayList<Node> elements, Canvas canvas, int total_magnitude,
                               int index) {
-      float VA_ratio = canvas.size/total_magnitude;
-      float used_magnitude = 0;
+      ArrayList<Node> side = new ArrayList<Node>(elements.get(0));
+      ArrayList<Rect> oldSide = NULL;
+      ArrayList<Rect> newSide = NULL;
       boolean worse = false;
-      Node c1 = elements.get(index);
-      float c1_ratio = 0;
-      c1.d_short = canvas.short_side;
-      c1.d_long = (float)c1.size*VA_ratio/canvas.short_side;
-      c1_ratio = c1.d_short/c1.d_long;
-      used_magnitude = c1.size;
+      int i = 1;
 
-      int i = index + 1;
-      while (!worse) {
-        Node c2 = elements.get(i);
-        
-        
-        
-        
+      do {
+        oldSide = newSide;
+        newSide = assembleSide(canvas.size/total_magnitude, canvas.shortside, side);
+        if (oldSide != NULL) {
+          Rect temp_new = newSide.get(newSide.size - 2);
+          Rect temp_old = oldSide.get(oldSide.size - 1); 
+          if (temp_new.getAspectRatio() < temp_old.getAspectRatio())
+            worse = true;
+        }
         i++;
       }
-        
-        
-        
-        /*float old_size = to_draw.size;
-        int i = 1;
-        float new_shortside;
-        float new_longside;
-        int used_magnitudes = 0;
-        ArrayList<Node> draw_boxes = new ArrayList<Node>(); //boxes to be passed into makeRow or makeCol
-      
-      while (!worse) {
-        to_draw = elements.get(i);
-        new_shortside = ((float)to_draw.size * h)/((float)to_draw.size + old_size);
-        new_longside = (float)to_draw.size/new_shortside;
-        float new_aspect_ratio = new_shortside/new_longside;
-        if (new_aspect_ratio > 1) {new_aspect_ratio = 1/new_aspect_ratio;}
-        if (new_aspect_ratio < old_aspect_ratio) {worse = true;}
-        else {
-          old_aspect_ratio = new_aspect_ratio;
-          used_magnitudes += (float)to_draw.size;
-          draw_boxes.add(elements.get(i)); // add box to row
-          elements.remove(i); // deletes box??
-        }
-      }
-      
-    float[] new_corners = {new_longside, w, 0, h};
-      drawElements(elements, new_corners, total_magnitude - used_magnitudes);
-
-      // recurse on the remaining elements*/
+      while (!worse);
 
     }
-
-    private void makeRow(ArrayList<Node> elements, int[] corners, int total_magnitude) { 
+    //ratio is the proportion of the canvas that the side should take up
+    private ArrayList<Rect> assembleSide(float ratio, float shortside, ArrayList<Node> nodes) {
+         
     }
-
-    private void makeCol(ArrayList<Node> elements, int[] corners, int total_magnitude) {
-    }
-
-
 }
 
+
+      // float VA_ratio = canvas.size/total_magnitude;
+      // float used_magnitude = 0;
+      // boolean worse = false;
+      // Node c1 = elements.get(index);
+      // float c1_ratio = 0;
+      // c1.d_short = canvas.short_side;
+      // c1.d_long = (float)c1.size*VA_ratio/canvas.short_side;
+      // c1_ratio = c1.d_short/c1.d_long;
+      // used_magnitude = c1.size;
+
+      // int i = index + 1;
+      // while (!worse) {
+      //   Node c2 = elements.get(i);
+        
+        
+        
+        
+      //   i++;
+      // }
