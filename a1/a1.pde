@@ -6,8 +6,7 @@ HashMap tree;
 
 void draw () {
   background(255, 255, 255);
-  int[] corners = {margins[0], width - margins[2], margins[1], height - margins[3]};
-  root.draw(corners);
+  root.draw(new Canvas(margins[0], margins[1],width - margins[2], height - margins[3]);
 }
 
 void setup () {
@@ -19,8 +18,8 @@ void setup () {
   int tree_size = preprocessTree(root);
 
   
-  hashTest();
-  // root.draw();
+  //hashTest();
+  root.draw();
 }
 
 void readInput(String filename) {
