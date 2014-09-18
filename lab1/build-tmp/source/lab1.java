@@ -61,6 +61,7 @@ public void draw() {
     fill(255, 0, 0);
     textSize(20);
     chart.highlightOnHover();
+    fill(255, 0, 0);
     if (mouseX < (width/2)) {
       textAlign(LEFT, CENTER);
       text(hovertext, mouseX, mouseY - 20);
