@@ -15,11 +15,17 @@ public class Tree {
     }
 
     public void draw () {
+        Canvas canvas = new Canvas(margins[0], margins[1], 
+            width - margins[2] - margins[0], height - margins[3] - margins[1]);
         if (clicked) {
-            respondToClick();
+            if (mouseX >= canvas.x && mouseX <= canvas.x + canvas.w && 
+                mouseY >= canvas.y && mouseY <= canvas.y + canvas.h) {
+                respondToClick();
+            } else {
+                clicked = false;
+            }
         }
-        root.draw(new Canvas(margins[0], margins[1], 
-            width - margins[2] - margins[0], height - margins[3] - margins[1]));
+        root.draw(canvas);
     }
 
     public void levelUp() {
