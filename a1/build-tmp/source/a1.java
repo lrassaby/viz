@@ -216,13 +216,14 @@ public class Node {
     ArrayList<Rect> oldSide = null;
     ArrayList<Rect> newSide = null;
     boolean worse = false;
-    float used_magnitude = elements.get(index).size;
+    float used_magnitude = 0;
 
 
     do {
+      used_magnitude += elements.get(index).size; 
       side.add(elements.get(index++));
       oldSide = newSide;
-      newSide = assembleSide(canvas.size()/(float)total_magnitude, canvas.getShortSide(), side);
+      newSide = assembleSide(canvas.size()/(float)total_magnitude, canvas.getShortSide(), side, used_magnitude);
       if (oldSide != null) {
         /* does the aspect ratio get worse? */
         Rect new_rectangle = newSide.get(newSide.size() - 1); // changed from newSide.size - 2, because we're actually comparing c2's aspect ratio to c1's according to remco
@@ -230,10 +231,11 @@ public class Node {
 
         if (new_rectangle.getAspectRatio() > old_rectangle.getAspectRatio()) {
           // keep the change
-          used_magnitude += elements.get(index - 1).size; 
         } else {
           index--;
+          used_magnitude -= elements.get(index).size;
           worse = true;
+          //println("drawing oldside of size " + oldSide.size());
           drawSide(oldSide, canvas);
 
           // TODO: condense
@@ -277,20 +279,24 @@ public class Node {
     float x_offset = canvas.w <= canvas.h ? oldSide.get(0).d_long : 0;
     float y_offset = canvas.w <= canvas.h ? 0 : oldSide.get(0).d_long;
 
-    drawElements(elements, new Canvas(canvas.x + x_offset,
-                                      canvas.y + y_offset,
-                                      canvas.w - x_offset,
-                                      canvas.h - y_offset),
-                (int) total_magnitude - (int) used_magnitude, index);
+    // drawElements(elements, new Canvas(canvas.x + x_offset,
+    //                                   canvas.y + y_offset,
+    //                                   canvas.w - x_offset,
+    //                                   canvas.h - y_offset),
+    //             (int) total_magnitude - (int) used_magnitude, index);
 
   }
 
   //ratio is the proportion of the canvas that the side should take up
-  private ArrayList<Rect> assembleSide(float ratio, float short_side, ArrayList<Node> nodes) {
+  private ArrayList<Rect> assembleSide(float ratio, float short_side, ArrayList<Node> nodes, float magnitude) {
+    if (nodes.size() == 1) {
+      println("magnitude: " + magnitude);
+    }
     ArrayList<Rect> side = new ArrayList<Rect>();
     for (Node n : nodes) {
-      float long_side = n.size * ratio/short_side;
-      side.add(new Rect(short_side, long_side, n.name));
+      float n_short_side = (n.size/ magnitude) * short_side;
+      float n_long_side = n.size * ratio/n_short_side;
+      side.add(new Rect(n_short_side, n_long_side, n.name));
     }
     return side;
   }
