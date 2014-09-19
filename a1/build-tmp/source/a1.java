@@ -193,6 +193,7 @@ public class Node {
     size = sz;
     isLeaf = lf;
   }
+  private float spacing = 5;
   
 
   // draw function for first element
@@ -243,7 +244,7 @@ public class Node {
           for (int i = 0; i < side.size() - 1; i++) {
             float w = canvas.w <= canvas.h ? oldSide.get(i).d_short : oldSide.get(i).d_long;
             float h = canvas.w <= canvas.h ? oldSide.get(i).d_long : oldSide.get(i).d_short;
-            side.get(i).draw(new Canvas(x, y, w, h));
+            side.get(i).draw(new Canvas(x + spacing, y + spacing, w - 2 * spacing, h - 2 * spacing));
             if (canvas.w <= canvas.h) {
               x += w;
             } else {
