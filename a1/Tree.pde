@@ -41,11 +41,8 @@ public class Tree {
         }
     }
 
-    public void setIntersect(String name, boolean val) {
-        Node node = (Node) tree.get(name);
-        if (node != null) {
-            node.intersect = val;
-        }
+    public Node getNode(String name) {
+        return (Node)tree.get(name);
     }
 
     private void respondToClick() {

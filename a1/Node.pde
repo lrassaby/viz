@@ -67,7 +67,7 @@ public class Node {
           for (int i = 0; i < side.size() - 1; i++) {
             float w = canvas.w <= canvas.h ? oldSide.get(i).d_short : oldSide.get(i).d_long;
             float h = canvas.w <= canvas.h ? oldSide.get(i).d_long : oldSide.get(i).d_short;
-            side.get(i).draw(new Canvas(x + spacing, y + spacing, w - 2 * spacing, h - 2 * spacing));
+            side.get(i).draw(new Canvas(x, y, w, h));
             if (canvas.w <= canvas.h) {
               x += w;
             } else {
@@ -86,7 +86,7 @@ public class Node {
         for (int i = 0; i < side.size(); i++) {
           float w = canvas.w <= canvas.h ? newSide.get(i).d_short : newSide.get(i).d_long;
           float h = canvas.w <= canvas.h ? newSide.get(i).d_long : newSide.get(i).d_short;
-          side.get(i).draw(new Canvas(x + spacing, y + spacing, w - 2 * spacing, h - 2 * spacing));
+          side.get(i).draw(new Canvas(x, y, w, h));
           if (canvas.w <= canvas.h) {
             x += w;
           } else {
@@ -131,12 +131,13 @@ public class Node {
       float w = canvas.w <= canvas.h ? r.d_short : r.d_long;
       float h = canvas.w <= canvas.h ? r.d_long : r.d_short;
 
+      Node n = tree.getNode(r.name);
       if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
         fill(200, 200, 255);
-        tree.setIntersect(r.name, true);
+        n.intersect = true;
       } else {
         fill(230);
-        tree.setIntersect(r.name, false);
+        n.intersect = false;
       }
       stroke(0);
       rect(x, y, w, h);
