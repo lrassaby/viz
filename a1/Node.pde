@@ -126,7 +126,7 @@ public class Node {
       float w = canvas.w <= canvas.h ? r.d_short : r.d_long;
       float h = canvas.w <= canvas.h ? r.d_long : r.d_short;
 
-      fill(200);
+      fill(230);
       rect(x, y, w, h);
 
       fill(0);
