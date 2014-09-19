@@ -31,7 +31,7 @@ public void setup () {
   frame.setResizable(true);
   size(700, 700);
   
-  readInput("hierarchy3.shf");
+  readInput("hierarchy4.shf");
   root = getRoot(tree);
   int tree_size = preprocessTree(root);
 }
@@ -235,7 +235,6 @@ public class Node {
           index--;
           worse = true;
           drawSide(oldSide, canvas);
-          
 
           // TODO: condense
           float x = canvas.x;
@@ -283,13 +282,15 @@ public class Node {
                                       canvas.w - x_offset,
                                       canvas.h - y_offset),
                 (int) total_magnitude - (int) used_magnitude, index);
+
   }
 
   //ratio is the proportion of the canvas that the side should take up
   private ArrayList<Rect> assembleSide(float ratio, float short_side, ArrayList<Node> nodes) {
     ArrayList<Rect> side = new ArrayList<Rect>();
     for (Node n : nodes) {
-      side.add(new Rect(short_side, n.size*ratio/short_side, n.name));
+      float long_side = n.size * ratio/short_side;
+      side.add(new Rect(short_side, long_side, n.name));
     }
     return side;
   }
@@ -301,6 +302,7 @@ public class Node {
     for (Rect r : rectangles) {
       float w = canvas.w <= canvas.h ? r.d_short : r.d_long;
       float h = canvas.w <= canvas.h ? r.d_long : r.d_short;
+
       rect(x, y, w, h);
       if (canvas.w <= canvas.h) {
         x += w;
