@@ -11,7 +11,7 @@ public class Node {
     size = sz;
     isLeaf = lf;
   }
-  private float spacing = 5;
+  private float spacing = 3;
   
 
   // draw function for first element
@@ -19,7 +19,8 @@ public class Node {
     ArrayList<Rect> root_arraylist = new ArrayList<Rect>();
     root_arraylist.add(new Rect(canvas.getShortSide(), canvas.getLongSide(), name));
     drawSide(root_arraylist, canvas);
-    drawChildren(canvas);
+    Canvas newcanvas = new Canvas(canvas.x + spacing, canvas.y + spacing, canvas.w - 2 * spacing, canvas.h - 2 * spacing);
+    drawChildren(newcanvas);
   }
 
 
