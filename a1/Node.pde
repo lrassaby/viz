@@ -81,7 +81,7 @@ public class Node {
         for (int i = 0; i < side.size(); i++) {
           float w = canvas.w <= canvas.h ? newSide.get(i).d_short : newSide.get(i).d_long;
           float h = canvas.w <= canvas.h ? newSide.get(i).d_long : newSide.get(i).d_short;
-          side.get(i).draw(new Canvas(x, y, w, h));
+          side.get(i).draw(new Canvas(x + spacing, y + spacing, w - 2 * spacing, h - 2 * spacing));
           if (canvas.w <= canvas.h) {
             x += w;
           } else {
