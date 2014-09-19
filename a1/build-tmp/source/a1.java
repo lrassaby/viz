@@ -110,29 +110,9 @@ public int preprocessTree(Node root) {
   return tree_size;
 }
 
-public void hashTest() {
-  Node root = null;
-  for (Object value : tree.values()) {
-      Node v = (Node)value;
-      println("Name: " + v.name);
-      println("Size: " + v.size);
-      Node p = (Node)v.parent;
-      if (p != null) {
-        println("Parent: " + p.name);
-      } else {
-        root = v;
-      }
-      println("Children: ");
-      if (!(v.isLeaf)) {
-        for (int i = 0; i < v.children.size(); i++) {
-          Node c = (Node)v.children.get(i);
-          println(c.name + " of size " + c.size);
-        }
-      }
-      println("");
-  }
+public void mouseClicked () {
+  
 }
-
 
 
 
@@ -193,7 +173,7 @@ public class Node {
     size = sz;
     isLeaf = lf;
   }
-  private float spacing = 2;
+  private float spacing = 5;
   
 
   // draw function for first element
@@ -308,10 +288,16 @@ public class Node {
       float w = canvas.w <= canvas.h ? r.d_short : r.d_long;
       float h = canvas.w <= canvas.h ? r.d_long : r.d_short;
 
-      fill(230);
+      if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
+        fill(200, 200, 255);
+      } else {
+        fill(230);
+      }
+      stroke(0);
       rect(x, y, w, h);
 
       fill(0);
+      stroke(0);
       textSize(12); 
       textAlign(CENTER, CENTER); 
 

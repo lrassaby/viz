@@ -92,29 +92,9 @@ int preprocessTree(Node root) {
   return tree_size;
 }
 
-void hashTest() {
-  Node root = null;
-  for (Object value : tree.values()) {
-      Node v = (Node)value;
-      println("Name: " + v.name);
-      println("Size: " + v.size);
-      Node p = (Node)v.parent;
-      if (p != null) {
-        println("Parent: " + p.name);
-      } else {
-        root = v;
-      }
-      println("Children: ");
-      if (!(v.isLeaf)) {
-        for (int i = 0; i < v.children.size(); i++) {
-          Node c = (Node)v.children.get(i);
-          println(c.name + " of size " + c.size);
-        }
-      }
-      println("");
-  }
+void mouseClicked () {
+  
 }
-
 
 
 
