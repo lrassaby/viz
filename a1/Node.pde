@@ -126,7 +126,15 @@ public class Node {
       float w = canvas.w <= canvas.h ? r.d_short : r.d_long;
       float h = canvas.w <= canvas.h ? r.d_long : r.d_short;
 
+      fill(200);
       rect(x, y, w, h);
+
+      fill(0);
+      textSize(12); 
+      textAlign(CENTER, CENTER); 
+
+      text(r.name, x + w / 2, y + h / 2);
+
       if (canvas.w <= canvas.h) {
         x += w;
       } else {
