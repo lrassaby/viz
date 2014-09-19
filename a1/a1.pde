@@ -13,7 +13,7 @@ void setup () {
   frame.setResizable(true);
   size(700, 700);
   
-  readInput("hierarchy4.shf");
+  readInput("hierarchy2.shf");
   root = getRoot(tree);
   int tree_size = preprocessTree(root);
 }

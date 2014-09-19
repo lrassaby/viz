@@ -31,7 +31,7 @@ public void setup () {
   frame.setResizable(true);
   size(700, 700);
   
-  readInput("hierarchy4.shf");
+  readInput("hierarchy2.shf");
   root = getRoot(tree);
   int tree_size = preprocessTree(root);
 }
@@ -235,7 +235,6 @@ public class Node {
           index--;
           used_magnitude -= elements.get(index).size;
           worse = true;
-          //println("drawing oldside of size " + oldSide.size());
           drawSide(oldSide, canvas);
 
           // TODO: condense
@@ -253,9 +252,9 @@ public class Node {
           }
         } 
       }
+
       if (index >= elements.size()) { // if the last child improves the aspect ratio
         drawSide(newSide, canvas);
-
 
         // TODO: condense
         float x = canvas.x;
@@ -276,26 +275,25 @@ public class Node {
     }
     while (!worse);
 
-    float x_offset = canvas.w <= canvas.h ? oldSide.get(0).d_long : 0;
-    float y_offset = canvas.w <= canvas.h ? 0 : oldSide.get(0).d_long;
+    float x_offset = canvas.w <= canvas.h ? 0 : oldSide.get(0).d_long;
+    float y_offset = canvas.w <= canvas.h ? oldSide.get(0).d_long : 0;
 
-    // drawElements(elements, new Canvas(canvas.x + x_offset,
-    //                                   canvas.y + y_offset,
-    //                                   canvas.w - x_offset,
-    //                                   canvas.h - y_offset),
-    //             (int) total_magnitude - (int) used_magnitude, index);
+    Canvas newcanvas = new Canvas(canvas.x + x_offset,
+                               canvas.y + y_offset,
+                               canvas.w - x_offset,
+                               canvas.h - y_offset);
+    // println("new canvas starting at (" + newcanvas.x + ", " + newcanvas.y + "), with dimensions (" + newcanvas.w + ", " + newcanvas.h + ")");
+    drawElements(elements, newcanvas, (int) total_magnitude - (int) used_magnitude, index);
 
   }
 
   //ratio is the proportion of the canvas that the side should take up
   private ArrayList<Rect> assembleSide(float ratio, float short_side, ArrayList<Node> nodes, float magnitude) {
-    if (nodes.size() == 1) {
-      println("magnitude: " + magnitude);
-    }
     ArrayList<Rect> side = new ArrayList<Rect>();
     for (Node n : nodes) {
       float n_short_side = (n.size/ magnitude) * short_side;
       float n_long_side = n.size * ratio/n_short_side;
+
       side.add(new Rect(n_short_side, n_long_side, n.name));
     }
     return side;
