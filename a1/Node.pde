@@ -11,7 +11,7 @@ public class Node {
     size = sz;
     isLeaf = lf;
   }
-  private float spacing = 5;
+  private float spacing = 2;
   
 
   // draw function for first element
