@@ -1,15 +1,19 @@
 public class Node {
+  public Tree tree;
   public String name = null;
   public Node parent = null;
   public int size;
+  public boolean intersect = false;
+
   private static final int XMIN = 0, XMAX = 1, YMIN = 2, YMAX = 3;
   public ArrayList<Node> children = new ArrayList<Node>();
   boolean isLeaf;
   public float x, y, d_short, d_long;
-  public Node(String nm, int sz, boolean lf) {
+  public Node(String nm, int sz, boolean lf, Tree tr) {
     name = nm;
     size = sz;
     isLeaf = lf;
+    tree = tr;
   }
   private float spacing = 3;
   
@@ -129,8 +133,10 @@ public class Node {
 
       if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
         fill(200, 200, 255);
+        tree.setIntersect(r.name, true);
       } else {
         fill(230);
+        tree.setIntersect(r.name, false);
       }
       stroke(0);
       rect(x, y, w, h);

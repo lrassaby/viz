@@ -1,3 +1,4 @@
+import java.util.*;
 public class Tree {
     private Node root;
     private HashMap tree;
@@ -7,7 +8,6 @@ public class Tree {
         readInput(filename);
         root = getRoot(tree);
         preprocessTree(root);
-
     }
 
     public void setClicked (boolean val){
@@ -15,6 +15,9 @@ public class Tree {
     }
 
     public void draw () {
+        if (clicked) {
+            respondToClick();
+        }
         root.draw(new Canvas(margins[0], margins[1], 
             width - margins[2] - margins[0], height - margins[3] - margins[1]));
     }
@@ -22,6 +25,34 @@ public class Tree {
     public void levelUp() {
         if (root.parent != null) {
             root = root.parent;
+        }
+    }
+
+    public void setRoot(String rootname) {
+        Node tryroot = (Node) tree.get(rootname);
+        if (tryroot != null) {
+            root = tryroot;
+        }
+    }
+
+    public void setIntersect(String name, boolean val) {
+        Node node = (Node) tree.get(name);
+        if (node != null) {
+            node.intersect = val;
+        }
+    }
+
+    private void respondToClick() {
+        if (root.isLeaf) {
+            clicked = false;
+        } else {
+            for (Node n : root.children) {
+                // println(n.name);
+                if (n.intersect) {
+                    root = n;
+                    clicked = false;
+                }
+            }
         }
     }
 
@@ -35,7 +66,7 @@ public class Tree {
         String[] temp = split(lines[i], ' ');
         // temp[0] is the name of the node
         // temp[1] is its size
-        tree.put(temp[0], new Node(temp[0], parseInt(temp[1]), true));
+        tree.put(temp[0], new Node(temp[0], parseInt(temp[1]), true, this));
       }
 
       /* take in relationships */
@@ -45,10 +76,10 @@ public class Tree {
         // temp[0] is the name of the parent
         // temp[1] is the name of the child
         if (!(tree.containsKey(temp[0]))) { // tree doesn't have the parent
-          tree.put(temp[0], new Node(temp[0], 0, false)); // add the parent
+          tree.put(temp[0], new Node(temp[0], 0, false, this)); // add the parent
         }
         if (!(tree.containsKey(temp[1]))) { // tree doesn't have the child
-          tree.put(temp[1], new Node(temp[1], 0, false)); // add the child (size 0)
+          tree.put(temp[1], new Node(temp[1], 0, false, this)); // add the child (size 0)
         }
 
         /* add the child to the parent and the parent to the child */

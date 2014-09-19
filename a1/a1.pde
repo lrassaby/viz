@@ -1,6 +1,3 @@
-import java.util.*;
-
-
 Tree tree;
 
 void draw () {
