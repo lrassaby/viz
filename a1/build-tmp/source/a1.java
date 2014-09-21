@@ -626,15 +626,11 @@ public class CSVTree implements SquarifiedChart {
     }
 
     private void drawHoverText() {
-      fill(0, 150, 150);
-      textSize(20);
-      if (mouseX < (width/2)) {
-        textAlign(LEFT, CENTER);
-        text(hovertext, mouseX, mouseY - 10);
-      } else {
-        textAlign(RIGHT, CENTER);
-        text(hovertext, mouseX, mouseY - 10);
-      }
+      fill(0, 0, 0);
+      textAlign(LEFT, CENTER);
+      textSize(12);
+      text(hovertext, margins[0] + 20, margins[1] - 20);
+
     }
 
     public void levelUp() {
@@ -688,7 +684,14 @@ public class CSVTree implements SquarifiedChart {
           for (TableRow row : t.rows()) {
             Node newchild = new Node(Integer.toString(count++), row.getString(categories[currentdisplay]), row.getInt(cats[1]), true, this);
             tree.put(newchild.name, newchild);
-
+            newchild.hovertext = "(";
+            for (int i = 0; i < categories.length; i++) {
+              newchild.hovertext += row.getString(categories[i]);
+              if (i != categories.length - 1) {
+                newchild.hovertext += ", ";
+              }
+            }
+            newchild.hovertext += ")";
             newchild.parent = root;
             root.children.add(newchild);
           }
