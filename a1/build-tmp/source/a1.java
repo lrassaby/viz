@@ -621,7 +621,7 @@ public class CSVTree implements SquarifiedChart {
           categoriesText += ", ";
         }
       }
-      text(categoriesText, margins[0] + 20, margins[1] - 35);
+      text(categoriesText, margins[0] + 20, margins[1] - 42);
       
     }
 
@@ -629,7 +629,7 @@ public class CSVTree implements SquarifiedChart {
       fill(0, 0, 0);
       textAlign(LEFT, CENTER);
       textSize(12);
-      text(hovertext, margins[0] + 20, margins[1] - 20);
+      text(hovertext, margins[0] + 20, margins[1] - 27);
 
     }
 
