@@ -36,6 +36,8 @@ public void setup () {
   catch (Exception e) { 
     e.printStackTrace();
   } 
+
+  File openfile;
   file = JOptionPane.showInputDialog(frame, "Input file", "hierarchy2.shf");
   
   tree = new Tree(file);
