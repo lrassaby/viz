@@ -3,6 +3,7 @@ import processing.data.*;
 import processing.event.*; 
 import processing.opengl.*; 
 
+import javax.swing.*; 
 import java.util.*; 
 
 import java.util.HashMap; 
@@ -16,6 +17,7 @@ import java.io.IOException;
 
 public class a1 extends PApplet {
 
+
 Tree tree;
 
 public void draw () {
@@ -26,8 +28,17 @@ public void draw () {
 public void setup () {
   frame.setResizable(true);
   size(1000, 800);
+
+  String file;
+  try { 
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+  } 
+  catch (Exception e) { 
+    e.printStackTrace();
+  } 
+  file = JOptionPane.showInputDialog(frame, "Input file", "hierarchy2.shf");
   
-  tree = new Tree("hierarchy2.shf");
+  tree = new Tree(file);
 }
 
 public void mousePressed () {

@@ -1,3 +1,4 @@
+import javax.swing.*;
 Tree tree;
 
 void draw () {
@@ -8,8 +9,17 @@ void draw () {
 void setup () {
   frame.setResizable(true);
   size(1000, 800);
+
+  String file;
+  try { 
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+  } 
+  catch (Exception e) { 
+    e.printStackTrace();
+  } 
+  file = JOptionPane.showInputDialog(frame, "Input file", "hierarchy2.shf");
   
-  tree = new Tree("hierarchy2.shf");
+  tree = new Tree(file);
 }
 
 void mousePressed () {
