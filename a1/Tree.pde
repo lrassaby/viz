@@ -4,6 +4,8 @@ public class Tree implements SquarifiedChart {
     private HashMap tree;
     private boolean clicked;
     private int[] margins = {20, 20, 20, 20}; // left, top, right, bottom
+    private String hovertext;
+
     Tree (String filename) {
         readInput(filename);
         root = getRoot(tree);
@@ -26,6 +28,26 @@ public class Tree implements SquarifiedChart {
             }
         }
         root.draw(canvas);
+        if (hovertext != null && mouseX >= canvas.x && mouseX <= canvas.x + canvas.w && 
+                mouseY >= canvas.y && mouseY <= canvas.y + canvas.h) {
+            drawHoverText();
+        } 
+    }
+
+    private void drawHoverText() {
+      fill(0, 150, 150);
+      textSize(20);
+      if (mouseX < (width/2)) {
+        textAlign(LEFT, CENTER);
+        text(hovertext, mouseX, mouseY - 10);
+      } else {
+        textAlign(RIGHT, CENTER);
+        text(hovertext, mouseX, mouseY - 10);
+      }
+    }
+
+    public void setHoverText(String hovertext) {
+      this.hovertext = hovertext;
     }
 
     public void levelUp() {

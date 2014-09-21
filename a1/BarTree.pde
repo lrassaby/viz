@@ -5,6 +5,7 @@ public class BarTree implements SquarifiedChart {
     private HashMap tree;
     private boolean clicked;
     private int[] margins = {20, 20, 20, 20}; // left, top, right, bottom
+    private String hovertext;
 
     BarTree (String filename) {
         readInput(filename);
@@ -28,6 +29,23 @@ public class BarTree implements SquarifiedChart {
             }
         }
         root.draw(canvas);
+        if (hovertext != null && mouseX >= canvas.x && mouseX <= canvas.x + canvas.w && 
+                mouseY >= canvas.y && mouseY <= canvas.y + canvas.h) {
+            drawHoverText();
+        } 
+    }
+
+
+    private void drawHoverText() {
+      fill(0, 150, 150);
+      textSize(20);
+      if (mouseX < (width/2)) {
+        textAlign(LEFT, CENTER);
+        text(hovertext, mouseX, mouseY - 20);
+      } else {
+        textAlign(RIGHT, CENTER);
+        text(hovertext, mouseX, mouseY - 20);
+      }
     }
 
     public void levelUp() {
@@ -108,6 +126,11 @@ public class BarTree implements SquarifiedChart {
       }
       return root;
     }
+
+    public void setHoverText(String hovertext) {
+      this.hovertext = hovertext;
+    }
+
 
     private int preprocessTree(Node root) {
 

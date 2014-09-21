@@ -134,6 +134,7 @@ public class BarTree implements SquarifiedChart {
     private HashMap tree;
     private boolean clicked;
     private int[] margins = {20, 20, 20, 20}; // left, top, right, bottom
+    private String hovertext;
 
     BarTree (String filename) {
         readInput(filename);
@@ -157,6 +158,23 @@ public class BarTree implements SquarifiedChart {
             }
         }
         root.draw(canvas);
+        if (hovertext != null && mouseX >= canvas.x && mouseX <= canvas.x + canvas.w && 
+                mouseY >= canvas.y && mouseY <= canvas.y + canvas.h) {
+            drawHoverText();
+        } 
+    }
+
+
+    private void drawHoverText() {
+      fill(0, 150, 150);
+      textSize(20);
+      if (mouseX < (width/2)) {
+        textAlign(LEFT, CENTER);
+        text(hovertext, mouseX, mouseY - 20);
+      } else {
+        textAlign(RIGHT, CENTER);
+        text(hovertext, mouseX, mouseY - 20);
+      }
     }
 
     public void levelUp() {
@@ -238,6 +256,11 @@ public class BarTree implements SquarifiedChart {
       return root;
     }
 
+    public void setHoverText(String hovertext) {
+      this.hovertext = hovertext;
+    }
+
+
     private int preprocessTree(Node root) {
 
       // base case: we're at a leaf
@@ -263,6 +286,85 @@ public class BarTree implements SquarifiedChart {
       return tree_size;
     }
 };
+public class Button {
+  boolean isect;
+  Point pos; 
+  Dimensions dim;
+  float roundness;
+  int c;
+  String text;
+ 
+
+  public void draw() {
+      strokeWeight(2);
+      fill(c); 
+      rect(pos.x, pos.y, dim.w, dim.h, roundness); 
+
+      fill(0);
+      textSize(12); 
+      textAlign(CENTER, CENTER); 
+
+      text(text, pos.x + dim.w / 2, pos.y + dim.h / 2);
+  }
+
+  
+  Button(Point pos, Dimensions dim, float roundness, int c, String text) { /* height and width of button */
+     this.isect = false;
+     this.pos = pos;
+     this.dim = dim;
+     this.roundness = roundness;
+     this.c = c;
+     this.text = text;
+  }
+
+  
+  public void intersect (int mousex, int mousey) {
+    /* if it's within x + width and y + height */
+    if (mousex <= (pos.x + dim.w) && mousex >= pos.x && mousey <= (pos.y + dim.h) && mousey >= pos.y) {
+      isect = true;
+    }
+    else {
+      isect = false;
+    }
+  }
+  
+  public void setSelected (boolean s) {
+    isect = s;
+  }
+
+  public void setPos(Point pos) {
+    this.pos = pos;
+  }
+  
+  public void setSize (Dimensions dim) {
+    this.dim = dim;
+  }
+  
+  public void setColor (int r, int g, int b) {
+    c = color (r, g, b);
+  }
+
+  public void setColorObject (int c) {
+    this.c = c;
+  }
+  
+  
+  public void setColor (int c) {
+    this.c = c;
+  }
+  
+  public void setText (String text) {
+     this.text = text; 
+  }
+
+  public boolean getIsect() {return isect;}
+  public Point getPos() {return pos;}
+  public Dimensions getDim() {return dim;}
+  public int getColor() {return c;}
+  public float getRoundness() {return roundness;}
+  public String getText() {return text;}
+};
+
 
 
 public class CSVTree implements SquarifiedChart {
@@ -270,10 +372,19 @@ public class CSVTree implements SquarifiedChart {
     private Node root;
     private HashMap tree;
     private boolean clicked;
-    private int[] margins = {20, 20, 20, 20}; // left, top, right, bottom
+    private int[] margins = {20, 80, 20, 20}; // left, top, right, bottom
     private String[] lines;
     private String[] categories; // in order of how we want them
     private int count;
+    private String hovertext;
+    private Button config_switcher;
+    private Button display_switcher;
+    private Point config_switcher_xy;
+    private Dimensions buttondim;
+    private Point display_switcher_xy;
+    private int currentdisplay;
+    private int currpermutation;
+    private ArrayList<String[]> permutations;
 
     CSVTree (String filename) {
       count = 0;
@@ -286,16 +397,45 @@ public class CSVTree implements SquarifiedChart {
       parseData();
       root = getRoot(tree);
       preprocessTree(root);
-      //treeTest(root);
+      buttondim = new Dimensions(170, 30);
+      config_switcher_xy = new Point(width - buttondim.w - margins[2], margins[1]);
+      display_switcher_xy = new Point(width - buttondim.w - margins[2] - buttondim.w - 20, margins[1]);
+      config_switcher = new Button(config_switcher_xy, buttondim, 7, color(255, 153, 51), "Change category order");;
+      display_switcher = new Button(display_switcher_xy, buttondim, 7, color(255, 153, 51), "Change display field");;
+      /* sorry for this disgusting permutation code... */
+      currpermutation = 0;
+      currentdisplay = 0;
+      permutations = new ArrayList<String[]>();
+      String[] nonsizecats = Arrays.copyOfRange(categories, 0, categories.length - 1);
+      calculatePermuatations(nonsizecats, 0, permutations);
+      for (int i = 0; i < permutations.size(); i++) {
+        permutations.set(i, Arrays.copyOf(permutations.get(i), permutations.get(i).length + 1));
+        permutations.get(i)[permutations.get(i).length - 1] = categories[categories.length - 1];
+      }
+      currentdisplay = 0;
     }
 
-    private void treeTest(Node r) {
-      if (r != null) {
-        println("at a node");
-        for (Node child : r.children) {
-          treeTest(child);
+   private void calculatePermuatations(String[] cats, int index, ArrayList<String[]> ret){
+    if(cats.length - index == 1) {
+        ret.add(cats.clone());
+    } else {
+        for(int i = index; i < cats.length; i++){
+            swap(cats, index, i);
+            calculatePermuatations(cats, index+1, ret);
+            swap(cats, index, i);
         }
-      }
+    }
+  }
+
+    private void swap(String[] cats, int i1, int i2){
+        String toswap = cats[i1];
+        cats[i1] = cats[i2];
+        cats[i2] = toswap;
+    }
+
+
+    public void setHoverText(String hovertext) {
+      this.hovertext = hovertext;
     }
 
     public void setCategories(String[] categories) {
@@ -314,14 +454,68 @@ public class CSVTree implements SquarifiedChart {
         Canvas canvas = new Canvas(margins[0], margins[1], 
             width - margins[2] - margins[0], height - margins[3] - margins[1]);
         if (clicked) {
-            if (mouseX >= canvas.x && mouseX <= canvas.x + canvas.w && 
+            config_switcher.intersect(mouseX, mouseY);
+            display_switcher.intersect(mouseX, mouseY);
+            if (config_switcher.getIsect()) {
+                currpermutation = (currpermutation + 1) % permutations.size();
+                setCategories(permutations.get(currpermutation));
+                parseData();
+                root = getRoot(tree);
+                preprocessTree(root);
+                config_switcher.setSelected(false);
+                clicked = false;
+            } else if (display_switcher.getIsect()) {
+                currentdisplay = (currentdisplay + 1) % (categories.length - 1);
+                display_switcher.setSelected(false);
+                parseData();
+                root = getRoot(tree);
+                preprocessTree(root);
+                clicked = false;
+            } else if (mouseX >= canvas.x && mouseX <= canvas.x + canvas.w && 
                 mouseY >= canvas.y && mouseY <= canvas.y + canvas.h) {
                 respondToClick();
             } else {
                 clicked = false;
             }
+
         }
         root.draw(canvas);
+        if (hovertext != null && mouseX >= canvas.x && mouseX <= canvas.x + canvas.w && 
+                mouseY >= canvas.y && mouseY <= canvas.y + canvas.h) {
+            drawHoverText();
+        } 
+        config_switcher_xy.setXY(width - buttondim.w - margins[2], margins[1] - 50);
+        config_switcher.draw();
+        display_switcher_xy.setXY(width - buttondim.w - margins[2] - buttondim.w - 20, margins[1] - 50);
+        display_switcher.draw();
+        drawCategories();
+    }
+
+    private void drawCategories() {
+      fill(0, 0, 0);
+      textSize(12);
+      textAlign(LEFT, CENTER);
+      String categoriesText = "Categories: ";
+      for (int i = 0; i < categories.length; i++) {
+        categoriesText += categories[i];
+        if (i != categories.length - 1) {
+          categoriesText += ", ";
+        }
+      }
+      text(categoriesText, margins[0] + 20, margins[1] - 35);
+      
+    }
+
+    private void drawHoverText() {
+      fill(0, 150, 150);
+      textSize(20);
+      if (mouseX < (width/2)) {
+        textAlign(LEFT, CENTER);
+        text(hovertext, mouseX, mouseY - 10);
+      } else {
+        textAlign(RIGHT, CENTER);
+        text(hovertext, mouseX, mouseY - 10);
+      }
     }
 
     public void levelUp() {
@@ -338,12 +532,7 @@ public class CSVTree implements SquarifiedChart {
     }
 
     public Node getNode(String name) {
-      try {
-        return (Node)tree.get(name);
-      } catch (Exception e) {
-        println("could not find " + name);
-      } 
-      return null;
+      return (Node)tree.get(name);
     }
 
     private void respondToClick() {
@@ -378,7 +567,7 @@ public class CSVTree implements SquarifiedChart {
         root = new Node();
         if (cats.length == 2) { // leaf level 
           for (TableRow row : t.rows()) {
-            Node newchild = new Node(Integer.toString(count++), row.getString(cats[1]), row.getInt(cats[1]), true, this);
+            Node newchild = new Node(Integer.toString(count++), row.getString(categories[currentdisplay]), row.getInt(cats[1]), true, this);
             tree.put(newchild.name, newchild);
 
             newchild.parent = root;
@@ -414,36 +603,6 @@ public class CSVTree implements SquarifiedChart {
     private void parseData() {
       tree = new HashMap();
       root = convertTable(data, categories);
-
-      // /* construct tree */
-      // int num_leaves = parseInt(lines[0]);
-      // for (int i = 1; i <= num_leaves; i++) {
-      //   String[] temp = split(lines[i], ' ');
-      //   // temp[0] is the name of the node
-      //   // temp[1] is its size
-      //   tree.put(temp[0], new Node(temp[0], parseInt(temp[1]), true, this));
-      // }
-
-      // /* take in relationships */
-      // int num_rels = parseInt(lines[num_leaves+1]);
-      // for (int i = num_leaves + 2; i < num_rels + num_leaves + 2; i++) {
-      //   String[] temp = split(lines[i], ' ');
-      //   // temp[0] is the name of the parent
-      //   // temp[1] is the name of the child
-      //   if (!(tree.containsKey(temp[0]))) { // tree doesn't have the parent
-      //     tree.put(temp[0], new Node(temp[0], 0, false, this)); // add the parent
-      //   }
-      //   if (!(tree.containsKey(temp[1]))) { // tree doesn't have the child
-      //     tree.put(temp[1], new Node(temp[1], 0, false, this)); // add the child (size 0)
-      //   }
-
-      //   /* add the child to the parent and the parent to the child */
-      //   Node par = (Node)tree.get(temp[0]);
-      //   Node chi = (Node)tree.get(temp[1]);
-        
-      //   par.children.add(chi);
-      //   chi.parent = par;
-      // }
     }
 
     private Node getRoot(HashMap tree) {
@@ -527,10 +686,38 @@ public class Canvas {
   }
 };
 
+public class Point {
+    int x, y;
+    String disp;
+    Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    public void setXY(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    public void setDisp(String disp) {
+        this.disp = disp;
+    }
+};
+
+public class Dimensions {
+    int w, h;
+    Dimensions(int w, int h) {
+        this.w = w;
+        this.h = h;
+    }
+    public void setWH(int w, int h) {
+        this.w = w;
+        this.h = h;
+    }
+};
 public class Node {
   public SquarifiedChart sqchart;
   public String name = null;
   public String displaystring = null; // if display string should be different from name
+  public String hovertext = null;
   public Node parent = null;
   public int size;
   public boolean intersect = false;
@@ -675,11 +862,17 @@ public class Node {
       if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
         fill(200, 200, 255);
         n.intersect = true;
+        if (hovertext != null) {
+          tree.setHoverText(hovertext);
+        }
       } else {
         fill(230);
         n.intersect = false;
       }
+
+
       stroke(0);
+      strokeWeight(1);
       rect(x, y, w, h);
 
       fill(0);
@@ -705,6 +898,7 @@ interface SquarifiedChart {
     public Node getNode(String name);
     public void draw();
     public void setClicked(boolean val);
+    public void setHoverText(String hovertext);
     public void levelUp();
 };
 
@@ -713,6 +907,8 @@ public class Tree implements SquarifiedChart {
     private HashMap tree;
     private boolean clicked;
     private int[] margins = {20, 20, 20, 20}; // left, top, right, bottom
+    private String hovertext;
+
     Tree (String filename) {
         readInput(filename);
         root = getRoot(tree);
@@ -735,6 +931,26 @@ public class Tree implements SquarifiedChart {
             }
         }
         root.draw(canvas);
+        if (hovertext != null && mouseX >= canvas.x && mouseX <= canvas.x + canvas.w && 
+                mouseY >= canvas.y && mouseY <= canvas.y + canvas.h) {
+            drawHoverText();
+        } 
+    }
+
+    private void drawHoverText() {
+      fill(0, 150, 150);
+      textSize(20);
+      if (mouseX < (width/2)) {
+        textAlign(LEFT, CENTER);
+        text(hovertext, mouseX, mouseY - 10);
+      } else {
+        textAlign(RIGHT, CENTER);
+        text(hovertext, mouseX, mouseY - 10);
+      }
+    }
+
+    public void setHoverText(String hovertext) {
+      this.hovertext = hovertext;
     }
 
     public void levelUp() {

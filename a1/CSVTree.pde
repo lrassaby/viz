@@ -5,10 +5,19 @@ public class CSVTree implements SquarifiedChart {
     private Node root;
     private HashMap tree;
     private boolean clicked;
-    private int[] margins = {20, 20, 20, 20}; // left, top, right, bottom
+    private int[] margins = {20, 80, 20, 20}; // left, top, right, bottom
     private String[] lines;
     private String[] categories; // in order of how we want them
     private int count;
+    private String hovertext;
+    private Button config_switcher;
+    private Button display_switcher;
+    private Point config_switcher_xy;
+    private Dimensions buttondim;
+    private Point display_switcher_xy;
+    private int currentdisplay;
+    private int currpermutation;
+    private ArrayList<String[]> permutations;
 
     CSVTree (String filename) {
       count = 0;
@@ -21,16 +30,45 @@ public class CSVTree implements SquarifiedChart {
       parseData();
       root = getRoot(tree);
       preprocessTree(root);
-      //treeTest(root);
+      buttondim = new Dimensions(170, 30);
+      config_switcher_xy = new Point(width - buttondim.w - margins[2], margins[1]);
+      display_switcher_xy = new Point(width - buttondim.w - margins[2] - buttondim.w - 20, margins[1]);
+      config_switcher = new Button(config_switcher_xy, buttondim, 7, color(255, 153, 51), "Change category order");;
+      display_switcher = new Button(display_switcher_xy, buttondim, 7, color(255, 153, 51), "Change display field");;
+      /* sorry for this disgusting permutation code... */
+      currpermutation = 0;
+      currentdisplay = 0;
+      permutations = new ArrayList<String[]>();
+      String[] nonsizecats = Arrays.copyOfRange(categories, 0, categories.length - 1);
+      calculatePermuatations(nonsizecats, 0, permutations);
+      for (int i = 0; i < permutations.size(); i++) {
+        permutations.set(i, Arrays.copyOf(permutations.get(i), permutations.get(i).length + 1));
+        permutations.get(i)[permutations.get(i).length - 1] = categories[categories.length - 1];
+      }
+      currentdisplay = 0;
     }
 
-    private void treeTest(Node r) {
-      if (r != null) {
-        println("at a node");
-        for (Node child : r.children) {
-          treeTest(child);
+   private void calculatePermuatations(String[] cats, int index, ArrayList<String[]> ret){
+    if(cats.length - index == 1) {
+        ret.add(cats.clone());
+    } else {
+        for(int i = index; i < cats.length; i++){
+            swap(cats, index, i);
+            calculatePermuatations(cats, index+1, ret);
+            swap(cats, index, i);
         }
-      }
+    }
+  }
+
+    private void swap(String[] cats, int i1, int i2){
+        String toswap = cats[i1];
+        cats[i1] = cats[i2];
+        cats[i2] = toswap;
+    }
+
+
+    public void setHoverText(String hovertext) {
+      this.hovertext = hovertext;
     }
 
     public void setCategories(String[] categories) {
@@ -49,14 +87,68 @@ public class CSVTree implements SquarifiedChart {
         Canvas canvas = new Canvas(margins[0], margins[1], 
             width - margins[2] - margins[0], height - margins[3] - margins[1]);
         if (clicked) {
-            if (mouseX >= canvas.x && mouseX <= canvas.x + canvas.w && 
+            config_switcher.intersect(mouseX, mouseY);
+            display_switcher.intersect(mouseX, mouseY);
+            if (config_switcher.getIsect()) {
+                currpermutation = (currpermutation + 1) % permutations.size();
+                setCategories(permutations.get(currpermutation));
+                parseData();
+                root = getRoot(tree);
+                preprocessTree(root);
+                config_switcher.setSelected(false);
+                clicked = false;
+            } else if (display_switcher.getIsect()) {
+                currentdisplay = (currentdisplay + 1) % (categories.length - 1);
+                display_switcher.setSelected(false);
+                parseData();
+                root = getRoot(tree);
+                preprocessTree(root);
+                clicked = false;
+            } else if (mouseX >= canvas.x && mouseX <= canvas.x + canvas.w && 
                 mouseY >= canvas.y && mouseY <= canvas.y + canvas.h) {
                 respondToClick();
             } else {
                 clicked = false;
             }
+
         }
         root.draw(canvas);
+        if (hovertext != null && mouseX >= canvas.x && mouseX <= canvas.x + canvas.w && 
+                mouseY >= canvas.y && mouseY <= canvas.y + canvas.h) {
+            drawHoverText();
+        } 
+        config_switcher_xy.setXY(width - buttondim.w - margins[2], margins[1] - 50);
+        config_switcher.draw();
+        display_switcher_xy.setXY(width - buttondim.w - margins[2] - buttondim.w - 20, margins[1] - 50);
+        display_switcher.draw();
+        drawCategories();
+    }
+
+    private void drawCategories() {
+      fill(0, 0, 0);
+      textSize(12);
+      textAlign(LEFT, CENTER);
+      String categoriesText = "Categories: ";
+      for (int i = 0; i < categories.length; i++) {
+        categoriesText += categories[i];
+        if (i != categories.length - 1) {
+          categoriesText += ", ";
+        }
+      }
+      text(categoriesText, margins[0] + 20, margins[1] - 35);
+      
+    }
+
+    private void drawHoverText() {
+      fill(0, 150, 150);
+      textSize(20);
+      if (mouseX < (width/2)) {
+        textAlign(LEFT, CENTER);
+        text(hovertext, mouseX, mouseY - 10);
+      } else {
+        textAlign(RIGHT, CENTER);
+        text(hovertext, mouseX, mouseY - 10);
+      }
     }
 
     public void levelUp() {
@@ -73,12 +165,7 @@ public class CSVTree implements SquarifiedChart {
     }
 
     public Node getNode(String name) {
-      try {
-        return (Node)tree.get(name);
-      } catch (Exception e) {
-        println("could not find " + name);
-      } 
-      return null;
+      return (Node)tree.get(name);
     }
 
     private void respondToClick() {
@@ -113,7 +200,7 @@ public class CSVTree implements SquarifiedChart {
         root = new Node();
         if (cats.length == 2) { // leaf level 
           for (TableRow row : t.rows()) {
-            Node newchild = new Node(Integer.toString(count++), row.getString(cats[1]), row.getInt(cats[1]), true, this);
+            Node newchild = new Node(Integer.toString(count++), row.getString(categories[currentdisplay]), row.getInt(cats[1]), true, this);
             tree.put(newchild.name, newchild);
 
             newchild.parent = root;

@@ -2,6 +2,7 @@ public class Node {
   public SquarifiedChart sqchart;
   public String name = null;
   public String displaystring = null; // if display string should be different from name
+  public String hovertext = null;
   public Node parent = null;
   public int size;
   public boolean intersect = false;
@@ -146,11 +147,17 @@ public class Node {
       if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
         fill(200, 200, 255);
         n.intersect = true;
+        if (hovertext != null) {
+          tree.setHoverText(hovertext);
+        }
       } else {
         fill(230);
         n.intersect = false;
       }
+
+
       stroke(0);
+      strokeWeight(1);
       rect(x, y, w, h);
 
       fill(0);
