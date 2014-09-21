@@ -1,6 +1,7 @@
 public class Node {
-  public Tree tree;
+  public SquarifiedChart sqchart;
   public String name = null;
+  public String displaystring = null; // if display string should be different from name
   public Node parent = null;
   public int size;
   public boolean intersect = false;
@@ -9,11 +10,21 @@ public class Node {
   public ArrayList<Node> children = new ArrayList<Node>();
   boolean isLeaf;
   public float x, y, d_short, d_long;
-  public Node(String nm, int sz, boolean lf, Tree tr) {
+  public Node() {
+
+  }
+  public Node(String nm, int sz, boolean lf, SquarifiedChart sqc) {
     name = nm;
     size = sz;
     isLeaf = lf;
-    tree = tr;
+    sqchart = sqc;
+  }
+  public Node(String nm, String ds, int sz, boolean lf, SquarifiedChart sqc) {
+    name = nm;
+    displaystring = ds;
+    size = sz;
+    isLeaf = lf;
+    sqchart = sqc;
   }
   private float spacing = 4;
   
@@ -131,7 +142,7 @@ public class Node {
       float w = canvas.w <= canvas.h ? r.d_short : r.d_long;
       float h = canvas.w <= canvas.h ? r.d_long : r.d_short;
 
-      Node n = tree.getNode(r.name);
+      Node n = sqchart.getNode(r.name);
       if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
         fill(200, 200, 255);
         n.intersect = true;
@@ -147,7 +158,11 @@ public class Node {
       textSize(12); 
       textAlign(CENTER, CENTER); 
 
-      text(r.name, x + w / 2, y + h / 2);
+      if (n.displaystring != null) {
+        text(n.displaystring, x + w / 2, y + h / 2);
+      } else {
+        text(n.name, x + w / 2, y + h / 2);
+      }
 
       if (canvas.w <= canvas.h) {
         x += w;

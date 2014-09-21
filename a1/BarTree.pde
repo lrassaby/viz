@@ -1,10 +1,12 @@
 import java.util.*;
-public class Tree implements SquarifiedChart {
+
+public class BarTree implements SquarifiedChart {
     private Node root;
     private HashMap tree;
     private boolean clicked;
     private int[] margins = {20, 20, 20, 20}; // left, top, right, bottom
-    Tree (String filename) {
+
+    BarTree (String filename) {
         readInput(filename);
         root = getRoot(tree);
         preprocessTree(root);

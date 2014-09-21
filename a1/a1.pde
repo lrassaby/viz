@@ -1,5 +1,6 @@
 import javax.swing.*;
-Tree tree;
+
+SquarifiedChart tree;
 
 void draw () {
   background(255, 255, 255);
@@ -29,7 +30,7 @@ void setup () {
   } else if (selectedValue == "Hierarchical Treemap") {
     try {
       File openfile;
-      file = JOptionPane.showInputDialog(frame, "Input file", "hierarchy2.shf");
+      file = JOptionPane.showInputDialog(frame, "Input file (type shf)", "hierarchy2.shf");
     } catch (Exception e) {
       println("Process cancelled.");
       exit();
@@ -46,6 +47,46 @@ void setup () {
         exit();
       }
     }
+  } else if (selectedValue == "Nonhierarchical Treemap") {
+    try {
+      File openfile;
+      file = JOptionPane.showInputDialog(frame, "Input file (type csv)", "soe-funding.csv");
+    } catch (Exception e) {
+      println("Process cancelled.");
+      exit();
+    }
+
+    if (file == null) {
+      println("Process cancelled.");
+      exit();
+    } else {
+      try {
+        tree = new CSVTree(file);
+      } catch (Exception e) {
+        e.printStackTrace();    
+        exit();
+      }
+    }
+  } else if (selectedValue == "Barchart Treemap") {
+    try {
+      File openfile;
+      file = JOptionPane.showInputDialog(frame, "Input file (type csv)", "soe-funding.csv");
+    } catch (Exception e) {
+      println("Process cancelled.");
+      exit();
+    }
+
+    if (file == null) {
+      println("Process cancelled.");
+      exit();
+    } else {
+      try {
+        tree = new BarTree(file);
+      } catch (Exception e) {
+        e.printStackTrace();    
+        exit();
+      }
+    }
   } else {
     JOptionPane.showMessageDialog(null, "Sorry, this feature hasn't been implemented.");
     exit();
@@ -53,6 +94,7 @@ void setup () {
 }
 
 void mousePressed () {
+
   if (mouseButton == LEFT) {
     tree.setClicked(true);
   } else if (mouseButton == RIGHT) {

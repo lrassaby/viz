@@ -40,3 +40,4 @@ public class Canvas {
     return w <= h ? h : w;
   }
 };
+
