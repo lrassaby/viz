@@ -10,7 +10,7 @@ void setup () {
   frame.setResizable(true);
   size(1000, 800);
 
-  String file;
+  String file = null;
   try { 
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
   } 
@@ -18,10 +18,38 @@ void setup () {
     e.printStackTrace();
   } 
 
-  File openfile;
-  file = JOptionPane.showInputDialog(frame, "Input file", "hierarchy2.shf");
-  
-  tree = new Tree(file);
+  Object[] possibleValues = { "Hierarchical Treemap", "Nonhierarchical Treemap", "Barchart Treemap" };
+  Object selectedValue = JOptionPane.showInputDialog(null,
+  "What sort of treemap?", "Input",
+  JOptionPane.INFORMATION_MESSAGE, null,
+  possibleValues, possibleValues[0]);
+  if (selectedValue == null) {
+    println("Process cancelled.");
+    exit();
+  } else if (selectedValue == "Hierarchical Treemap") {
+    try {
+      File openfile;
+      file = JOptionPane.showInputDialog(frame, "Input file", "hierarchy2.shf");
+    } catch (Exception e) {
+      println("Process cancelled.");
+      exit();
+    }
+
+    if (file == null) {
+      println("Process cancelled.");
+      exit();
+    } else {
+      try {
+        tree = new Tree(file);
+      } catch (Exception e) {
+        e.printStackTrace();    
+        exit();
+      }
+    }
+  } else {
+    JOptionPane.showMessageDialog(null, "Sorry, this feature hasn't been implemented.");
+    exit();
+  }
 }
 
 void mousePressed () {
