@@ -1,4 +1,6 @@
 Louis Rassaby, Jim Bonish, Suzie Church
 09/22/2014
 ---------------------------------------
-
+ - Louis worked mainly on debugging the treemap and on the additional requirements.
+ - Jim focused mainly on parsing the SHF files and on the hierarchical treemap.
+ - Suzie focused on developing and debugging the hierarchical treemap.

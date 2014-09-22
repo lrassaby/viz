@@ -191,7 +191,7 @@ public class BarTree implements SquarifiedChart {
 
     void drawAxes(Canvas canvas) {
         strokeWeight(2);
-        line(canvas.x, canvas.y + canvas.h, canvas.x, canvas.y);
+        line(canvas.x, canvas.y + canvas.h, canvas.x, canvas.y - 10);
         line(canvas.x, canvas.y + canvas.h, canvas.x + canvas.w, canvas.y + canvas.h);
     }
 

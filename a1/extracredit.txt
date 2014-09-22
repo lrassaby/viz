@@ -1,0 +1,10 @@
+There were several components that we implemented that were beyond the 
+requirements for the assignment:
+- GUI for starting a treemap
+- Modular data structures that make developing a new treemap relatively simple 
+- Color generation based on the golden ratio, for maximal clarity
+- Concentric colored borders around hovering nodes
+- "Change display fields" button in nonhierarchical treemap
+- Support for any number of columns in a CSV file for the nonhierarchical and 
+barchart treemap 
+
