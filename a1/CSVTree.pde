@@ -129,6 +129,7 @@ public class CSVTree implements SquarifiedChart {
         drawCategories();
     }
 
+
     private void drawCategories() {
       fill(0, 0, 0);
       textSize(12);
@@ -153,8 +154,9 @@ public class CSVTree implements SquarifiedChart {
       textAlign(LEFT, CENTER);
       textSize(12);
       text(hovertext, margins[0] + 20, margins[1] - 27);
-
     }
+
+
 
     public void levelUp() {
         if (root.parent != null) {

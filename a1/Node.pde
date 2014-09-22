@@ -7,6 +7,7 @@ public class Node {
   public int size;
   public boolean intersect = false;
   public Color c;
+  public String category;
 
   private static final int XMIN = 0, XMAX = 1, YMIN = 2, YMAX = 3;
   public ArrayList<Node> children = new ArrayList<Node>();
@@ -29,7 +30,7 @@ public class Node {
     isLeaf = lf;
     sqchart = sqc;
   }
-  private float spacing = 4;
+  public float spacing = 4;
   
 
   // draw function for first element
