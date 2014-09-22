@@ -1,3 +1,4 @@
+#!/bin/bash   
  processing-java \
- --sketch=/Users/louisrassaby/Dropbox/cs_classes/comp150v/group1/a1 \
+ --sketch=$(pwd) \
  --output=build-tmp --run --force
