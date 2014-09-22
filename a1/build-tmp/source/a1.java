@@ -485,7 +485,6 @@ public class Button {
 };
 
 
-// TODO: figure out why the category change toggle button is going wonky
 public class CSVTree implements SquarifiedChart {
     private Table data;
     private Node root;
@@ -506,9 +505,11 @@ public class CSVTree implements SquarifiedChart {
     private int currpermutation;
     private ArrayList<String[]> permutations;
     private int level;
+    private ColorGenerator colors;
 
   
     CSVTree (String filename) {
+      colors = new ColorGenerator();
       count = 0;
       data = loadTable(filename, "header");
       lines = loadStrings(filename);
@@ -724,7 +725,7 @@ public class CSVTree implements SquarifiedChart {
           }
         }
         root.name = Integer.toString(count++);
-        root.c = (new Color(200, 200, 255)).randomize();
+        root.c = colors.generate();
         root.sqchart = this;
         tree.put(root.name, root); // add to the hash tree
       }
@@ -789,19 +790,38 @@ public class Color {
         this.g = g;
         this.b = b;
     }
-    public Color randomize() {
-        Random random = new Random();
-        int red = random.nextInt(256);
-        int green = random.nextInt(256);
-        int blue = random.nextInt(256);
+};
 
-        r = (red + r) / 2;
-        g = (green + g) / 2;
-        b = (blue + b) / 2;
-
-        return this; 
+// see http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
+public class ColorGenerator {
+    private float golden_ratio_conjugate = 0.618033988749895f;
+    private float h = 0.5f;
+    public Color generate() {
+        h += golden_ratio_conjugate;
+        h %= 1;
+        return hsvToRGB(h, 0.70f, 0.90f);
     }
-
+    public Color hsvToRGB (float h, float s, float v) {
+        float h_i = PApplet.parseInt(h*6);
+        float f = h*6 - h_i;
+        float p = v * (1 - s);
+        float q = v * (1 - f*s);
+        float t = v * (1 - (1 - f) * s);
+        if (h_i == 0) {
+            return new Color(PApplet.parseInt(v * 256), PApplet.parseInt(t * 256), PApplet.parseInt(p * 256));
+        } else if (h_i == 1) {
+            return new Color(PApplet.parseInt(q * 256), PApplet.parseInt(v * 256), PApplet.parseInt(p * 256));
+        } else if (h_i == 2) {
+            return new Color(PApplet.parseInt(p * 256), PApplet.parseInt(v * 256), PApplet.parseInt(t * 256));
+        } else if (h_i == 3) {
+            return new Color(PApplet.parseInt(p * 256), PApplet.parseInt(q * 256), PApplet.parseInt(v * 256));
+        } else if (h_i == 4) {
+            return new Color(PApplet.parseInt(t * 256), PApplet.parseInt(p * 256), PApplet.parseInt(v * 256));
+        } else if (h_i == 5) {
+            return new Color(PApplet.parseInt(v * 256), PApplet.parseInt(p * 256), PApplet.parseInt(q * 256));
+        }
+        return new Color(0, 0, 0);
+    }
 };
 
 public class Rect {
@@ -1076,8 +1096,10 @@ public class Tree implements SquarifiedChart {
     private boolean clicked;
     private int[] margins = {20, 20, 20, 20}; // left, top, right, bottom
     private String hovertext;
+    private ColorGenerator colors;
 
     Tree (String filename) {
+        colors = new ColorGenerator();
         readInput(filename);
         root = getRoot(tree);
         preprocessTree(root);
@@ -1181,7 +1203,7 @@ public class Tree implements SquarifiedChart {
         /* add the child to the parent and the parent to the child */
         Node par = (Node)tree.get(temp[0]);
         Node chi = (Node)tree.get(temp[1]);
-        par.c = (new Color(200, 200, 255)).randomize();
+        par.c = colors.generate();
         
         par.children.add(chi);
         chi.parent = par;

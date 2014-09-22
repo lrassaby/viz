@@ -19,9 +19,11 @@ public class CSVTree implements SquarifiedChart {
     private int currpermutation;
     private ArrayList<String[]> permutations;
     private int level;
+    private ColorGenerator colors;
 
   
     CSVTree (String filename) {
+      colors = new ColorGenerator();
       count = 0;
       data = loadTable(filename, "header");
       lines = loadStrings(filename);
@@ -237,7 +239,7 @@ public class CSVTree implements SquarifiedChart {
           }
         }
         root.name = Integer.toString(count++);
-        root.c = (new Color(200, 200, 255)).randomize();
+        root.c = colors.generate();
         root.sqchart = this;
         tree.put(root.name, root); // add to the hash tree
       }

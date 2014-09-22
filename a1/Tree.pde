@@ -5,8 +5,10 @@ public class Tree implements SquarifiedChart {
     private boolean clicked;
     private int[] margins = {20, 20, 20, 20}; // left, top, right, bottom
     private String hovertext;
+    private ColorGenerator colors;
 
     Tree (String filename) {
+        colors = new ColorGenerator();
         readInput(filename);
         root = getRoot(tree);
         preprocessTree(root);
@@ -110,7 +112,7 @@ public class Tree implements SquarifiedChart {
         /* add the child to the parent and the parent to the child */
         Node par = (Node)tree.get(temp[0]);
         Node chi = (Node)tree.get(temp[1]);
-        par.c = (new Color(200, 200, 255)).randomize();
+        par.c = colors.generate();
         
         par.children.add(chi);
         chi.parent = par;
