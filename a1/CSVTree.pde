@@ -1,5 +1,4 @@
 import java.util.*;
-
 public class CSVTree implements SquarifiedChart {
     private Table data;
     private Node root;
@@ -206,7 +205,7 @@ public class CSVTree implements SquarifiedChart {
         root = new Node();
         if (cats.length == 1) { // leaf level 
           for (TableRow row : t.rows()) {
-            Node newchild = new Node(Integer.toString(count++), row.getString(categories[currentdisplay]), row.getInt(cats[0]), true, this);
+            Node newchild = new Node(Integer.toString(count++), row.getString(orig_categories[currentdisplay]), row.getInt(cats[0]), true, this);
             tree.put(newchild.name, newchild);
             newchild.hovertext = "(";
             for (int i = 0; i < categories.length; i++) {
