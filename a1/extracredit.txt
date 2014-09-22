@@ -7,4 +7,3 @@ requirements for the assignment:
 - "Change display fields" button in nonhierarchical treemap
 - Support for any number of columns in a CSV file for the nonhierarchical and 
 barchart treemap 
-
