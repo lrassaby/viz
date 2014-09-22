@@ -1,3 +1,30 @@
+public class Color {
+    int r, g, b;
+    Color(int r, int g, int b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+    void setRGB(int r, int g, int b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+    public Color randomize() {
+        Random random = new Random();
+        int red = random.nextInt(256);
+        int green = random.nextInt(256);
+        int blue = random.nextInt(256);
+
+        r = (red + r) / 2;
+        g = (green + g) / 2;
+        b = (blue + b) / 2;
+
+        return this; 
+    }
+
+};
+
 public class Rect {
     float d_short, d_long;
     String name;
@@ -68,3 +95,4 @@ public class Dimensions {
         this.h = h;
     }
 };
+

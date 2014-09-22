@@ -6,13 +6,15 @@ public class Node {
   public Node parent = null;
   public int size;
   public boolean intersect = false;
+  public Color c;
 
   private static final int XMIN = 0, XMAX = 1, YMIN = 2, YMAX = 3;
   public ArrayList<Node> children = new ArrayList<Node>();
   boolean isLeaf;
   public float x, y, d_short, d_long;
-  public Node() {
 
+
+  public Node() {
   }
   public Node(String nm, int sz, boolean lf, SquarifiedChart sqc) {
     name = nm;
@@ -145,7 +147,11 @@ public class Node {
 
       Node n = sqchart.getNode(r.name);
       if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
-        fill(200, 200, 255);
+        if (c != null) {
+          fill(c.r, c.g, c.b);
+        } else {
+          fill(200, 200, 255);
+        }
         n.intersect = true;
         if (hovertext != null) {
           tree.setHoverText(hovertext);

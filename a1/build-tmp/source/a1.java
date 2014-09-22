@@ -493,6 +493,7 @@ public class CSVTree implements SquarifiedChart {
     private boolean clicked;
     private int[] margins = {20, 80, 20, 20}; // left, top, right, bottom
     private String[] lines;
+    private String[] orig_categories; // in order of how we want them
     private String[] categories; // in order of how we want them
     private int count;
     private String hovertext;
@@ -504,7 +505,9 @@ public class CSVTree implements SquarifiedChart {
     private int currentdisplay;
     private int currpermutation;
     private ArrayList<String[]> permutations;
+    private int level;
 
+  
     CSVTree (String filename) {
       count = 0;
       data = loadTable(filename, "header");
@@ -513,6 +516,7 @@ public class CSVTree implements SquarifiedChart {
       for (int i = 0; i < categories.length; i++) { // trim whitespace
         categories[i] = categories[i].trim();
       }
+      orig_categories = categories.clone();
       parseData();
       root = getRoot(tree);
       preprocessTree(root);
@@ -622,7 +626,11 @@ public class CSVTree implements SquarifiedChart {
         }
       }
       text(categoriesText, margins[0] + 20, margins[1] - 42);
-      
+      if (level == categories.length) {
+        text("Current level: Item", margins[0] + 20, margins[1] - 57);
+      } else {
+        text("Current level: " + categories[level], margins[0] + 20, margins[1] - 57);
+      }
     }
 
     private void drawHoverText() {
@@ -636,6 +644,7 @@ public class CSVTree implements SquarifiedChart {
     public void levelUp() {
         if (root.parent != null) {
             root = root.parent;
+            level--;
         }
     }
 
@@ -659,6 +668,7 @@ public class CSVTree implements SquarifiedChart {
                 if (n.intersect) {
                     root = n;
                     clicked = false;
+                    level++;
                 }
             }
         }
@@ -667,8 +677,8 @@ public class CSVTree implements SquarifiedChart {
     private Table convertToTable(Iterable<TableRow> t)
     {
       Table new_table = new Table();
-      for (int i = 0; i < categories.length; i++) {
-        new_table.addColumn(categories[i]); 
+      for (int i = 0; i < orig_categories.length; i++) {
+        new_table.addColumn(orig_categories[i]); 
       }
       for (TableRow r : t) {
         new_table.addRow(r);
@@ -680,9 +690,9 @@ public class CSVTree implements SquarifiedChart {
       Node root = null;
       if (t.getRowCount() > 0) {
         root = new Node();
-        if (cats.length == 2) { // leaf level 
+        if (cats.length == 1) { // leaf level 
           for (TableRow row : t.rows()) {
-            Node newchild = new Node(Integer.toString(count++), row.getString(categories[currentdisplay]), row.getInt(cats[1]), true, this);
+            Node newchild = new Node(Integer.toString(count++), row.getString(categories[currentdisplay]), row.getInt(cats[0]), true, this);
             tree.put(newchild.name, newchild);
             newchild.hovertext = "(";
             for (int i = 0; i < categories.length; i++) {
@@ -695,7 +705,7 @@ public class CSVTree implements SquarifiedChart {
             newchild.parent = root;
             root.children.add(newchild);
           }
-        } else if (cats.length > 2) { // not leaf level
+        } else if (cats.length > 1) { // not leaf level
           String[] remainingCats = Arrays.copyOfRange(cats, 1, cats.length);
 
           ArrayList<String> distinct = new ArrayList<String>();
@@ -714,6 +724,7 @@ public class CSVTree implements SquarifiedChart {
           }
         }
         root.name = Integer.toString(count++);
+        root.c = (new Color(200, 200, 255)).randomize();
         root.sqchart = this;
         tree.put(root.name, root); // add to the hash tree
       }
@@ -723,6 +734,7 @@ public class CSVTree implements SquarifiedChart {
 
 
     private void parseData() {
+      level = 0;
       tree = new HashMap();
       root = convertTable(data, categories);
     }
@@ -765,6 +777,33 @@ public class CSVTree implements SquarifiedChart {
       return tree_size;
     }
 };
+public class Color {
+    int r, g, b;
+    Color(int r, int g, int b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+    public void setRGB(int r, int g, int b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+    public Color randomize() {
+        Random random = new Random();
+        int red = random.nextInt(256);
+        int green = random.nextInt(256);
+        int blue = random.nextInt(256);
+
+        r = (red + r) / 2;
+        g = (green + g) / 2;
+        b = (blue + b) / 2;
+
+        return this; 
+    }
+
+};
+
 public class Rect {
     float d_short, d_long;
     String name;
@@ -835,6 +874,7 @@ public class Dimensions {
         this.h = h;
     }
 };
+
 public class Node {
   public SquarifiedChart sqchart;
   public String name = null;
@@ -843,13 +883,15 @@ public class Node {
   public Node parent = null;
   public int size;
   public boolean intersect = false;
+  public Color c;
 
   private static final int XMIN = 0, XMAX = 1, YMIN = 2, YMAX = 3;
   public ArrayList<Node> children = new ArrayList<Node>();
   boolean isLeaf;
   public float x, y, d_short, d_long;
-  public Node() {
 
+
+  public Node() {
   }
   public Node(String nm, int sz, boolean lf, SquarifiedChart sqc) {
     name = nm;
@@ -982,7 +1024,11 @@ public class Node {
 
       Node n = sqchart.getNode(r.name);
       if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
-        fill(200, 200, 255);
+        if (c != null) {
+          fill(c.r, c.g, c.b);
+        } else {
+          fill(200, 200, 255);
+        }
         n.intersect = true;
         if (hovertext != null) {
           tree.setHoverText(hovertext);
@@ -1135,6 +1181,7 @@ public class Tree implements SquarifiedChart {
         /* add the child to the parent and the parent to the child */
         Node par = (Node)tree.get(temp[0]);
         Node chi = (Node)tree.get(temp[1]);
+        par.c = (new Color(200, 200, 255)).randomize();
         
         par.children.add(chi);
         chi.parent = par;
