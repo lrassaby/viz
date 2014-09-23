@@ -1,6 +1,7 @@
 There were several components that we implemented that were beyond the 
 requirements for the assignment:
 - GUI for starting a treemap
+- Super cool zoom navigation on barchart
 - Modular data structures that make developing a new treemap relatively simple 
 - Color generation based on the golden ratio, for maximal clarity
 - Concentric colored borders around hovering nodes
