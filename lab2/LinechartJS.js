@@ -3,7 +3,7 @@
 //just translated
 
 function Linechart (p, originx, originy, data, topyaxisx, topyaxisy, rightxaxisx, rightxaxisy) {
-    minY = data[0].count;
+    minY = data[0].;
     maxY = data[0].count;
     for (var i = 1; i < data.length; i++) {
         if (data[i].count < minY) minY = data[i].count;
@@ -46,6 +46,7 @@ function Linechart (p, originx, originy, data, topyaxisx, topyaxisy, rightxaxisx
         var prevx =  (this.originx + sectionWidth) / 2 + (sectionWidth * 0.1);
         var prevy =  (this.data[0].count * ratio) + this.originy;
         this.drawCircle(prevx, prevy, 10);
+        console.log(ratio);
         for (var i = 1; i < this.numData; i++) {
             var x = this.originx + sectionWidth * i + sectionWidth / 2 + sectionWidth * 0.1;
             var y = data[i].count * ratio + this.originy;

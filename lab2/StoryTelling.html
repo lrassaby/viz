@@ -47,14 +47,14 @@ img{
 
 </head>
 <body>
-<h2 id = "title"> DATA SET TITLE</h2>
+<h2 id = "title"> Dexter Ratings Progression</h2>
 <p id = "intro">  </p>
-<p id = "p1" >  </p>
-<p id = "p2" >  </p>
-<p id = "p3" >  </p>
+<p id = "p1" > Seasons 1-2 </p>
+<p id = "p2" > Season 4-5 </p>
+<p id = "p3" > Season 7-8 </p>
 <canvas class = "canvas" id = "canvas1"></canvas>
 
-<div><img src = "cookiebutter.jpg" id = "poster"> </div>
+<!--<div><img src = "cookiebutter.jpg" id = "poster"> </div>-->
 <div id = "buttons">
    <button id = "pre" onclick = "decrease()"> Previous </button>
    <button id = "next" onclick = "increase()"> Next </button>
@@ -65,9 +65,7 @@ img{
 <script src = "http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script src = "http://processingjs.org/js/processing.min.js"></script>
 <script type = "text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
-
-//linechart script
-<script src = "Linechart.js"></script>
+<script src = "Chart.js"></script>
 
 
 <script>
@@ -107,16 +105,29 @@ function decrease(){
 
 function sketchProc(p) {	
    var margin = 30, iWidth = 600, iHeight = 400;
-    var data0 = [['pineapple', '15'], ['grape', '-3'], ['lemon', '12'], ['apple', '1'], ['orange', '5'], ['coffee', '8']];
+   	var data0 =[];
+   	var data1 = [];
+    var data2 = [];
+    for (var i = 0; i < 24; i++) {
+    	data0.push([result[i].Episode, result[i].Rating]);
+    }
+    for (var i = 36; i < 60; i++) {
+    	data1.push([result[i].Episode, result[i].Rating]);
+    }
+    for (var i = 72; i < 96; i++) {
+    	data2.push([result[i].Episode, result[i].Rating]);
+    }
+
+
 
     //FIRST LINECHART GRAPH TO SHOW ON FIRST SLIDE
-	var linechart0 = new Linechart(p, 80, iHeight - 30, data0, 80, 30, iWidth - 30, iHeight - 30);	
+	var linechart0 = new Chart(p, data0, 80,iHeight - 30, 80, 30, iWidth - 30, iHeight - 30);	
 
 	//SECOND LINECHART GRAPH TO SHOW ON SECOND SLIDE
-	var linechart1 = new Linechart(p, 80, iHeight - 30, data0, 80, 30, iWidth - 30, iHeight - 30);		
+	var linechart1 = new Chart(p, data1, 80,iHeight - 30, 80, 30, iWidth - 30, iHeight - 30);
 
 	//THIRD LINECHART GRAPH TO SHOW ON THIRD SLIDE
-	var linechart2 = new Linechart(p, 80, iHeight - 30, data0, 80, 30, iWidth - 30, iHeight - 30);		
+	var linechart2 = new Chart(p, data2, 80,iHeight - 30, 80, 30, iWidth - 30, iHeight - 30);
    
    p.setup = function(){ 
 	   p.size(iWidth + 2 * margin, iHeight + 2 * margin, p.P2D);
@@ -152,22 +163,20 @@ function sketchProc(p) {
 	   
 	   $("#intro").css("padding-left", "40%");
 	   $("#intro").show();
-       $("#poster").show();
+	   $("#canvas1").show();
+
+       $("p").show();
        
 
        //DRAWING FIRST GRAPH
-       linechart0.draw();
-
-	   $("#intro").text("Step 0");
-       $("#canvas1").hide();
-       $("#p1").hide();
+       linechart0.draw();  
+       $("#p1").show();
        $("#p2").hide();
        $("#p3").hide();
    }
    
    function step1() {
        $("#poster").hide();
-       linechart1.draw();
        $("#canvas1").show();
 	   $("p").show();
 	   
@@ -183,13 +192,12 @@ function sketchProc(p) {
 	   // The example to write processing.js code in Javasript
 	   p.textAlign(p.CENTER);
 	   // The example to use teh "result dataset"
-	   p.text(result[0].Title, p.width / 2.0, p.height / 3.0);
-	   p.text("I'm dying!!!!!!!", p.width / 2.0, p.height / 3.0 - 20);
+	   //p.text(result[0].Title, p.width / 2.0, p.height / 3.0);
 	   // I'm calling local JavaScript function here
 	   //cat(p.width / 2.0 + Math.random() * 50, p.height / 2.0 + Math.random() * 10, 30, Math.random());
-	   $("#p1").text("p1");
-	   $("#p2").text("p2");
-	   $("#p3").text("p3");		   
+	   $("#p1").hide();
+	   $("#p2").show();
+	   $("#p3").hide();		   
    }
    
    function step2(){
@@ -200,9 +208,9 @@ function sketchProc(p) {
 	  //DRAWING THIRD GRAPH
 	  linechart2.draw();
 	   
-	   $("#p1").text("p1");
-	   $("#p2").text("p2");
-	   $("#p3").hide();   
+	   $("#p1").hide();
+	   $("#p2").hide();
+	   $("#p3").show();   
    }
    }
 
