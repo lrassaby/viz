@@ -485,7 +485,6 @@ public class Button {
 };
 
 
-// TODO: figure out why the category change toggle button is going wonky
 public class CSVTree implements SquarifiedChart {
     private Table data;
     private Node root;

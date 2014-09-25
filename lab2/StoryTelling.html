@@ -39,7 +39,7 @@ footer{
 }
 
 img{
-    margin-left:42%;
+    margin-left:28%;
     text-align: center;
 }
 
@@ -47,23 +47,28 @@ img{
 
 </head>
 <body>
-<h2 id = "title"> Template </h2>
+<h2 id = "title"> DATA SET TITLE</h2>
 <p id = "intro">  </p>
 <p id = "p1" >  </p>
 <p id = "p2" >  </p>
 <p id = "p3" >  </p>
 <canvas class = "canvas" id = "canvas1"></canvas>
-<div><img src = "dexter.jpeg" id = "poster"> </div>
+
+<div><img src = "cookiebutter.jpg" id = "poster"> </div>
 <div id = "buttons">
    <button id = "pre" onclick = "decrease()"> Previous </button>
    <button id = "next" onclick = "increase()"> Next </button>
 </div>
 <footer>
-   <p> comp 150-07(VIZ), Lab 2: Story telling </p>
+   <p> comp 150-07(VIZ), Lab 2: Dexter</p>
 </footer>
 <script src = "http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script src = "http://processingjs.org/js/processing.min.js"></script>
 <script type = "text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+
+//linechart script
+<script src = "Linechart.js"></script>
+
 
 <script>
 
@@ -102,6 +107,16 @@ function decrease(){
 
 function sketchProc(p) {	
    var margin = 30, iWidth = 600, iHeight = 400;
+    var data0 = [['pineapple', '15'], ['grape', '-3'], ['lemon', '12'], ['apple', '1'], ['orange', '5'], ['coffee', '8']];
+
+    //FIRST LINECHART GRAPH TO SHOW ON FIRST SLIDE
+	var linechart0 = new Linechart(p, 80, iHeight - 30, data0, 80, 30, iWidth - 30, iHeight - 30);	
+
+	//SECOND LINECHART GRAPH TO SHOW ON SECOND SLIDE
+	var linechart1 = new Linechart(p, 80, iHeight - 30, data0, 80, 30, iWidth - 30, iHeight - 30);		
+
+	//THIRD LINECHART GRAPH TO SHOW ON THIRD SLIDE
+	var linechart2 = new Linechart(p, 80, iHeight - 30, data0, 80, 30, iWidth - 30, iHeight - 30);		
    
    p.setup = function(){ 
 	   p.size(iWidth + 2 * margin, iHeight + 2 * margin, p.P2D);
@@ -139,6 +154,10 @@ function sketchProc(p) {
 	   $("#intro").show();
        $("#poster").show();
        
+
+       //DRAWING FIRST GRAPH
+       linechart0.draw();
+
 	   $("#intro").text("Step 0");
        $("#canvas1").hide();
        $("#p1").hide();
@@ -146,12 +165,17 @@ function sketchProc(p) {
        $("#p3").hide();
    }
    
-   function step1(){
+   function step1() {
        $("#poster").hide();
+       linechart1.draw();
        $("#canvas1").show();
 	   $("p").show();
 	   
 	   $("#intro").hide();	   
+
+
+	   //DRAWING SECOND GRAPH
+	   linechart1.draw();
 	   
 	   $("#pre").prop("disabled",false);
 	   $("#next").prop("disabled",false);
@@ -162,7 +186,7 @@ function sketchProc(p) {
 	   p.text(result[0].Title, p.width / 2.0, p.height / 3.0);
 	   p.text("I'm dying!!!!!!!", p.width / 2.0, p.height / 3.0 - 20);
 	   // I'm calling local JavaScript function here
-	   cat(p.width / 2.0 + Math.random() * 50, p.height / 2.0 + Math.random() * 10, 30, Math.random());
+	   //cat(p.width / 2.0 + Math.random() * 50, p.height / 2.0 + Math.random() * 10, 30, Math.random());
 	   $("#p1").text("p1");
 	   $("#p2").text("p2");
 	   $("#p3").text("p3");		   
@@ -171,31 +195,15 @@ function sketchProc(p) {
    function step2(){
 	   $("#pre").prop("disabled",false);
 	   $("#next").prop("disabled",true);
-	   
-	   cat(p.width / 2.0, p.height / 2.0, 50, Math.random() * 10);
+	  
+
+	  //DRAWING THIRD GRAPH
+	  linechart2.draw();
 	   
 	   $("#p1").text("p1");
 	   $("#p2").text("p2");
 	   $("#p3").hide();   
    }
-   
-   function cat(x, y, size, random){   
-	   var headSize = size * 2 / 3, earSize = size * 0.4, eyeSize = (size * 0.005 - 1 > 0)? (size * 0.005) : 1;
-	   p.noStroke();
-	   p.triangle(x - earSize * 2, y - size * 0.15, x - earSize , y - size * 0.45, x - 1.5 * earSize, y - size * 0.15 - p.sqrt(3) * earSize);
-       p.triangle(x + earSize * 2, y - size * 0.15, x + earSize , y - size * 0.45, x + 1.5 * earSize, y - size * 0.15 - p.sqrt(3) * earSize);
-	   p.ellipse(x, y + 1 / 4 * size, headSize / ( 3 / 4 ) , headSize); // head
-	   p.stroke(p.color(0));
-	   p.strokeWeight(size * 0.2);
-	   p.fill(p.color(0));
-	   if(!random){
-		   random = 0;
-	   }
-	   p.bezier(x - headSize , y + 1 / 2 * size,  
-			   x - 1 * headSize,  y + 2 /2 * size,
-			   x - 2 * headSize,  y + 1 /2 * size + random,
-			   x - 3 * headSize,  y + 2 /2* size + random); // head
-    }
    }
 
 
