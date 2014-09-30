@@ -16,40 +16,18 @@ import java.io.IOException;
 
 public class a2 extends PApplet {
 
-// TODO: additional requirements
 
 
-int[] margins = {80, 65, 30, 100}; // left, top, right, bottom
-Point origin, 
-      topyaxis, 
-      rightxaxis;
-String hovertext;
-Dimensions buttondim;
 TransitionChart chart;
+ButtonGroup buttons;
 
-// To create a new chart just change the strings in here 
-String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart"};
-
-Button[] buttons = new Button[chart_texts.length]; 
-Point[] buttonpos = new Point[chart_texts.length];
-boolean hover;
 
 public void setup () {
   frame.setResizable(true);
-  size(700, 700);
+  size(900, 700);
+  Point center = new Point(900/2, 700/2);
 
-  origin = new Point(margins[0], height - margins[3]);
-  topyaxis = new Point(margins[0], margins[1]); 
-  rightxaxis = new Point(width - margins[2], height - margins[3]);
-  buttondim = new Dimensions(100, 30);
-
-
-  for (int i = 0; i < buttons.length; i++) {
-    buttonpos[i] = new Point(width - buttondim.w - margins[2] - (buttons.length - i - 1) * (buttondim.w + 10), margins[1] - 50);
-    buttons[i] = new Button(buttonpos[i], buttondim, 7, color(50, 200, 160), chart_texts[i]);
-  }
-
-  String file = null;
+  String filename = null;
   try { 
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
   } 
@@ -57,150 +35,93 @@ public void setup () {
     e.printStackTrace();
   } 
   try {
-      file = JOptionPane.showInputDialog(frame, "Input file (type csv)", "data.csv");
+      filename = JOptionPane.showInputDialog(frame, "Input file (type csv)", "data.csv");
   } catch (Exception e) {
       println("Process cancelled.");
       exit();
   }
-  if (file == null) {
+  if (filename == null) {
       println("Process cancelled.");
       exit();
   }
-  Table data = loadTable(file, "header");
+  Table data = loadTable(filename, "header");
+  String[] lines = loadStrings(filename);
+  String[] categories = lines[0].split(",");
 
-  chart = new TransitionChart(data, origin, topyaxis, rightxaxis);
+  String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart"};
+  buttons = new ButtonGroup(chart_texts);
+  chart = new TransitionChart(data, categories, center);
+  chart.setChartType(chart_texts[0]);
+  buttons.setSelection(chart_texts[0]);
 }
 
 
 public void draw() {
-
   background(240, 240, 240);
 
-  origin.setXY(margins[0], height - margins[3]);
-  topyaxis.setXY(margins[0], margins[1]);
-  rightxaxis.setXY(width - margins[2], height - margins[3]);
-
-  chart.setAxes(origin, topyaxis, rightxaxis);
   chart.draw();
-
-  String chart_type = chart.getChartType();
-
-  for (int i = 0; i < buttons.length; i++) {
-    buttonpos[i].setXY(width - buttondim.w - margins[2] - (buttons.length - i - 1) * (buttondim.w + 10), margins[1] - 50);
-    if (chart_texts[i] == chart_type) {
-      buttons[i].setColor(40, 190, 100);
-    } else {
-      buttons[i].setColor(50, 200, 160);
-    }
-    buttons[i].draw();
-  }
-
-  if (hover) {
-    fill(255, 0, 0);
-    textSize(20);
-    // chart.highlightOnHover();
-    fill(255, 0, 0);
-    if (mouseX < (width/2)) {
-      textAlign(LEFT, CENTER);
-      text(hovertext, mouseX, mouseY - 20);
-    } else {
-      textAlign(RIGHT, CENTER);
-      text(hovertext, mouseX, mouseY - 20);
-    }
-  }
+  buttons.draw();
 }
 
 public void mouseClicked() {
-  for (int i = 0; i < buttons.length; i++) {
-    buttons[i].intersect(mouseX, mouseY);
-    boolean selected = buttons[i].getIsect();
-    if (selected) { 
-      buttons[i].setSelected(false);
-      if (!chart.inTransition()) {
-        chart.setChartType(chart_texts[i]);
-      }
-    }
+  String clicked = buttons.getClicked();
+  if (chart.setChartType(clicked)) {
+    buttons.setSelection(clicked);
   }
 }
 
 
 
 public class AxisChart {
-    Linechart linechart;
-    Barchart barchart;
-    boolean barchartSelected = false, linechartSelected = true;
-    Point origin, topyaxis, rightxaxis;
-    String x_label = "Fruits", y_label = "Count";
-    FruitCount[] datapoints;
-    int minY, maxY;
+    protected Table data;
+    protected String[] categories;
+    protected float maxY;
+    protected int[] margins = {80, 30, 120, 100};
+    protected Point origin, topyaxis, rightxaxis;
 
-    AxisChart (Table data, Point origin, Point topyaxis, Point rightxaxis) {
-        /* get data */
-        int i = 0;
-        datapoints = new FruitCount[data.getRowCount()];       
+    AxisChart (Table data, String[] categories) {
+        this.data = data;
+        maxY = data.getRow(0).getInt(categories[1]);
         for (TableRow row : data.rows()) {
-            datapoints[i++] = new FruitCount(row.getString("Name"), parseInt(row.getString("Number")));
+            int rowweight = row.getInt(categories[1]);
+            if (rowweight > maxY) {
+                maxY = rowweight;
+            }
         }
-        setAxes(origin, topyaxis, rightxaxis);
-        /* initialize */
-        barchart = new Barchart(datapoints, origin, topyaxis, rightxaxis);
-        linechart = new Linechart(datapoints, origin, topyaxis, rightxaxis);
-        
-        minY = datapoints[0].count;
-        maxY = datapoints[0].count;
-        for (i = 1; i < datapoints.length; i++) {
-            if (datapoints[i].count < minY) minY = datapoints[i].count;
-            if (datapoints[i].count > maxY) maxY = datapoints[i].count;
-        }
+        this.categories = categories;
+        origin = new Point(margins[0], height - margins[3]);
+        topyaxis = new Point(margins[0], margins[1]); 
+        rightxaxis = new Point(width - margins[2], height - margins[3]);
     }
 
-    public void draw() {
-        drawAxes();
-        drawLabels();
-        if (barchartSelected) {
-            barchart.setData(datapoints, origin, topyaxis, rightxaxis);
-            barchart.draw();
-        } else if (linechartSelected) {
-            linechart.setData(datapoints, origin, topyaxis, rightxaxis);
-            linechart.draw();
-        }
-    }
-    public void toggleChartSelection() {
-        barchartSelected = linechartSelected;
-        linechartSelected = !linechartSelected;
-    }
-
-    public void setAxes(Point origin, Point topyaxis, Point rightxaxis) {
-        this.origin = origin;
-        this.topyaxis = topyaxis;
-        this.rightxaxis = rightxaxis;
-    }
+ 
     public void drawAxes() {
         strokeWeight(2);
         line(origin.x, origin.y, topyaxis.x, topyaxis.y);
         line(origin.x, origin.y, rightxaxis.x, rightxaxis.y);
     }
-    public void drawLabels() {
+
+    protected void drawLabels() {
         fill(0);
         textSize(16); 
         textAlign(RIGHT, CENTER); 
         /* X labels */
         // X-axis label
-        makeText(x_label, rightxaxis.x, rightxaxis.y + 70, false);
+        makeText(categories[0], rightxaxis.x, rightxaxis.y + 70, 0);
         // X value labels
         textSize(12); 
-        int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
+        int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
         strokeWeight(sectionWidth * 0.8f);
         strokeCap(SQUARE);
-        for (int i = 0; i < datapoints.length; i++) {
+        for (int i = 0; i < data.getRowCount(); i++) {
             int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
             int y = origin.y + 10;
-            makeText(datapoints[i].fruit, x, y, true);
+            makeText(data.getRow(i).getString(categories[0]), x, y, -HALF_PI / 2);
         }
         /* Y labels */
         // Y-axis label
         textSize(16); 
-        makeText(y_label, topyaxis.x - 60, topyaxis.y + 50, true);
+        makeText(categories[1], topyaxis.x - 60, topyaxis.y + 50, -HALF_PI);
 
         // Y value labels
         textSize(12);
@@ -212,114 +133,49 @@ public class AxisChart {
             increment = 30;
         }
         for (int i = 0; i <= maxY; i+= increment) {
-            makeText(Integer.toString(i), origin.x - 10, PApplet.parseInt(i * ratio + origin.y), false);
+            makeText(Integer.toString(i), origin.x - 10, PApplet.parseInt(i * ratio + origin.y), 0);
         }
     }
 
-    public void makeText(String str, int x, int y, boolean vert) {      
-        if (vert) {
-            pushMatrix();
-            translate(x, y);
-            rotate(-HALF_PI);
-            translate(-x, -y);
-            text(str, x, y);
-            popMatrix();
-        } else {
-            text(str, x, y);
-        }
-    }
 
-    public String mouseOver(int x, int y) {
-        if (barchartSelected) {
-            return barchart.intersect(x, y);
-        } else {
-            return linechart.intersect(x, y);
-        }
-    }
-
-    public void highlightOnHover() {
-        if (barchartSelected) {
-            barchart.highlightOnHover();
-        } else if (linechartSelected) {
-            linechart.highlightOnHover();
-        }
-    }
 };
-public class Barchart {
-    int minY, maxY;
-    Point origin, topyaxis, rightxaxis;
-    FruitCount[] datapoints;
-    boolean isect;
-    int dataHovered; 
+public class Barchart extends AxisChart {
+    private float weight = 0.8f;
 
-    public String intersect (int mousex, int mousey) {
-        float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
-        int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
-        strokeWeight(sectionWidth * 0.8f);
-        
-        for (int i = 0; i < datapoints.length; i++) {
-            int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-            int y = PApplet.parseInt(datapoints[i].count * ratio) + origin.y;
-            
-            if (mousex > x - sectionWidth * 0.4f && mousex < x + sectionWidth * 0.4f) {
-                // within the x range
-                if (mousey > y && mousey < origin.y) {
-                    // within the y range
-                    dataHovered = i;
-                    return "(" + datapoints[i].fruit + ", " + datapoints[i].count + ")";
-                }
-            }
-        }
-        return "";
+    Barchart(Table data, String[] categories) {
+        super(data, categories);
     }
 
-    Barchart(FruitCount[] datapoints, Point origin, Point topyaxis, Point rightxaxis) {
-        setData(datapoints, origin, topyaxis, rightxaxis);
-    }
-    public void setData(FruitCount[] datapoints, Point origin, Point topyaxis, Point rightxaxis) {
-        this.datapoints = datapoints;
-        this.origin = origin;
-        this.topyaxis = topyaxis;
-        this.rightxaxis = rightxaxis;
-        minY = datapoints[0].count;
-        maxY = datapoints[0].count;
-        for (int i = 1; i < datapoints.length; i++) {
-            if (datapoints[i].count < minY) minY = datapoints[i].count;
-            if (datapoints[i].count > maxY) maxY = datapoints[i].count;
-        }
-    }
     public void draw () {
-        float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
-        int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
-        strokeWeight(sectionWidth * 0.8f);
-        strokeCap(SQUARE);
-        for (int i = 0; i < datapoints.length; i++) {
-            int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-            int y = PApplet.parseInt(datapoints[i].count * ratio) + origin.y;
-            line(x, origin.y, x, y);
-        }
+        origin.setXY(margins[0], height - margins[3]);
+        topyaxis.setXY(margins[0], margins[1]);
+        rightxaxis.setXY(width - margins[2], height - margins[3]);
+        drawAxes();
+        drawLabels();
+        drawData();
     }
 
-    public void highlightOnHover() {
-            float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
-            int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
-            
-            int x = origin.x + sectionWidth * dataHovered + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-            int y = PApplet.parseInt(datapoints[dataHovered].count * ratio) + origin.y;
-            stroke(255, 255, 0);
-            strokeWeight(sectionWidth * 0.8f);
-            strokeCap(SQUARE);
+
+    public void drawData() {
+        float ratio = PApplet.parseFloat(topyaxis.y - origin.y) / maxY;
+        int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
+        strokeWeight(sectionWidth * weight);
+        stroke(0);
+        strokeCap(SQUARE);
+        for (int i = 0; i < data.getRowCount(); i++) {
+            int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+            int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
             line(x, origin.y, x, y);
-            stroke(0);
+        }
     }
 };
 public class Button {
-  boolean isect;
-  Point pos; 
-  Dimensions dim;
-  float roundness;
-  int c;
-  String text;
+  private boolean isect;
+  private Point pos; 
+  private Dimensions dim;
+  private float roundness;
+  private int c;
+  private String text;
  
 
   public void draw() {
@@ -359,8 +215,8 @@ public class Button {
     isect = s;
   }
 
-  public void setPos(Point pos) {
-    this.pos = pos;
+  public void setPos(int x, int y) {
+    this.pos.setXY(x, y);
   }
   
   public void setSize (Dimensions dim) {
@@ -392,9 +248,57 @@ public class Button {
   public String getText() {return text;}
 };
 
+class ButtonGroup {
+    private Button[] buttons;
+    private String selection;
+    
+    ButtonGroup (String[] chart_texts) {
+        selection = chart_texts[0];
+        buttons = new Button[chart_texts.length]; 
+        Dimensions buttondim = new Dimensions(90, (height - 80) / buttons.length);
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i] = new Button(new Point(), buttondim, 7, color(255, 153, 51), chart_texts[i]);
+        }
+    }
+
+    public void draw() {
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i].pos.setXY(width - buttons[0].dim.w - 20, 30 + i * (buttons[i].dim.h + 10));
+            if (buttons[i].getText() == selection) {
+                buttons[i].setColor(40, 190, 100);
+            } else {
+                buttons[i].setColor(50, 200, 160);
+            }
+            buttons[i].draw();
+        }
+    }
+    public String getSelection () {
+        return selection;
+    }
+
+    public void setSelection (String selection) {
+        this.selection = selection;
+    }
+
+    public String getClicked() {
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i].intersect(mouseX, mouseY);
+            boolean selected = buttons[i].getIsect();
+            if (selected) { 
+                buttons[i].setSelected(false);
+                return buttons[i].getText();
+            }
+        }
+        return "";
+    }
+};
 public class Point {
     int x, y;
     String disp;
+    Point() {
+        this.x = 0;
+        this.y = 0;
+    }
     Point(int x, int y) {
         this.x = x;
         this.y = y;
@@ -435,135 +339,90 @@ public class Line {
         this.end = end;
     }
 };
+public class Linechart extends AxisChart {
+    private int radius = 5;
 
-
-public class FruitCount {
-    String fruit;
-    int count;
-    FruitCount(String fruit, int count) {
-        this.fruit = fruit;
-        this.count = count;
-    }
-    public void setFruitCount(String fruit, int count) {
-        this.fruit = fruit;
-        this.count = count;
-    }
-};
-public class Linechart {
-    int minY, maxY;
-    Point origin, topyaxis, rightxaxis;
-    FruitCount[] datapoints;
-    boolean isect;
-    int radius = 5;
-    int dataHovered;
-
-    public String intersect (int mousex, int mousey) {
-        float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
-        int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
-        strokeWeight(sectionWidth * 0.8f);
-        
-        for (int i = 0; i < datapoints.length; i++) {
-            int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-            int y = PApplet.parseInt(datapoints[i].count * ratio) + origin.y + 4;
-            
-            if ((mousex - x) * (mousex - x) + (mousey - y) * (mousey - y) < (radius + 1) * (radius + 1)) {
-                dataHovered = i;
-                return "(" + datapoints[i].fruit + ", " + datapoints[i].count + ")";
-            }
-        }
-        return "";
-    }
-
-    Linechart(FruitCount[] datapoints, Point origin, Point topyaxis, Point rightxaxis) {
-        setData(datapoints, origin, topyaxis, rightxaxis);
-    }
-    public void setData(FruitCount[] datapoints, Point origin, Point topyaxis, Point rightxaxis) {
-        this.datapoints = datapoints;
-        this.origin = origin;
-        this.topyaxis = topyaxis;
-        this.rightxaxis = rightxaxis;
-        minY = datapoints[0].count;
-        maxY = datapoints[0].count;
-        for (int i = 1; i < datapoints.length; i++) {
-            if (datapoints[i].count < minY) minY = datapoints[i].count;
-            if (datapoints[i].count > maxY) maxY = datapoints[i].count;
-        }
+    Linechart(Table data, String[] categories) {
+        super(data, categories);
     }
 
     public void draw () {
+        origin.setXY(margins[0], height - margins[3]);
+        topyaxis.setXY(margins[0], margins[1]);
+        rightxaxis.setXY(width - margins[2], height - margins[3]);
+        drawAxes();
+        drawLabels();
+        drawData();
+    }
+
+
+    public void drawData () {
         strokeWeight(2);
         float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
-        int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
-        Point prev = new Point(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(datapoints[0].count * ratio) + origin.y);
+        int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
+        Point prev = new Point(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio) + origin.y);
+        stroke(0);
         drawCircle(prev.x, prev.y, 10);
-        for (int i = 1; i < datapoints.length; i++) {
+        for (int i = 1; i < data.getRowCount(); i++) {
             int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-            int y = PApplet.parseInt(datapoints[i].count * ratio) + origin.y;
+            int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
             line(prev.x, prev.y, x, y);
             prev.setXY(x, y);
             drawCircle(prev.x, prev.y, radius * 2);
         }
     }
-
-    public void drawCircle(int x, int y, float diameter) {
-        ellipse(x, y, diameter, diameter);
-    }
-
-    public void highlightOnHover() {
-        float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
-        int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
-        Point prev = new Point(origin.x + sectionWidth / 2, PApplet.parseInt(datapoints[0].count * ratio) + origin.y);
-        int x = origin.x + sectionWidth * dataHovered + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-        int y = PApplet.parseInt(datapoints[dataHovered].count * ratio) + origin.y;
-            
-        prev.setXY(x, y);
-        fill(255, 255, 0);
-        stroke(255, 255, 0);
-        drawCircle(prev.x, prev.y, radius * 2);
-        stroke(0);
-        fill(0);
-    }
 };
 public class Piechart {
 	float radius;
     Point center;
-    FruitCount[] datapoints;
-    float[] ratios;
+    Table datapoints;
+    float[] angles;
+    int[] colors;
+    String[] categories;
     int dataHovered;
 
     public boolean intersect (int mousex, int mousey) {
     	return(dist(center.x, center.y, mousex, mousey) <= radius);
     }
 
-    Piechart(FruitCount[] datapoints, Point center, float radius) {
-        setData(datapoints, center, radius);
+    Piechart(Table datapoints, String[] categories, Point center) {
+        setData(datapoints, categories, center);
     }
 
-    public void setData(FruitCount[] datapoints, Point center, float radius) {
+    public void setData(Table datapoints, String[] categories, Point center) {
         this.datapoints = datapoints;
+        this.categories = categories;
         this.center = center;
-        this.radius = radius;
+        this.radius = 300;
+        this.angles = new float[datapoints.getRowCount()];
         int total_magnitude = 0;
-        for (int i = 0; i < datapoints.length; i++) {
-        	total_magnitude += datapoints[i].count;
+        for (int i = 0; i < datapoints.getRowCount(); i++) {
+        	total_magnitude += datapoints.getRow(i).getInt(categories[1]);
         }
-        for (int i = 0; i < datapoints.length; i++) {
-        	ratios[i] = (datapoints[i].count/total_magnitude);
+        println(total_magnitude);
+        for (int i = 0; i < datapoints.getRowCount(); i++) {
+        	angles[i] = (PApplet.parseFloat(datapoints.getRow(i).getInt(categories[1])) / total_magnitude) * 360;
+        }
+
+        colors = new int[angles.length];
+        for (int i = 0; i < colors.length; i++) {
+            colors[i] = color(random(255), random(255), random(255));
         }
     }
 
     public void draw () {
-    	drawCircle(center.x, center.y, radius * 2);
-        for (int i = 0; i < datapoints.length; i++) {
-            float x = cos(radians(360 * ratios[i])) * radius;
-            float y = sin(radians(360 * ratios[i])) * radius;
-            line(center.x, center.y, x, y);
+        float angle = 0;
+        for (int i = 0; i < angles.length; i++) {
+            fill(colors[i]);
+            arc(width/2, height/2, radius * 2, radius *2, angle, angle+radians(angles[i]));
+            angle += radians(angles[i]);
         }
     }
 
     public void drawCircle(int x, int y, float diameter) {
         ellipse(x, y, diameter, diameter);
     }
+};
 
     // void highlightOnHover() {
     //     float ratio = float((topyaxis.y - origin.y)) / maxY;
@@ -579,52 +438,74 @@ public class Piechart {
     //     stroke(0);
     //     fill(0);
     // }
-};
 public class TransitionChart {
+    // transitions
     private String prev_chart_type;
     private String chart_type;
     private boolean in_transition;
-    private AxisChart chart;
-    TransitionChart(Table data, Point origin, Point topyaxis, Point rightxaxis) {
-        this.chart = new AxisChart(data, origin, topyaxis, rightxaxis);
-        this.in_transition = false;
+    // charts
+    private Barchart barchart;
+    private Linechart linechart;
+    private Piechart piechart;
+    // data
+    private String[] categories;
+    private Table data;
+
+    TransitionChart(Table data, String[] categories, Point center) {
+        this.barchart = new Barchart(data, categories);
+        this.linechart = new Linechart(data, categories);
+        this.piechart = new Piechart(data, categories, center);
+        this.data = data;
+        this.categories = categories;
     }
-    public void setChartType(String chart_type) {
-        if (!in_transition) {
+
+    public boolean setChartType(String chart_type) {
+        if (!in_transition && chart_type != "") {
             this.prev_chart_type = this.chart_type;
             this.chart_type = chart_type;
-            in_transition = true;
+            in_transition = false; // should become true
+            return true;
         }
+        return false;
     }
+
     public Boolean inTransition() {
         return in_transition;
     }
+
     public String getChartType() {
         return chart_type;
     }
-    public void setAxes(Point origin, Point topyaxis, Point rightxaxis) {
-        chart.setAxes(origin, topyaxis, rightxaxis);
-    }
+
     public void draw() {
-        chart.draw();
+        if (in_transition) {
+
+        } else {
+            if (chart_type == "Line Chart") {
+                linechart.draw();
+            } else if (chart_type == "Bar Chart") {
+                barchart.draw();
+            } else if (chart_type == "Pie Chart") {
+                piechart.draw();
+            }
+        }
     }
 };
-public void setup() {
-    frame.setResizable(true);
-    size(700, 700);
-	radius = 50;
-	center = new Point(CENTER, CENTER);
-
-  	Table data = loadTable("data.csv", "header");
-  	datapoints = new FruitCount[data.getRowCount()];       
-        for (TableRow row : data.rows()) {
-            datapoints[i++] = new FruitCount(row.getString("Name"), parseInt(row.getString("Number")));
-        }
-	Piechart chart = new Piechart(datapoints, center, radius);
+public void makeText(String str, int x, int y, float rotation) {      
+    if (rotation != 0) {
+        pushMatrix();
+        translate(x, y);
+        rotate(rotation);
+        translate(-x, -y);
+        text(str, x, y);
+        popMatrix();
+    } else {
+        text(str, x, y);
+    }
 }
 
-public void draw() {
-	chart.draw();
+public void drawCircle(int x, int y, float diameter) {
+    ellipse(x, y, diameter, diameter);
 }
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "a2" };
