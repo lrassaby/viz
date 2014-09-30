@@ -4,10 +4,10 @@ public class Piechart {
     float[] angles;
     color[] colors;
     String[] categories;
-    int dataHovered;
+    ColorGenerator colorgenerator;
 
     boolean intersect (int mousex, int mousey) {
-    	return(dist(width / 2, height / 2, mousex, mousey) <= radius);
+    	return(dist(width / 2 - 40, height / 2, mousex, mousey) <= radius);
     }
 
     Piechart(Table data, String[] categories) {
@@ -15,6 +15,7 @@ public class Piechart {
     }
 
     void setData(Table data, String[] categories) {
+        colorgenerator = new ColorGenerator();
         this.data = data;
         this.categories = categories;
         this.radius = 300;
@@ -29,7 +30,7 @@ public class Piechart {
 
         colors = new color[angles.length];
         for (int i = 0; i < colors.length; i++) {
-            colors[i] = color(random(255), random(255), random(255));
+            colors[i] = colorgenerator.generate();
         }
     }
 
@@ -37,12 +38,8 @@ public class Piechart {
         float angle = 0;
         for (int i = 0; i < angles.length; i++) {
             fill(colors[i]);
-            arc(width/2, height/2, radius * 2, radius *2, angle, angle+radians(angles[i]));
+            arc(width/2 - 40, height/2, radius * 2, radius *2, angle, angle+radians(angles[i]));
             angle += radians(angles[i]);
         }
-    }
-
-    void drawCircle(int x, int y, float diameter) {
-        ellipse(x, y, diameter, diameter);
     }
 };

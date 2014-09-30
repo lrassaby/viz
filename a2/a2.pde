@@ -26,6 +26,7 @@ void setup () {
       println("Process cancelled.");
       exit();
   }
+  
   Table data = loadTable(filename, "header");
   String[] lines = loadStrings(filename);
   String[] categories = lines[0].split(",");

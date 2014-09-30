@@ -44,6 +44,7 @@ public void setup () {
       println("Process cancelled.");
       exit();
   }
+  println(filename == null);
   Table data = loadTable(filename, "header");
   String[] lines = loadStrings(filename);
   String[] categories = lines[0].split(",");
@@ -402,10 +403,10 @@ public class Piechart {
     float[] angles;
     int[] colors;
     String[] categories;
-    int dataHovered;
+    ColorGenerator colorgenerator;
 
     public boolean intersect (int mousex, int mousey) {
-    	return(dist(width / 2, height / 2, mousex, mousey) <= radius);
+    	return(dist(width / 2 - 40, height / 2, mousex, mousey) <= radius);
     }
 
     Piechart(Table data, String[] categories) {
@@ -413,6 +414,7 @@ public class Piechart {
     }
 
     public void setData(Table data, String[] categories) {
+        colorgenerator = new ColorGenerator();
         this.data = data;
         this.categories = categories;
         this.radius = 300;
@@ -427,7 +429,7 @@ public class Piechart {
 
         colors = new int[angles.length];
         for (int i = 0; i < colors.length; i++) {
-            colors[i] = color(random(255), random(255), random(255));
+            colors[i] = colorgenerator.generate();
         }
     }
 
@@ -435,13 +437,9 @@ public class Piechart {
         float angle = 0;
         for (int i = 0; i < angles.length; i++) {
             fill(colors[i]);
-            arc(width/2, height/2, radius * 2, radius *2, angle, angle+radians(angles[i]));
+            arc(width/2 - 40, height/2, radius * 2, radius *2, angle, angle+radians(angles[i]));
             angle += radians(angles[i]);
         }
-    }
-
-    public void drawCircle(int x, int y, float diameter) {
-        ellipse(x, y, diameter, diameter);
     }
 };
 public class TransitionChart {
@@ -458,7 +456,7 @@ public class TransitionChart {
     private String[] categories;
     private Table data;
     // constants
-    private final float transition_time = 2.0f;
+    private final float transition_time = 1.5f;
     private final float transition_frames = transition_time * 60.0f;
 
     TransitionChart(Table data, String[] categories) {
@@ -549,6 +547,38 @@ public void makeText(String str, int x, int y, float rotation) {
 public void drawCircle(int x, int y, float diameter) {
     ellipse(x, y, diameter, diameter);
 }
+
+// see http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
+public class ColorGenerator {
+    private float golden_ratio_conjugate = 0.618033988749895f;
+    private float h = 0.5f;
+    public int generate() {
+        h += golden_ratio_conjugate;
+        h %= 1;
+        return hsvToRGB(h, 0.70f, 0.80f);
+    }
+    public int hsvToRGB (float h, float s, float v) {
+        float h_i = PApplet.parseInt(h*6);
+        float f = h*6 - h_i;
+        float p = v * (1 - s);
+        float q = v * (1 - f*s);
+        float t = v * (1 - (1 - f) * s);
+        if (h_i == 0) {
+            return color(PApplet.parseInt(v * 256), PApplet.parseInt(t * 256), PApplet.parseInt(p * 256));
+        } else if (h_i == 1) {
+            return color(PApplet.parseInt(q * 256), PApplet.parseInt(v * 256), PApplet.parseInt(p * 256));
+        } else if (h_i == 2) {
+            return color(PApplet.parseInt(p * 256), PApplet.parseInt(v * 256), PApplet.parseInt(t * 256));
+        } else if (h_i == 3) {
+            return color(PApplet.parseInt(p * 256), PApplet.parseInt(q * 256), PApplet.parseInt(v * 256));
+        } else if (h_i == 4) {
+            return color(PApplet.parseInt(t * 256), PApplet.parseInt(p * 256), PApplet.parseInt(v * 256));
+        } else if (h_i == 5) {
+            return color(PApplet.parseInt(v * 256), PApplet.parseInt(p * 256), PApplet.parseInt(q * 256));
+        }
+        return color(0, 0, 0);
+    }
+};
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "a2" };
     if (passedArgs != null) {
