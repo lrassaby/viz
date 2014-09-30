@@ -525,7 +525,60 @@ public class Linechart {
     }
 };
 public class Piechart {
-   
+	float radius;
+    Point center;
+    FruitCount[] datapoints;
+    float[] ratios;
+    int dataHovered;
+
+    public boolean intersect (int mousex, int mousey) {
+    	return(dist(center.x, center.y, mousex, mousey) <= radius);
+    }
+
+    Piechart(FruitCount[] datapoints, Point center, float radius) {
+        setData(datapoints, center, radius);
+    }
+
+    public void setData(FruitCount[] datapoints, Point center, float radius) {
+        this.datapoints = datapoints;
+        this.center = center;
+        this.radius = radius;
+        int total_magnitude = 0;
+        for (int i = 0; i < datapoints.length; i++) {
+        	total_magnitude += datapoints[i].count;
+        }
+        for (int i = 0; i < datapoints.length; i++) {
+        	ratios[i] = (datapoints[i].count/total_magnitude);
+        }
+    }
+
+    public void draw () {
+    	drawCircle(center.x, center.y, radius * 2);
+        for (int i = 0; i < datapoints.length; i++) {
+            float x = cos(radians(360 * ratios[i])) * radius;
+            float y = sin(radians(360 * ratios[i])) * radius;
+            line(center.x, center.y, x, y);
+        }
+    }
+
+    public void drawCircle(int x, int y, float diameter) {
+        ellipse(x, y, diameter, diameter);
+    }
+
+    // void highlightOnHover() {
+    //     float ratio = float((topyaxis.y - origin.y)) / maxY;
+    //     int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
+    //     Point prev = new Point(origin.x + sectionWidth / 2, int(datapoints[0].count * ratio) + origin.y);
+    //     int x = origin.x + sectionWidth * dataHovered + sectionWidth / 2 + int(sectionWidth * 0.1);
+    //     int y = int(datapoints[dataHovered].count * ratio) + origin.y;
+            
+    //     prev.setXY(x, y);
+    //     fill(255, 255, 0);
+    //     stroke(255, 255, 0);
+    //     drawCircle(prev.x, prev.y, radius * 2);
+    //     stroke(0);
+    //     fill(0);
+    // }
 };
 public class TransitionChart {
     private String prev_chart_type;
@@ -556,6 +609,23 @@ public class TransitionChart {
         chart.draw();
     }
 };
+public void setup() {
+    frame.setResizable(true);
+    size(700, 700);
+	radius = 50;
+	center = new Point(CENTER, CENTER);
+
+  	Table data = loadTable("data.csv", "header");
+  	datapoints = new FruitCount[data.getRowCount()];       
+        for (TableRow row : data.rows()) {
+            datapoints[i++] = new FruitCount(row.getString("Name"), parseInt(row.getString("Number")));
+        }
+	Piechart chart = new Piechart(datapoints, center, radius);
+}
+
+public void draw() {
+	chart.draw();
+}
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "a2" };
     if (passedArgs != null) {
