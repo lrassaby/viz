@@ -23,7 +23,7 @@ public class AxisChart {
  
     void drawAxes() {
         strokeWeight(2);
-        line(origin.x, origin.y, topyaxis.x, topyaxis.y);
+        line(origin.x, origin.y, topyaxis.x, topyaxis.y - 5);
         line(origin.x, origin.y, rightxaxis.x, rightxaxis.y);
     }
 
@@ -58,7 +58,7 @@ public class AxisChart {
         } catch (Exception e) {
             increment = 30;
         }
-        for (int i = 0; i <= maxY; i+= increment) {
+        for (int i = 0; i <= maxY * 1.03; i+= increment) {
             makeText(Integer.toString(i), origin.x - 10, int(i * ratio + origin.y), 0);
         }
     }

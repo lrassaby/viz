@@ -25,6 +25,7 @@ ButtonGroup buttons;
 public void setup () {
   frame.setResizable(true);
   size(900, 700);
+  frameRate(60);
 
   String filename = null;
   try { 
@@ -96,7 +97,7 @@ public class AxisChart {
  
     public void drawAxes() {
         strokeWeight(2);
-        line(origin.x, origin.y, topyaxis.x, topyaxis.y);
+        line(origin.x, origin.y, topyaxis.x, topyaxis.y - 5);
         line(origin.x, origin.y, rightxaxis.x, rightxaxis.y);
     }
 
@@ -131,7 +132,7 @@ public class AxisChart {
         } catch (Exception e) {
             increment = 30;
         }
-        for (int i = 0; i <= maxY; i+= increment) {
+        for (int i = 0; i <= maxY * 1.03f; i+= increment) {
             makeText(Integer.toString(i), origin.x - 10, PApplet.parseInt(i * ratio + origin.y), 0);
         }
     }
@@ -139,34 +140,46 @@ public class AxisChart {
 
 };
 public class Barchart extends AxisChart {
-    private float weight = 0.8f;
-
     Barchart(Table data, String[] categories) {
         super(data, categories);
     }
 
-    public void draw () {
+    public void draw (float transition_completeness, Transition transition) {
         origin.setXY(margins[0], height - margins[3]);
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
         drawAxes();
         drawLabels();
-        drawData();
+        drawData(transition_completeness, transition);
     }
 
 
-    public void drawData() {
+    public void drawData (float transition_completeness, Transition transition) {
         float ratio = PApplet.parseFloat(topyaxis.y - origin.y) / maxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
-        strokeWeight(sectionWidth * weight);
+        strokeWeight(lerp(2, sectionWidth * 0.8f, transition_completeness));
         stroke(0);
         strokeCap(SQUARE);
-        for (int i = 0; i < data.getRowCount(); i++) {
-            int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-            int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
-            line(x, origin.y, x, y);
+
+        switch(transition) {
+            case NONE:
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    line(x, origin.y, x, y);
+                }
+                break;
+            case LINETOBAR:
+            case BARTOLINE:
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    line(x, lerp(y, origin.y, transition_completeness), x, y);
+                }
+                break;
         }
-    }
+        
+    }   
 };
 public class Button {
   private boolean isect;
@@ -339,35 +352,47 @@ public class Line {
     }
 };
 public class Linechart extends AxisChart {
-    private int radius = 5;
-
     Linechart(Table data, String[] categories) {
         super(data, categories);
     }
 
-    public void draw () {
+    public void draw (float transition_completeness, Transition transition) {
         origin.setXY(margins[0], height - margins[3]);
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
         drawAxes();
         drawLabels();
-        drawData();
+        drawData(transition_completeness, transition);
     }
 
-
-    public void drawData () {
+    public void drawData (float transition_completeness, Transition transition) {
         strokeWeight(2);
         float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
         Point prev = new Point(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio) + origin.y);
         stroke(0);
-        drawCircle(prev.x, prev.y, 10);
-        for (int i = 1; i < data.getRowCount(); i++) {
-            int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-            int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
-            line(prev.x, prev.y, x, y);
-            prev.setXY(x, y);
-            drawCircle(prev.x, prev.y, radius * 2);
+        switch (transition) {
+            case NONE:
+                drawCircle(prev.x, prev.y, 10);
+                for (int i = 1; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    line(prev.x, prev.y, x, y);
+                    prev.setXY(x, y);
+                    drawCircle(prev.x, prev.y, 10);
+                }
+                break;
+            case LINETOBAR:
+            case BARTOLINE:
+                drawCircle(prev.x, prev.y, lerp(0, 10, transition_completeness));
+                for (int i = 1; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    line(prev.x, prev.y, lerp(prev.x, x, transition_completeness), lerp(prev.y, y, transition_completeness));
+                    prev.setXY(x, y);
+                    drawCircle(prev.x, prev.y, lerp(2, 10, transition_completeness));
+                }
+                break;
         }
     }
 };
@@ -375,8 +400,8 @@ public class Piechart {
    Piechart(Table data, String[] categories) {
 
    }
-   public void draw() {
-    
+   public void draw(float transition_completeness, Transition transition) {
+
    }
 };
 public class TransitionChart {
@@ -384,6 +409,7 @@ public class TransitionChart {
     private String prev_chart_type;
     private String chart_type;
     private boolean in_transition;
+    private int transition_start_frame;
     // charts
     private Barchart barchart;
     private Linechart linechart;
@@ -391,6 +417,9 @@ public class TransitionChart {
     // data
     private String[] categories;
     private Table data;
+    // constants
+    private final float transition_time = 2.0f;
+    private final float transition_frames = transition_time * 60.0f;
 
     TransitionChart(Table data, String[] categories) {
         this.barchart = new Barchart(data, categories);
@@ -398,13 +427,17 @@ public class TransitionChart {
         this.piechart = new Piechart(data, categories);
         this.data = data;
         this.categories = categories;
+        this.transition_start_frame = 0;
+        this.in_transition = false;
     }
 
     public boolean setChartType(String chart_type) {
         if (!in_transition && chart_type != "") {
             this.prev_chart_type = this.chart_type;
             this.chart_type = chart_type;
-            in_transition = false; // should become true
+            if (prev_chart_type != "" && prev_chart_type != null) {
+                in_transition = true; // should become true
+            }
             return true;
         }
         return false;
@@ -420,14 +453,42 @@ public class TransitionChart {
 
     public void draw() {
         if (in_transition) {
+            if (transition_start_frame == 0) { // beginning of transition
+                transition_start_frame = frameCount;
+            }
+            int elapsed_frames = frameCount - transition_start_frame;
+            float progress = elapsed_frames / transition_frames;
 
+            if (prev_chart_type == "Line Chart" && chart_type == "Bar Chart") {
+                if (progress < 0.5f) {
+                    linechart.draw(1.0f - (progress * 2), Transition.LINETOBAR);
+                } else {
+                    barchart.draw((progress - 0.5f) * 2, Transition.LINETOBAR);
+                }
+            } else if (prev_chart_type == "Bar Chart" && chart_type == "Line Chart") {
+                if (progress < 0.5f) {
+                    barchart.draw(1.0f - (progress * 2), Transition.LINETOBAR);
+                } else {
+                    linechart.draw((progress - 0.5f) * 2, Transition.LINETOBAR);
+                }
+            } else {
+                println("Transformation not yet implemented.");
+                in_transition = false;
+                transition_start_frame = 0;
+            }
+
+
+            if (elapsed_frames >= transition_frames) {
+                in_transition = false;
+                transition_start_frame = 0;
+            }             
         } else {
             if (chart_type == "Line Chart") {
-                linechart.draw();
+                linechart.draw(1, Transition.NONE);
             } else if (chart_type == "Bar Chart") {
-                barchart.draw();
+                barchart.draw(1, Transition.NONE);
             } else if (chart_type == "Pie Chart") {
-                piechart.draw();
+                piechart.draw(1, Transition.NONE);
             }
         }
     }

@@ -7,6 +7,7 @@ ButtonGroup buttons;
 void setup () {
   frame.setResizable(true);
   size(900, 700);
+  frameRate(60);
 
   String filename = null;
   try { 
