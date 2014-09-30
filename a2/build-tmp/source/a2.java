@@ -44,7 +44,7 @@ public void setup () {
       println("Process cancelled.");
       exit();
   }
-  println(filename == null);
+  
   Table data = loadTable(filename, "header");
   String[] lines = loadStrings(filename);
   String[] categories = lines[0].split(",");
@@ -398,16 +398,11 @@ public class Linechart extends AxisChart {
     }
 };
 public class Piechart {
-	float radius;
     Table data;
     float[] angles;
     int[] colors;
     String[] categories;
     ColorGenerator colorgenerator;
-
-    public boolean intersect (int mousex, int mousey) {
-    	return(dist(width / 2 - 40, height / 2, mousex, mousey) <= radius);
-    }
 
     Piechart(Table data, String[] categories) {
         setData(data, categories);
@@ -417,7 +412,6 @@ public class Piechart {
         colorgenerator = new ColorGenerator();
         this.data = data;
         this.categories = categories;
-        this.radius = 300;
         this.angles = new float[data.getRowCount()];
         int total_magnitude = 0;
         for (int i = 0; i < data.getRowCount(); i++) {
@@ -437,7 +431,7 @@ public class Piechart {
         float angle = 0;
         for (int i = 0; i < angles.length; i++) {
             fill(colors[i]);
-            arc(width/2 - 40, height/2, radius * 2, radius *2, angle, angle+radians(angles[i]));
+            arc(width/2 - 50, height/2, (min(height, width - 120)) - 40, (min (height, width - 120)) - 40, angle, angle+radians(angles[i]));
             angle += radians(angles[i]);
         }
     }
