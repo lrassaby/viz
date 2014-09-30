@@ -22,7 +22,7 @@ public class ColorGenerator {
     public color generate() {
         h += golden_ratio_conjugate;
         h %= 1;
-        return hsvToRGB(h, 0.70, 0.80);
+        return hsvToRGB(h, 0.60, 0.90);
     }
     public color hsvToRGB (float h, float s, float v) {
         float h_i = int(h*6);
@@ -30,19 +30,20 @@ public class ColorGenerator {
         float p = v * (1 - s);
         float q = v * (1 - f*s);
         float t = v * (1 - (1 - f) * s);
+        color c = color(0, 0, 0);
         if (h_i == 0) {
-            return color(int(v * 256), int(t * 256), int(p * 256));
+            c = color(int(v * 256), int(t * 256), int(p * 256));
         } else if (h_i == 1) {
-            return color(int(q * 256), int(v * 256), int(p * 256));
+            c = color(int(q * 256), int(v * 256), int(p * 256));
         } else if (h_i == 2) {
-            return color(int(p * 256), int(v * 256), int(t * 256));
+            c = color(int(p * 256), int(v * 256), int(t * 256));
         } else if (h_i == 3) {
-            return color(int(p * 256), int(q * 256), int(v * 256));
+            c = color(int(p * 256), int(q * 256), int(v * 256));
         } else if (h_i == 4) {
-            return color(int(t * 256), int(p * 256), int(v * 256));
+            c = color(int(t * 256), int(p * 256), int(v * 256));
         } else if (h_i == 5) {
-            return color(int(v * 256), int(p * 256), int(q * 256));
+            c = color(int(v * 256), int(p * 256), int(q * 256));
         }
-        return color(0, 0, 0);
+        return c;
     }
 };

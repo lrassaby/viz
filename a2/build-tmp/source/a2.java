@@ -549,7 +549,7 @@ public class ColorGenerator {
     public int generate() {
         h += golden_ratio_conjugate;
         h %= 1;
-        return hsvToRGB(h, 0.70f, 0.80f);
+        return hsvToRGB(h, 0.60f, 0.90f);
     }
     public int hsvToRGB (float h, float s, float v) {
         float h_i = PApplet.parseInt(h*6);
@@ -557,20 +557,21 @@ public class ColorGenerator {
         float p = v * (1 - s);
         float q = v * (1 - f*s);
         float t = v * (1 - (1 - f) * s);
+        int c = color(0, 0, 0);
         if (h_i == 0) {
-            return color(PApplet.parseInt(v * 256), PApplet.parseInt(t * 256), PApplet.parseInt(p * 256));
+            c = color(PApplet.parseInt(v * 256), PApplet.parseInt(t * 256), PApplet.parseInt(p * 256));
         } else if (h_i == 1) {
-            return color(PApplet.parseInt(q * 256), PApplet.parseInt(v * 256), PApplet.parseInt(p * 256));
+            c = color(PApplet.parseInt(q * 256), PApplet.parseInt(v * 256), PApplet.parseInt(p * 256));
         } else if (h_i == 2) {
-            return color(PApplet.parseInt(p * 256), PApplet.parseInt(v * 256), PApplet.parseInt(t * 256));
+            c = color(PApplet.parseInt(p * 256), PApplet.parseInt(v * 256), PApplet.parseInt(t * 256));
         } else if (h_i == 3) {
-            return color(PApplet.parseInt(p * 256), PApplet.parseInt(q * 256), PApplet.parseInt(v * 256));
+            c = color(PApplet.parseInt(p * 256), PApplet.parseInt(q * 256), PApplet.parseInt(v * 256));
         } else if (h_i == 4) {
-            return color(PApplet.parseInt(t * 256), PApplet.parseInt(p * 256), PApplet.parseInt(v * 256));
+            c = color(PApplet.parseInt(t * 256), PApplet.parseInt(p * 256), PApplet.parseInt(v * 256));
         } else if (h_i == 5) {
-            return color(PApplet.parseInt(v * 256), PApplet.parseInt(p * 256), PApplet.parseInt(q * 256));
+            c = color(PApplet.parseInt(v * 256), PApplet.parseInt(p * 256), PApplet.parseInt(q * 256));
         }
-        return color(0, 0, 0);
+        return c;
     }
 };
   static public void main(String[] passedArgs) {
