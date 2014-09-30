@@ -25,11 +25,7 @@ ButtonGroup buttons;
 public void setup () {
   frame.setResizable(true);
   size(900, 700);
-<<<<<<< HEAD
-  Point center = new Point(900/2, 700/2);
-=======
   frameRate(60);
->>>>>>> e57ca4eed330be2bbb5891418e3c9f8928ff4dea
 
   String filename = null;
   try { 
@@ -54,7 +50,7 @@ public void setup () {
 
   String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart"};
   buttons = new ButtonGroup(chart_texts);
-  chart = new TransitionChart(data, categories, center);
+  chart = new TransitionChart(data, categories);
   chart.setChartType(chart_texts[0]);
   buttons.setSelection(chart_texts[0]);
 }
@@ -402,35 +398,31 @@ public class Linechart extends AxisChart {
 };
 public class Piechart {
 	float radius;
-    Point center;
-    Table datapoints;
+    Table data;
     float[] angles;
     int[] colors;
     String[] categories;
     int dataHovered;
 
-<<<<<<< HEAD
     public boolean intersect (int mousex, int mousey) {
-    	return(dist(center.x, center.y, mousex, mousey) <= radius);
+    	return(dist(width / 2, height / 2, mousex, mousey) <= radius);
     }
 
-    Piechart(Table datapoints, String[] categories, Point center) {
-        setData(datapoints, categories, center);
+    Piechart(Table data, String[] categories) {
+        setData(data, categories);
     }
 
-    public void setData(Table datapoints, String[] categories, Point center) {
-        this.datapoints = datapoints;
+    public void setData(Table data, String[] categories) {
+        this.data = data;
         this.categories = categories;
-        this.center = center;
         this.radius = 300;
-        this.angles = new float[datapoints.getRowCount()];
+        this.angles = new float[data.getRowCount()];
         int total_magnitude = 0;
-        for (int i = 0; i < datapoints.getRowCount(); i++) {
-        	total_magnitude += datapoints.getRow(i).getInt(categories[1]);
+        for (int i = 0; i < data.getRowCount(); i++) {
+        	total_magnitude += data.getRow(i).getInt(categories[1]);
         }
-        println(total_magnitude);
-        for (int i = 0; i < datapoints.getRowCount(); i++) {
-        	angles[i] = (PApplet.parseFloat(datapoints.getRow(i).getInt(categories[1])) / total_magnitude) * 360;
+        for (int i = 0; i < data.getRowCount(); i++) {
+        	angles[i] = (PApplet.parseFloat(data.getRow(i).getInt(categories[1])) / total_magnitude) * 360;
         }
 
         colors = new int[angles.length];
@@ -439,7 +431,7 @@ public class Piechart {
         }
     }
 
-    public void draw () {
+    public void draw (float transition_completeness, Transition transition) {
         float angle = 0;
         for (int i = 0; i < angles.length; i++) {
             fill(colors[i]);
@@ -451,28 +443,7 @@ public class Piechart {
     public void drawCircle(int x, int y, float diameter) {
         ellipse(x, y, diameter, diameter);
     }
-=======
-   }
-   public void draw(float transition_completeness, Transition transition) {
-
-   }
->>>>>>> e57ca4eed330be2bbb5891418e3c9f8928ff4dea
 };
-
-    // void highlightOnHover() {
-    //     float ratio = float((topyaxis.y - origin.y)) / maxY;
-    //     int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
-    //     Point prev = new Point(origin.x + sectionWidth / 2, int(datapoints[0].count * ratio) + origin.y);
-    //     int x = origin.x + sectionWidth * dataHovered + sectionWidth / 2 + int(sectionWidth * 0.1);
-    //     int y = int(datapoints[dataHovered].count * ratio) + origin.y;
-            
-    //     prev.setXY(x, y);
-    //     fill(255, 255, 0);
-    //     stroke(255, 255, 0);
-    //     drawCircle(prev.x, prev.y, radius * 2);
-    //     stroke(0);
-    //     fill(0);
-    // }
 public class TransitionChart {
     // transitions
     private String prev_chart_type;
@@ -490,10 +461,10 @@ public class TransitionChart {
     private final float transition_time = 2.0f;
     private final float transition_frames = transition_time * 60.0f;
 
-    TransitionChart(Table data, String[] categories, Point center) {
+    TransitionChart(Table data, String[] categories) {
         this.barchart = new Barchart(data, categories);
         this.linechart = new Linechart(data, categories);
-        this.piechart = new Piechart(data, categories, center);
+        this.piechart = new Piechart(data, categories);
         this.data = data;
         this.categories = categories;
         this.transition_start_frame = 0;

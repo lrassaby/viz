@@ -12,13 +12,13 @@ public class TransitionChart {
     private String[] categories;
     private Table data;
     // constants
-    private final float transition_time = 2.0;
+    private final float transition_time = 1.5;
     private final float transition_frames = transition_time * 60.0;
 
-    TransitionChart(Table data, String[] categories, Point center) {
+    TransitionChart(Table data, String[] categories) {
         this.barchart = new Barchart(data, categories);
         this.linechart = new Linechart(data, categories);
-        this.piechart = new Piechart(data, categories, center);
+        this.piechart = new Piechart(data, categories);
         this.data = data;
         this.categories = categories;
         this.transition_start_frame = 0;

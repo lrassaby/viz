@@ -1,32 +1,30 @@
 public class Piechart {
 	float radius;
-    Point center;
-    Table datapoints;
+    Table data;
     float[] angles;
     color[] colors;
     String[] categories;
     int dataHovered;
 
     boolean intersect (int mousex, int mousey) {
-    	return(dist(center.x, center.y, mousex, mousey) <= radius);
+    	return(dist(width / 2, height / 2, mousex, mousey) <= radius);
     }
 
-    Piechart(Table datapoints, String[] categories, Point center) {
-        setData(datapoints, categories, center);
+    Piechart(Table data, String[] categories) {
+        setData(data, categories);
     }
 
-    void setData(Table datapoints, String[] categories, Point center) {
-        this.datapoints = datapoints;
+    void setData(Table data, String[] categories) {
+        this.data = data;
         this.categories = categories;
-        this.center = center;
         this.radius = 300;
-        this.angles = new float[datapoints.getRowCount()];
+        this.angles = new float[data.getRowCount()];
         int total_magnitude = 0;
-        for (int i = 0; i < datapoints.getRowCount(); i++) {
-        	total_magnitude += datapoints.getRow(i).getInt(categories[1]);
+        for (int i = 0; i < data.getRowCount(); i++) {
+        	total_magnitude += data.getRow(i).getInt(categories[1]);
         }
-        for (int i = 0; i < datapoints.getRowCount(); i++) {
-        	angles[i] = (float(datapoints.getRow(i).getInt(categories[1])) / total_magnitude) * 360;
+        for (int i = 0; i < data.getRowCount(); i++) {
+        	angles[i] = (float(data.getRow(i).getInt(categories[1])) / total_magnitude) * 360;
         }
 
         colors = new color[angles.length];
@@ -35,7 +33,7 @@ public class Piechart {
         }
     }
 
-    void draw () {
+    void draw (float transition_completeness, Transition transition) {
         float angle = 0;
         for (int i = 0; i < angles.length; i++) {
             fill(colors[i]);

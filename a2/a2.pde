@@ -7,11 +7,7 @@ ButtonGroup buttons;
 void setup () {
   frame.setResizable(true);
   size(900, 700);
-<<<<<<< HEAD
-  Point center = new Point(900/2, 700/2);
-=======
   frameRate(60);
->>>>>>> e57ca4eed330be2bbb5891418e3c9f8928ff4dea
 
   String filename = null;
   try { 
@@ -36,7 +32,7 @@ void setup () {
 
   String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart"};
   buttons = new ButtonGroup(chart_texts);
-  chart = new TransitionChart(data, categories, center);
+  chart = new TransitionChart(data, categories);
   chart.setChartType(chart_texts[0]);
   buttons.setSelection(chart_texts[0]);
 }
