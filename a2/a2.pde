@@ -7,7 +7,11 @@ ButtonGroup buttons;
 void setup () {
   frame.setResizable(true);
   size(900, 700);
+<<<<<<< HEAD
   Point center = new Point(900/2, 700/2);
+=======
+  frameRate(60);
+>>>>>>> e57ca4eed330be2bbb5891418e3c9f8928ff4dea
 
   String filename = null;
   try { 

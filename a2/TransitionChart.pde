@@ -3,6 +3,7 @@ public class TransitionChart {
     private String prev_chart_type;
     private String chart_type;
     private boolean in_transition;
+    private int transition_start_frame;
     // charts
     private Barchart barchart;
     private Linechart linechart;
@@ -10,6 +11,9 @@ public class TransitionChart {
     // data
     private String[] categories;
     private Table data;
+    // constants
+    private final float transition_time = 2.0;
+    private final float transition_frames = transition_time * 60.0;
 
     TransitionChart(Table data, String[] categories, Point center) {
         this.barchart = new Barchart(data, categories);
@@ -17,13 +21,17 @@ public class TransitionChart {
         this.piechart = new Piechart(data, categories, center);
         this.data = data;
         this.categories = categories;
+        this.transition_start_frame = 0;
+        this.in_transition = false;
     }
 
     boolean setChartType(String chart_type) {
         if (!in_transition && chart_type != "") {
             this.prev_chart_type = this.chart_type;
             this.chart_type = chart_type;
-            in_transition = false; // should become true
+            if (prev_chart_type != "" && prev_chart_type != null) {
+                in_transition = true; // should become true
+            }
             return true;
         }
         return false;
@@ -39,14 +47,42 @@ public class TransitionChart {
 
     void draw() {
         if (in_transition) {
+            if (transition_start_frame == 0) { // beginning of transition
+                transition_start_frame = frameCount;
+            }
+            int elapsed_frames = frameCount - transition_start_frame;
+            float progress = elapsed_frames / transition_frames;
 
+            if (prev_chart_type == "Line Chart" && chart_type == "Bar Chart") {
+                if (progress < 0.5) {
+                    linechart.draw(1.0 - (progress * 2), Transition.LINETOBAR);
+                } else {
+                    barchart.draw((progress - 0.5) * 2, Transition.LINETOBAR);
+                }
+            } else if (prev_chart_type == "Bar Chart" && chart_type == "Line Chart") {
+                if (progress < 0.5) {
+                    barchart.draw(1.0 - (progress * 2), Transition.LINETOBAR);
+                } else {
+                    linechart.draw((progress - 0.5) * 2, Transition.LINETOBAR);
+                }
+            } else {
+                println("Transformation not yet implemented.");
+                in_transition = false;
+                transition_start_frame = 0;
+            }
+
+
+            if (elapsed_frames >= transition_frames) {
+                in_transition = false;
+                transition_start_frame = 0;
+            }             
         } else {
             if (chart_type == "Line Chart") {
-                linechart.draw();
+                linechart.draw(1, Transition.NONE);
             } else if (chart_type == "Bar Chart") {
-                barchart.draw();
+                barchart.draw(1, Transition.NONE);
             } else if (chart_type == "Pie Chart") {
-                piechart.draw();
+                piechart.draw(1, Transition.NONE);
             }
         }
     }

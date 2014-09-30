@@ -48,18 +48,3 @@ public class Piechart {
         ellipse(x, y, diameter, diameter);
     }
 };
-
-    // void highlightOnHover() {
-    //     float ratio = float((topyaxis.y - origin.y)) / maxY;
-    //     int sectionWidth = abs(((rightxaxis.x - origin.x) / datapoints.length));
-    //     Point prev = new Point(origin.x + sectionWidth / 2, int(datapoints[0].count * ratio) + origin.y);
-    //     int x = origin.x + sectionWidth * dataHovered + sectionWidth / 2 + int(sectionWidth * 0.1);
-    //     int y = int(datapoints[dataHovered].count * ratio) + origin.y;
-            
-    //     prev.setXY(x, y);
-    //     fill(255, 255, 0);
-    //     stroke(255, 255, 0);
-    //     drawCircle(prev.x, prev.y, radius * 2);
-    //     stroke(0);
-    //     fill(0);
-    // }
