@@ -1,6 +1,10 @@
 public class Point {
     int x, y;
     String disp;
+    Point() {
+        this.x = 0;
+        this.y = 0;
+    }
     Point(int x, int y) {
         this.x = x;
         this.y = y;
@@ -39,19 +43,5 @@ public class Line {
     void setPoints(Point start, Point end) {
         this.start = start;
         this.end = end;
-    }
-};
-
-
-public class FruitCount {
-    String fruit;
-    int count;
-    FruitCount(String fruit, int count) {
-        this.fruit = fruit;
-        this.count = count;
-    }
-    void setFruitCount(String fruit, int count) {
-        this.fruit = fruit;
-        this.count = count;
     }
 };

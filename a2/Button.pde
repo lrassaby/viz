@@ -1,10 +1,10 @@
 public class Button {
-  boolean isect;
-  Point pos; 
-  Dimensions dim;
-  float roundness;
-  color c;
-  String text;
+  private boolean isect;
+  private Point pos; 
+  private Dimensions dim;
+  private float roundness;
+  private color c;
+  private String text;
  
 
   void draw() {
@@ -44,8 +44,8 @@ public class Button {
     isect = s;
   }
 
-  void setPos(Point pos) {
-    this.pos = pos;
+  void setPos(int x, int y) {
+    this.pos.setXY(x, y);
   }
   
   void setSize (Dimensions dim) {
