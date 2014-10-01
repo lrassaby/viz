@@ -276,6 +276,7 @@ class ButtonGroup {
 
     public void draw() {
         for (int i = 0; i < buttons.length; i++) {
+            buttons[i].dim.setWH(90, (height - 80) / buttons.length);
             buttons[i].pos.setXY(width - buttons[0].dim.w - 20, 30 + i * (buttons[i].dim.h + 10));
             if (buttons[i].getText() == selection) {
                 buttons[i].setColor(40, 190, 100);
