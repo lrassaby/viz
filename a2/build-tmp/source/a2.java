@@ -401,7 +401,7 @@ public class Linechart extends AxisChart {
         stroke(0);
         switch (transition) {
             case NONE:
-                drawCircle(prev.x, prev.y, 10);
+                drawCircle(prev.x, prev.y, 12);
                 for (int i = 1; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
                     int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
@@ -412,7 +412,7 @@ public class Linechart extends AxisChart {
                 break;
             case LINETOBAR:
             case BARTOLINE:
-                drawCircle(prev.x, prev.y, lerp(0, 10, transition_completeness));
+                drawCircle(prev.x, prev.y, lerp(4, 12, transition_completeness));
                 for (int i = 1; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
                     int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
