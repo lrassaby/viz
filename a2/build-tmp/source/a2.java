@@ -66,7 +66,7 @@ public void draw() {
 
 public void mouseClicked() {
   String clicked = buttons.getClicked();
-  if (chart.setChartType(clicked)) {
+  if (clicked != chart.getChartType() && chart.setChartType(clicked)) {
     buttons.setSelection(clicked);
   }
 }
