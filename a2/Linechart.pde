@@ -7,8 +7,10 @@ public class Linechart extends AxisChart {
         origin.setXY(margins[0], height - margins[3]);
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
-        drawAxes();
-        drawLabels();
+        float c = 0;
+        color col = color(c, c, c);
+        drawAxes(col);
+        drawLabels(col);
         drawData(transition_completeness, transition);
     }
 

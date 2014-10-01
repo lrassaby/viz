@@ -21,14 +21,17 @@ public class AxisChart {
     }
 
  
-    void drawAxes() {
+    void drawAxes(color c) {
         strokeWeight(2);
+        stroke(c);
+        fill(c);
         line(origin.x, origin.y, topyaxis.x, topyaxis.y - 5);
         line(origin.x, origin.y, rightxaxis.x, rightxaxis.y);
     }
 
-    protected void drawLabels() {
-        fill(0);
+    protected void drawLabels(color c) {
+        stroke(c);
+        fill(c);
         textSize(16); 
         textAlign(RIGHT, CENTER); 
         /* X labels */

@@ -40,7 +40,7 @@ void setup () {
 
 
 void draw() {
-  background(240, 240, 240);
+  background(255, 255, 255);
 
   chart.draw();
   buttons.draw();

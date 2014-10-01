@@ -58,7 +58,7 @@ public void setup () {
 
 
 public void draw() {
-  background(240, 240, 240);
+  background(255, 255, 255);
 
   chart.draw();
   buttons.draw();
@@ -96,14 +96,17 @@ public class AxisChart {
     }
 
  
-    public void drawAxes() {
+    public void drawAxes(int c) {
         strokeWeight(2);
+        stroke(c);
+        fill(c);
         line(origin.x, origin.y, topyaxis.x, topyaxis.y - 5);
         line(origin.x, origin.y, rightxaxis.x, rightxaxis.y);
     }
 
-    protected void drawLabels() {
-        fill(0);
+    protected void drawLabels(int c) {
+        stroke(c);
+        fill(c);
         textSize(16); 
         textAlign(RIGHT, CENTER); 
         /* X labels */
@@ -149,8 +152,21 @@ public class Barchart extends AxisChart {
         origin.setXY(margins[0], height - margins[3]);
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
-        drawAxes();
-        drawLabels();
+        float c = 0;
+        switch(transition) {
+            case NONE:
+            case LINETOBAR:
+            case BARTOLINE:
+                c = 0;
+                break;
+            case BARTOPIE:
+            case PIETOBAR:
+                c = lerp(255, 0, transition_completeness);
+                break;
+        }
+        int col = color(c, c, c);
+        drawAxes(col);
+        drawLabels(col);
         drawData(transition_completeness, transition);
     }
 
@@ -370,8 +386,10 @@ public class Linechart extends AxisChart {
         origin.setXY(margins[0], height - margins[3]);
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
-        drawAxes();
-        drawLabels();
+        float c = 0;
+        int col = color(c, c, c);
+        drawAxes(col);
+        drawLabels(col);
         drawData(transition_completeness, transition);
     }
 
@@ -522,7 +540,7 @@ public class TransitionChart {
     private String[] categories;
     private Table data;
     // constants
-    private final float transition_time = 10;
+    private final float transition_time = 3;
     private final float transition_frames = transition_time * 60.0f;
 
     TransitionChart(Table data, String[] categories) {

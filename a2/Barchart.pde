@@ -7,8 +7,21 @@ public class Barchart extends AxisChart {
         origin.setXY(margins[0], height - margins[3]);
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
-        drawAxes();
-        drawLabels();
+        float c = 0;
+        switch(transition) {
+            case NONE:
+            case LINETOBAR:
+            case BARTOLINE:
+                c = 0;
+                break;
+            case BARTOPIE:
+            case PIETOBAR:
+                c = lerp(255, 0, transition_completeness);
+                break;
+        }
+        color col = color(c, c, c);
+        drawAxes(col);
+        drawLabels(col);
         drawData(transition_completeness, transition);
     }
 
