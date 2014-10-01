@@ -183,9 +183,6 @@ public class Barchart extends AxisChart {
                 for (int i = 0; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
                     int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
-                    if (i == 0) {
-                        println(y);
-                    }
                     line(x, origin.y, x, y);
                 }
                 break;
@@ -506,7 +503,7 @@ public class TransitionChart {
     private String[] categories;
     private Table data;
     // constants
-    private final float transition_time = 10;
+    private final float transition_time = 2;
     private final float transition_frames = transition_time * 60.0f;
 
     TransitionChart(Table data, String[] categories) {
