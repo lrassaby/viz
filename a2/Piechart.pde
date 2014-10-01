@@ -43,19 +43,20 @@ public class Piechart {
     }
 
     void draw (float transition_completeness, Transition transition) {
+        strokeWeight(1);
         origin.setXY(margins[0], height - margins[3]);
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
 
         float angle = 0;
         float ratio = float(topyaxis.y - origin.y) / maxY;
-        int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
+        int sectionWidth = abs((rightxaxis.x - origin.x) / data.getRowCount());
 
         switch(transition) {
             case NONE:
                 for (int i = 0; i < angles.length; i++) {
                     fill(colors[i]);
-                    arc(width/2 - 50, height/2, (min(height, width - 120)) - 40, (min (height, width - 120)) - 40, angle, angle+radians(angles[i]), PIE);
+                    arc(width/2 - 50, height/2, (min(height, width - 120) - 40), (min(height, width - 120) - 40), angle, angle+radians(angles[i]), PIE);
                     angle += radians(angles[i]);
                 }
                 break;
@@ -64,11 +65,12 @@ public class Piechart {
                 for (int i = 0; i < angles.length; i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
                     int y = int(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
-                    fill(colors[i]);
+                    fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness));
 
                     int arcx = int(lerp(x, width/2 - 50, transition_completeness));
                     int arcy = int(lerp(origin.y, height/2, transition_completeness));
-                    int diam = int(lerp(origin.y - y, min(height, width - 120) - 40, transition_completeness));
+                    int diam = int(lerp(origin.y - y, (min(height, width - 120) - 40) / 2, transition_completeness)) * 2;
+                    
                     float startr = lerp(3 * HALF_PI, angle, transition_completeness);
                     float endr = lerp(3 * HALF_PI, angle+radians(angles[i]), transition_completeness);
 
