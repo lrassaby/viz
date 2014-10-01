@@ -156,9 +156,9 @@ public class Barchart extends AxisChart {
 
 
     public void drawData (float transition_completeness, Transition transition) {
-        float ratio = PApplet.parseFloat(topyaxis.y - origin.y) / maxY;
+        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
-        strokeWeight(lerp(2, sectionWidth * 0.8f, transition_completeness));
+        strokeWeight(lerp(5, sectionWidth * 0.8f, transition_completeness));
         stroke(0);
         strokeCap(SQUARE);
 
@@ -166,7 +166,7 @@ public class Barchart extends AxisChart {
             case NONE:
                 for (int i = 0; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                    int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
                     line(x, origin.y, x, y);
                 }
                 break;
@@ -174,8 +174,16 @@ public class Barchart extends AxisChart {
             case BARTOLINE:
                 for (int i = 0; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                    int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
                     line(x, lerp(y, origin.y, transition_completeness), x, y);
+                }
+                break;
+            case BARTOPIE:
+            case PIETOBAR:
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                    line(x, origin.y, x, y);
                 }
                 break;
         }
@@ -369,16 +377,16 @@ public class Linechart extends AxisChart {
 
     public void drawData (float transition_completeness, Transition transition) {
         strokeWeight(2);
-        float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
+        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
-        Point prev = new Point(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio) + origin.y);
+        Point prev = new Point(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio));
         stroke(0);
         switch (transition) {
             case NONE:
                 drawCircle(prev.x, prev.y, 10);
                 for (int i = 1; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                    int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
                     line(prev.x, prev.y, x, y);
                     prev.setXY(x, y);
                     drawCircle(prev.x, prev.y, 10);
@@ -389,7 +397,7 @@ public class Linechart extends AxisChart {
                 drawCircle(prev.x, prev.y, lerp(0, 10, transition_completeness));
                 for (int i = 1; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                    int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
                     line(prev.x, prev.y, lerp(prev.x, x, transition_completeness), lerp(prev.y, y, transition_completeness));
                     prev.setXY(x, y);
                     drawCircle(prev.x, prev.y, lerp(2, 10, transition_completeness));
@@ -399,11 +407,14 @@ public class Linechart extends AxisChart {
     }
 };
 public class Piechart {
-    Table data;
-    float[] angles;
-    int[] colors;
-    String[] categories;
-    ColorGenerator colorgenerator;
+    private Table data;
+    private String[] categories;
+    private float[] angles;
+    private int[] colors;
+    private ColorGenerator colorgenerator;
+    private int[] margins = {80, 30, 120, 100};
+    private Point origin, topyaxis, rightxaxis;
+    private float maxY;
 
     Piechart(Table data, String[] categories) {
         setData(data, categories);
@@ -426,14 +437,53 @@ public class Piechart {
         for (int i = 0; i < colors.length; i++) {
             colors[i] = colorgenerator.generate();
         }
+        origin = new Point(margins[0], height - margins[3]);
+        topyaxis = new Point(margins[0], margins[1]); 
+        rightxaxis = new Point(width - margins[2], height - margins[3]);
+
+        maxY = data.getRow(0).getInt(categories[1]);
+        for (TableRow row : data.rows()) {
+            int rowweight = row.getInt(categories[1]);
+            if (rowweight > maxY) {
+                maxY = rowweight;
+            }
+        }
     }
 
     public void draw (float transition_completeness, Transition transition) {
+        origin.setXY(margins[0], height - margins[3]);
+        topyaxis.setXY(margins[0], margins[1]);
+        rightxaxis.setXY(width - margins[2], height - margins[3]);
+
         float angle = 0;
-        for (int i = 0; i < angles.length; i++) {
-            fill(colors[i]);
-            arc(width/2 - 50, height/2, (min(height, width - 120)) - 40, (min (height, width - 120)) - 40, angle, angle+radians(angles[i]));
-            angle += radians(angles[i]);
+        float ratio = PApplet.parseFloat(topyaxis.y - origin.y) / maxY;
+        int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
+
+        switch(transition) {
+            case NONE:
+                for (int i = 0; i < angles.length; i++) {
+                    fill(colors[i]);
+                    arc(width/2 - 50, height/2, (min(height, width - 120)) - 40, (min (height, width - 120)) - 40, angle, angle+radians(angles[i]), PIE);
+                    angle += radians(angles[i]);
+                }
+                break;
+            case BARTOPIE:
+            case PIETOBAR:
+                for (int i = 0; i < angles.length; i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    fill(colors[i]);
+
+                    int arcx = PApplet.parseInt(lerp(x, width/2 - 50, transition_completeness));
+                    int arcy = PApplet.parseInt(lerp(origin.y, height/2, transition_completeness));
+                    int diam = PApplet.parseInt(lerp(origin.y - y, min(height, width - 120) - 40, transition_completeness));
+                    float startr = lerp(3 * HALF_PI, angle, transition_completeness);
+                    float endr = lerp(3 * HALF_PI, angle+radians(angles[i]), transition_completeness);
+
+                    arc(arcx, arcy, diam, diam, startr, endr, PIE);
+                    angle += radians(angles[i]);
+                }
+                break;
         }
     }
 };
@@ -451,7 +501,7 @@ public class TransitionChart {
     private String[] categories;
     private Table data;
     // constants
-    private final float transition_time = 1.5f;
+    private final float transition_time = 10;
     private final float transition_frames = transition_time * 60.0f;
 
     TransitionChart(Table data, String[] categories) {
@@ -503,6 +553,18 @@ public class TransitionChart {
                     barchart.draw(1.0f - (progress * 2), Transition.LINETOBAR);
                 } else {
                     linechart.draw((progress - 0.5f) * 2, Transition.LINETOBAR);
+                }
+            } else if (prev_chart_type == "Bar Chart" && chart_type == "Pie Chart") {
+                if (progress < 0.5f) {
+                    barchart.draw(1.0f - (progress * 2), Transition.BARTOPIE);
+                } else {
+                    piechart.draw((progress - 0.5f) * 2, Transition.BARTOPIE);
+                }
+            } else if (prev_chart_type == "Pie Chart" && chart_type == "Bar Chart") {
+                if (progress < 0.5f) {
+                    piechart.draw(1.0f - (progress * 2), Transition.PIETOBAR);
+                } else {
+                    barchart.draw((progress - 0.5f) * 2, Transition.PIETOBAR);
                 }
             } else {
                 println("Transformation not yet implemented.");
