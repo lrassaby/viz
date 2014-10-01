@@ -28,7 +28,7 @@ public class Linechart extends AxisChart {
                     int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
                     line(prev.x, prev.y, x, y);
                     prev.setXY(x, y);
-                    drawCircle(prev.x, prev.y, 10);
+                    drawCircle(prev.x, prev.y, 12);
                 }
                 break;
             case LINETOBAR:
@@ -39,7 +39,7 @@ public class Linechart extends AxisChart {
                     int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
                     line(prev.x, prev.y, lerp(prev.x, x, transition_completeness), lerp(prev.y, y, transition_completeness));
                     prev.setXY(x, y);
-                    drawCircle(prev.x, prev.y, lerp(2, 10, transition_completeness));
+                    drawCircle(prev.x, prev.y, lerp(4, 12, transition_completeness));
                 }
                 break;
         }
