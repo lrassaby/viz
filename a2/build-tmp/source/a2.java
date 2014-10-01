@@ -59,7 +59,6 @@ public void setup () {
 
 public void draw() {
   background(255, 255, 255);
-
   chart.draw();
   buttons.draw();
 }
@@ -129,15 +128,19 @@ public class AxisChart {
 
         // Y value labels
         textSize(12);
-        float ratio = PApplet.parseFloat((topyaxis.y - origin.y)) / maxY;
+        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
         int increment;
         try {
-            increment = PApplet.parseInt(25/abs(ratio));
+            increment = PApplet.parseInt(25/ratio);
         } catch (Exception e) {
             increment = 30;
         }
+        if (increment < 1) {
+            increment = 1;
+        }
+
         for (int i = 0; i <= maxY * 1.03f; i+= increment) {
-            makeText(Integer.toString(i), origin.x - 10, PApplet.parseInt(i * ratio + origin.y), 0);
+            makeText(Integer.toString(i), origin.x - 10, PApplet.parseInt(-i * ratio + origin.y), 0);
         }
     }
 

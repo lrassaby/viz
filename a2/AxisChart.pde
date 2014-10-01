@@ -54,15 +54,19 @@ public class AxisChart {
 
         // Y value labels
         textSize(12);
-        float ratio = float((topyaxis.y - origin.y)) / maxY;
+        float ratio = float(origin.y - topyaxis.y) / maxY;
         int increment;
         try {
-            increment = int(25/abs(ratio));
+            increment = int(25/ratio);
         } catch (Exception e) {
             increment = 30;
         }
+        if (increment < 1) {
+            increment = 1;
+        }
+
         for (int i = 0; i <= maxY * 1.03; i+= increment) {
-            makeText(Integer.toString(i), origin.x - 10, int(i * ratio + origin.y), 0);
+            makeText(Integer.toString(i), origin.x - 10, int(-i * ratio + origin.y), 0);
         }
     }
 
