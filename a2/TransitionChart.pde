@@ -12,7 +12,7 @@ public class TransitionChart {
     private String[] categories;
     private Table data;
     // constants
-    private final float transition_time = 2;
+    private final float transition_time = 10;
     private final float transition_frames = transition_time * 60.0;
 
     TransitionChart(Table data, String[] categories) {
@@ -66,16 +66,16 @@ public class TransitionChart {
                     linechart.draw((progress - 0.5) * 2, Transition.LINETOBAR);
                 }
             } else if (prev_chart_type == "Bar Chart" && chart_type == "Pie Chart") {
-                if (progress < 0.5) {
-                    barchart.draw(1.0 - (progress * 2), Transition.BARTOPIE);
+                if (progress < 0.25) {
+                    barchart.draw(1.0 - (progress * 4), Transition.BARTOPIE);
                 } else {
-                    piechart.draw((progress - 0.5) * 2, Transition.BARTOPIE);
+                    piechart.draw((progress - 0.25) * 4.0/3, Transition.BARTOPIE);
                 }
             } else if (prev_chart_type == "Pie Chart" && chart_type == "Bar Chart") {
-                if (progress < 0.5) {
-                    piechart.draw(1.0 - (progress * 2), Transition.PIETOBAR);
+                if (progress < 0.75) {
+                    piechart.draw(1.0 - (progress * 4.0/3), Transition.PIETOBAR);
                 } else {
-                    barchart.draw((progress - 0.5) * 2, Transition.PIETOBAR);
+                    barchart.draw((progress - 0.75) * 4.0, Transition.PIETOBAR);
                 }
             } else {
                 println("Transformation not yet implemented.");

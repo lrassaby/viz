@@ -65,15 +65,34 @@ public class Piechart {
                 for (int i = 0; i < angles.length; i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
                     int y = int(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
-                    fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness));
+                    if (transition_completeness < 0.5) {
+                        fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness * 2));
+                    } else {
+                        fill(colors[i]);
+                    }
+                    int arcx, arcy, diam;
+                    float startr, endr;
+                    if (transition_completeness > 0.5) {
+                        arcx = int(lerp(x, width/2 - 50, (transition_completeness - 0.5) * 2));
+                        arcy = int(lerp(origin.y, height/2, (transition_completeness - 0.5) * 2));
+                    } else {
+                        arcx = x;
+                        arcy = origin.y;
+                    }
+                   
+                    if (transition_completeness < 0.5) {
+                        diam = int(lerp(origin.y - y, (min(height, width - 120) - 40) / 2, transition_completeness * 2)) * 2;
+                    } else {
+                        diam = (min(height, width - 120) - 40);
+                    }
 
-                    int arcx = int(lerp(x, width/2 - 50, transition_completeness));
-                    int arcy = int(lerp(origin.y, height/2, transition_completeness));
-                    int diam = int(lerp(origin.y - y, (min(height, width - 120) - 40) / 2, transition_completeness)) * 2;
-                    
-                    float startr = lerp(3 * HALF_PI, angle, transition_completeness);
-                    float endr = lerp(3 * HALF_PI, angle+radians(angles[i]), transition_completeness);
-
+                    if (transition_completeness < 0.5) {
+                        startr = lerp(3 * HALF_PI - 0.01, 3 * HALF_PI - radians(angles[i]) / 2, transition_completeness * 2);
+                        endr = lerp(3 * HALF_PI + 0.01, 3 * HALF_PI + radians(angles[i]) / 2, transition_completeness * 2);
+                    } else {
+                        startr = lerp(3 * HALF_PI - radians(angles[i]) / 2, angle, (transition_completeness - 0.5) * 2);
+                        endr = lerp(3 * HALF_PI + radians(angles[i]) / 2, angle+radians(angles[i]), (transition_completeness - 0.5) * 2);
+                    }
                     arc(arcx, arcy, diam, diam, startr, endr, PIE);
                     angle += radians(angles[i]);
                 }

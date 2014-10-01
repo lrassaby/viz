@@ -473,15 +473,34 @@ public class Piechart {
                 for (int i = 0; i < angles.length; i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
                     int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
-                    fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness));
+                    if (transition_completeness < 0.5f) {
+                        fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness * 2));
+                    } else {
+                        fill(colors[i]);
+                    }
+                    int arcx, arcy, diam;
+                    float startr, endr;
+                    if (transition_completeness > 0.5f) {
+                        arcx = PApplet.parseInt(lerp(x, width/2 - 50, (transition_completeness - 0.5f) * 2));
+                        arcy = PApplet.parseInt(lerp(origin.y, height/2, (transition_completeness - 0.5f) * 2));
+                    } else {
+                        arcx = x;
+                        arcy = origin.y;
+                    }
+                   
+                    if (transition_completeness < 0.5f) {
+                        diam = PApplet.parseInt(lerp(origin.y - y, (min(height, width - 120) - 40) / 2, transition_completeness * 2)) * 2;
+                    } else {
+                        diam = (min(height, width - 120) - 40);
+                    }
 
-                    int arcx = PApplet.parseInt(lerp(x, width/2 - 50, transition_completeness));
-                    int arcy = PApplet.parseInt(lerp(origin.y, height/2, transition_completeness));
-                    int diam = PApplet.parseInt(lerp(origin.y - y, (min(height, width - 120) - 40) / 2, transition_completeness)) * 2;
-                    
-                    float startr = lerp(3 * HALF_PI, angle, transition_completeness);
-                    float endr = lerp(3 * HALF_PI, angle+radians(angles[i]), transition_completeness);
-
+                    if (transition_completeness < 0.5f) {
+                        startr = lerp(3 * HALF_PI - 0.01f, 3 * HALF_PI - radians(angles[i]) / 2, transition_completeness * 2);
+                        endr = lerp(3 * HALF_PI + 0.01f, 3 * HALF_PI + radians(angles[i]) / 2, transition_completeness * 2);
+                    } else {
+                        startr = lerp(3 * HALF_PI - radians(angles[i]) / 2, angle, (transition_completeness - 0.5f) * 2);
+                        endr = lerp(3 * HALF_PI + radians(angles[i]) / 2, angle+radians(angles[i]), (transition_completeness - 0.5f) * 2);
+                    }
                     arc(arcx, arcy, diam, diam, startr, endr, PIE);
                     angle += radians(angles[i]);
                 }
@@ -503,7 +522,7 @@ public class TransitionChart {
     private String[] categories;
     private Table data;
     // constants
-    private final float transition_time = 2;
+    private final float transition_time = 10;
     private final float transition_frames = transition_time * 60.0f;
 
     TransitionChart(Table data, String[] categories) {
@@ -557,16 +576,16 @@ public class TransitionChart {
                     linechart.draw((progress - 0.5f) * 2, Transition.LINETOBAR);
                 }
             } else if (prev_chart_type == "Bar Chart" && chart_type == "Pie Chart") {
-                if (progress < 0.5f) {
-                    barchart.draw(1.0f - (progress * 2), Transition.BARTOPIE);
+                if (progress < 0.25f) {
+                    barchart.draw(1.0f - (progress * 4), Transition.BARTOPIE);
                 } else {
-                    piechart.draw((progress - 0.5f) * 2, Transition.BARTOPIE);
+                    piechart.draw((progress - 0.25f) * 4.0f/3, Transition.BARTOPIE);
                 }
             } else if (prev_chart_type == "Pie Chart" && chart_type == "Bar Chart") {
-                if (progress < 0.5f) {
-                    piechart.draw(1.0f - (progress * 2), Transition.PIETOBAR);
+                if (progress < 0.75f) {
+                    piechart.draw(1.0f - (progress * 4.0f/3), Transition.PIETOBAR);
                 } else {
-                    barchart.draw((progress - 0.5f) * 2, Transition.PIETOBAR);
+                    barchart.draw((progress - 0.75f) * 4.0f, Transition.PIETOBAR);
                 }
             } else {
                 println("Transformation not yet implemented.");
