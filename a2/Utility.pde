@@ -15,6 +15,11 @@ void drawCircle(int x, int y, float diameter) {
     ellipse(x, y, diameter, diameter);
 }
 
+final float serp(float x, float y, float completeness) {
+    float sinvalue = sin(completeness * HALF_PI);
+    return y * sinvalue + x * (1-sinvalue);
+}
+
 // see http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
 public class ColorGenerator {
     private float golden_ratio_conjugate = 0.618033988749895;

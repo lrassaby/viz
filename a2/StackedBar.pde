@@ -17,7 +17,7 @@ public class StackedBar extends AxisChart {
         rightxaxis.setXY(width - margins[2], height - margins[3]);
         color col = color(0, 0, 0);
         drawAxes(col);
-        drawLabels(col, lerp(float(origin.y - topyaxis.y) / maxY, float(origin.y - topyaxis.y) / superMaxY, transition_completeness));
+        drawLabels(col, serp(float(origin.y - topyaxis.y) / maxY, float(origin.y - topyaxis.y) / superMaxY, transition_completeness));
         drawData(transition_completeness, transition);
     }
 
@@ -45,7 +45,7 @@ public class StackedBar extends AxisChart {
             case BARTOSTACKED:
             case STACKEDTOBAR:
                 if (transition_completeness < 0.25) {
-                    ratio = float(origin.y - topyaxis.y) / lerp(maxY, superMaxY, transition_completeness * 4);
+                    ratio = float(origin.y - topyaxis.y) / serp(maxY, superMaxY, transition_completeness * 4);
                     stroke(lerpColor(color(0, 0, 0), colors[0], transition_completeness * 4));
 
                     for (int i = 0; i < data.getRowCount(); i++) {
@@ -61,7 +61,7 @@ public class StackedBar extends AxisChart {
                             int finallength = int(data.getRow(i).getInt(categories[j]) * ratio);
                             stroke(colors[j - 1]);
                             if (j > 1) {
-                                int newy = int(lerp(prevy, prevy - finallength, (transition_completeness - 0.25) * 4.0/3.0));
+                                int newy = int(serp(prevy, prevy - finallength, (transition_completeness - 0.25) * 4.0/3.0));
                                 line(x, prevy, x, newy);
                                 prevy = newy;
                             } else {

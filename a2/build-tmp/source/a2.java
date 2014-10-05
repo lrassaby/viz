@@ -174,7 +174,7 @@ public class Barchart extends AxisChart {
                 break;
             case BARTOPIE:
             case PIETOBAR:
-                c = lerp(255, 0, transition_completeness);
+                c = serp(255, 0, transition_completeness);
                 break;
         }
         int col = color(c, c, c);
@@ -187,7 +187,7 @@ public class Barchart extends AxisChart {
     public void drawData (float transition_completeness, Transition transition) {
         float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
-        strokeWeight(lerp(5, sectionWidth * 0.8f, transition_completeness));
+        strokeWeight(serp(5, sectionWidth * 0.8f, transition_completeness));
         stroke(0);
         strokeCap(SQUARE);
 
@@ -204,7 +204,7 @@ public class Barchart extends AxisChart {
                 for (int i = 0; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
                     int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
-                    line(x, lerp(y, origin.y, transition_completeness), x, y);
+                    line(x, serp(y, origin.y, transition_completeness), x, y);
                 }
                 break;
             case BARTOPIE:
@@ -409,7 +409,7 @@ public class Linechart extends AxisChart {
                 break;
             case LINETOPIE:
             case PIETOLINE:
-                c = lerp(255, 0, transition_completeness);
+                c = serp(255, 0, transition_completeness);
                 break;
         }
         int col = color(c, c, c);
@@ -438,13 +438,13 @@ public class Linechart extends AxisChart {
                 break;
             case LINETOBAR:
             case BARTOLINE:
-                drawCircle(prev.x, prev.y, lerp(4, 12, transition_completeness));
+                drawCircle(prev.x, prev.y, serp(4, 12, transition_completeness));
                 for (int i = 1; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
                     int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
-                    line(prev.x, prev.y, lerp(prev.x, x, transition_completeness), lerp(prev.y, y, transition_completeness));
+                    line(prev.x, prev.y, serp(prev.x, x, transition_completeness), serp(prev.y, y, transition_completeness));
                     prev.setXY(x, y);
-                    drawCircle(prev.x, prev.y, lerp(4, 12, transition_completeness));
+                    drawCircle(prev.x, prev.y, serp(4, 12, transition_completeness));
                 }
                 break;
             case LINETOPIE:
@@ -454,7 +454,7 @@ public class Linechart extends AxisChart {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
                     int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
                     
-                    line(prev.x, prev.y, lerp(prev.x, x,(transition_completeness)), lerp(prev.y, y,(transition_completeness)));
+                    line(prev.x, prev.y, serp(prev.x, x,(transition_completeness)), serp(prev.y, y,(transition_completeness)));
                     prev.setXY(x, y);
                     drawCircle(prev.x, prev.y, 12);
                 }
@@ -537,25 +537,25 @@ public class Piechart {
                     int arcx, arcy, diam;
                     float startr, endr;
                     if (transition_completeness > 0.5f) {
-                        arcx = PApplet.parseInt(lerp(x, width/2 - 50, (transition_completeness - 0.5f) * 2));
-                        arcy = PApplet.parseInt(lerp(origin.y, height/2, (transition_completeness - 0.5f) * 2));
+                        arcx = PApplet.parseInt(serp(x, width/2 - 50, (transition_completeness - 0.5f) * 2));
+                        arcy = PApplet.parseInt(serp(origin.y, height/2, (transition_completeness - 0.5f) * 2));
                     } else {
                         arcx = x;
                         arcy = origin.y;
                     }
                    
                     if (transition_completeness < 0.5f) {
-                        diam = PApplet.parseInt(lerp(origin.y - y, (min(height, width - 120) - 40) / 2, transition_completeness * 2)) * 2;
+                        diam = PApplet.parseInt(serp(origin.y - y, (min(height, width - 120) - 40) / 2, transition_completeness * 2)) * 2;
                     } else {
                         diam = (min(height, width - 120) - 40);
                     }
 
                     if (transition_completeness < 0.5f) {
-                        startr = lerp(3 * HALF_PI - 0.01f, 3 * HALF_PI - radians(angles[i]) / 2, transition_completeness * 2);
-                        endr = lerp(3 * HALF_PI + 0.01f, 3 * HALF_PI + radians(angles[i]) / 2, transition_completeness * 2);
+                        startr = serp(3 * HALF_PI - 0.01f, 3 * HALF_PI - radians(angles[i]) / 2, transition_completeness * 2);
+                        endr = serp(3 * HALF_PI + 0.01f, 3 * HALF_PI + radians(angles[i]) / 2, transition_completeness * 2);
                     } else {
-                        startr = lerp(3 * HALF_PI - radians(angles[i]) / 2, angle, (transition_completeness - 0.5f) * 2);
-                        endr = lerp(3 * HALF_PI + radians(angles[i]) / 2, angle+radians(angles[i]), (transition_completeness - 0.5f) * 2);
+                        startr = serp(3 * HALF_PI - radians(angles[i]) / 2, angle, (transition_completeness - 0.5f) * 2);
+                        endr = serp(3 * HALF_PI + radians(angles[i]) / 2, angle+radians(angles[i]), (transition_completeness - 0.5f) * 2);
                     }
                     arc(arcx, arcy, diam, diam, startr, endr, PIE);
                     angle += radians(angles[i]);
@@ -575,8 +575,8 @@ public class Piechart {
                     int arcx, arcy, diam;
                     float startr, endr;
                     if (transition_completeness > 0.5f) {
-                        arcx = PApplet.parseInt(lerp(x, width/2 - 50, (transition_completeness - 0.5f) * 2));
-                        arcy = PApplet.parseInt(lerp(y, height/2, (transition_completeness - 0.5f) * 2));
+                        arcx = PApplet.parseInt(serp(x, width/2 - 50, (transition_completeness - 0.5f) * 2));
+                        arcy = PApplet.parseInt(serp(y, height/2, (transition_completeness - 0.5f) * 2));
                     } else {
                         arcx = x;
                         arcy = y;
@@ -587,14 +587,14 @@ public class Piechart {
                     float default_diam = (min(height, width - 120) - 40);
                     float midway_diam = default_diam * sqrt(((PApplet.parseFloat(yval)/maxY))/ PI);
                     if (transition_completeness < 0.5f) {
-                        diam = PApplet.parseInt(lerp(12, midway_diam, transition_completeness * 2));
+                        diam = PApplet.parseInt(serp(12, midway_diam, transition_completeness * 2));
                     } else {
-                        diam = PApplet.parseInt(lerp(midway_diam, default_diam, (transition_completeness - 0.5f) * 2.0f));
+                        diam = PApplet.parseInt(serp(midway_diam, default_diam, (transition_completeness - 0.5f) * 2.0f));
                     }
 
                     if (transition_completeness < 0.5f) {
-                        startr = lerp(angle - PI, angle, transition_completeness * 2);
-                        endr = lerp(angle+radians(angles[i]) + PI, angle+radians(angles[i]), transition_completeness * 2);
+                        startr = serp(angle - PI, angle, transition_completeness * 2);
+                        endr = serp(angle+radians(angles[i]) + PI, angle+radians(angles[i]), transition_completeness * 2);
                     } else {
                         startr = angle;
                         endr = angle+radians(angles[i]);
@@ -626,7 +626,7 @@ public class StackedBar extends AxisChart {
         rightxaxis.setXY(width - margins[2], height - margins[3]);
         int col = color(0, 0, 0);
         drawAxes(col);
-        drawLabels(col, lerp(PApplet.parseFloat(origin.y - topyaxis.y) / maxY, PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY, transition_completeness));
+        drawLabels(col, serp(PApplet.parseFloat(origin.y - topyaxis.y) / maxY, PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY, transition_completeness));
         drawData(transition_completeness, transition);
     }
 
@@ -654,7 +654,7 @@ public class StackedBar extends AxisChart {
             case BARTOSTACKED:
             case STACKEDTOBAR:
                 if (transition_completeness < 0.25f) {
-                    ratio = PApplet.parseFloat(origin.y - topyaxis.y) / lerp(maxY, superMaxY, transition_completeness * 4);
+                    ratio = PApplet.parseFloat(origin.y - topyaxis.y) / serp(maxY, superMaxY, transition_completeness * 4);
                     stroke(lerpColor(color(0, 0, 0), colors[0], transition_completeness * 4));
 
                     for (int i = 0; i < data.getRowCount(); i++) {
@@ -670,7 +670,7 @@ public class StackedBar extends AxisChart {
                             int finallength = PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
                             stroke(colors[j - 1]);
                             if (j > 1) {
-                                int newy = PApplet.parseInt(lerp(prevy, prevy - finallength, (transition_completeness - 0.25f) * 4.0f/3.0f));
+                                int newy = PApplet.parseInt(serp(prevy, prevy - finallength, (transition_completeness - 0.25f) * 4.0f/3.0f));
                                 line(x, prevy, x, newy);
                                 prevy = newy;
                             } else {
@@ -854,6 +854,11 @@ public void makeText(String str, int x, int y, float rotation) {
 
 public void drawCircle(int x, int y, float diameter) {
     ellipse(x, y, diameter, diameter);
+}
+
+public final float serp(float x, float y, float completeness) {
+    float sinvalue = sin(completeness * HALF_PI);
+    return y * sinvalue + x * (1-sinvalue);
 }
 
 // see http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/

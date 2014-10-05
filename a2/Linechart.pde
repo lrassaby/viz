@@ -16,7 +16,7 @@ public class Linechart extends AxisChart {
                 break;
             case LINETOPIE:
             case PIETOLINE:
-                c = lerp(255, 0, transition_completeness);
+                c = serp(255, 0, transition_completeness);
                 break;
         }
         color col = color(c, c, c);
@@ -45,13 +45,13 @@ public class Linechart extends AxisChart {
                 break;
             case LINETOBAR:
             case BARTOLINE:
-                drawCircle(prev.x, prev.y, lerp(4, 12, transition_completeness));
+                drawCircle(prev.x, prev.y, serp(4, 12, transition_completeness));
                 for (int i = 1; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
                     int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
-                    line(prev.x, prev.y, lerp(prev.x, x, transition_completeness), lerp(prev.y, y, transition_completeness));
+                    line(prev.x, prev.y, serp(prev.x, x, transition_completeness), serp(prev.y, y, transition_completeness));
                     prev.setXY(x, y);
-                    drawCircle(prev.x, prev.y, lerp(4, 12, transition_completeness));
+                    drawCircle(prev.x, prev.y, serp(4, 12, transition_completeness));
                 }
                 break;
             case LINETOPIE:
@@ -61,7 +61,7 @@ public class Linechart extends AxisChart {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
                     int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
                     
-                    line(prev.x, prev.y, lerp(prev.x, x,(transition_completeness)), lerp(prev.y, y,(transition_completeness)));
+                    line(prev.x, prev.y, serp(prev.x, x,(transition_completeness)), serp(prev.y, y,(transition_completeness)));
                     prev.setXY(x, y);
                     drawCircle(prev.x, prev.y, 12);
                 }

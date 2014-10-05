@@ -73,25 +73,25 @@ public class Piechart {
                     int arcx, arcy, diam;
                     float startr, endr;
                     if (transition_completeness > 0.5) {
-                        arcx = int(lerp(x, width/2 - 50, (transition_completeness - 0.5) * 2));
-                        arcy = int(lerp(origin.y, height/2, (transition_completeness - 0.5) * 2));
+                        arcx = int(serp(x, width/2 - 50, (transition_completeness - 0.5) * 2));
+                        arcy = int(serp(origin.y, height/2, (transition_completeness - 0.5) * 2));
                     } else {
                         arcx = x;
                         arcy = origin.y;
                     }
                    
                     if (transition_completeness < 0.5) {
-                        diam = int(lerp(origin.y - y, (min(height, width - 120) - 40) / 2, transition_completeness * 2)) * 2;
+                        diam = int(serp(origin.y - y, (min(height, width - 120) - 40) / 2, transition_completeness * 2)) * 2;
                     } else {
                         diam = (min(height, width - 120) - 40);
                     }
 
                     if (transition_completeness < 0.5) {
-                        startr = lerp(3 * HALF_PI - 0.01, 3 * HALF_PI - radians(angles[i]) / 2, transition_completeness * 2);
-                        endr = lerp(3 * HALF_PI + 0.01, 3 * HALF_PI + radians(angles[i]) / 2, transition_completeness * 2);
+                        startr = serp(3 * HALF_PI - 0.01, 3 * HALF_PI - radians(angles[i]) / 2, transition_completeness * 2);
+                        endr = serp(3 * HALF_PI + 0.01, 3 * HALF_PI + radians(angles[i]) / 2, transition_completeness * 2);
                     } else {
-                        startr = lerp(3 * HALF_PI - radians(angles[i]) / 2, angle, (transition_completeness - 0.5) * 2);
-                        endr = lerp(3 * HALF_PI + radians(angles[i]) / 2, angle+radians(angles[i]), (transition_completeness - 0.5) * 2);
+                        startr = serp(3 * HALF_PI - radians(angles[i]) / 2, angle, (transition_completeness - 0.5) * 2);
+                        endr = serp(3 * HALF_PI + radians(angles[i]) / 2, angle+radians(angles[i]), (transition_completeness - 0.5) * 2);
                     }
                     arc(arcx, arcy, diam, diam, startr, endr, PIE);
                     angle += radians(angles[i]);
@@ -111,8 +111,8 @@ public class Piechart {
                     int arcx, arcy, diam;
                     float startr, endr;
                     if (transition_completeness > 0.5) {
-                        arcx = int(lerp(x, width/2 - 50, (transition_completeness - 0.5) * 2));
-                        arcy = int(lerp(y, height/2, (transition_completeness - 0.5) * 2));
+                        arcx = int(serp(x, width/2 - 50, (transition_completeness - 0.5) * 2));
+                        arcy = int(serp(y, height/2, (transition_completeness - 0.5) * 2));
                     } else {
                         arcx = x;
                         arcy = y;
@@ -123,14 +123,14 @@ public class Piechart {
                     float default_diam = (min(height, width - 120) - 40);
                     float midway_diam = default_diam * sqrt(((float(yval)/maxY))/ PI);
                     if (transition_completeness < 0.5) {
-                        diam = int(lerp(12, midway_diam, transition_completeness * 2));
+                        diam = int(serp(12, midway_diam, transition_completeness * 2));
                     } else {
-                        diam = int(lerp(midway_diam, default_diam, (transition_completeness - 0.5) * 2.0));
+                        diam = int(serp(midway_diam, default_diam, (transition_completeness - 0.5) * 2.0));
                     }
 
                     if (transition_completeness < 0.5) {
-                        startr = lerp(angle - PI, angle, transition_completeness * 2);
-                        endr = lerp(angle+radians(angles[i]) + PI, angle+radians(angles[i]), transition_completeness * 2);
+                        startr = serp(angle - PI, angle, transition_completeness * 2);
+                        endr = serp(angle+radians(angles[i]) + PI, angle+radians(angles[i]), transition_completeness * 2);
                     } else {
                         startr = angle;
                         endr = angle+radians(angles[i]);
