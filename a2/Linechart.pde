@@ -56,6 +56,7 @@ public class Linechart extends AxisChart {
                 break;
             case LINETOPIE:
             case PIETOLINE:
+                drawCircle(prev.x, prev.y, 12);
                 for (int i = 1; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
                     int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
