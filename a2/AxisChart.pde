@@ -25,7 +25,7 @@ public class AxisChart {
         strokeWeight(2);
         stroke(c);
         fill(c);
-        line(origin.x, origin.y, topyaxis.x, topyaxis.y - 5);
+        line(origin.x, origin.y, topyaxis.x, topyaxis.y - 15);
         line(origin.x, origin.y, rightxaxis.x, rightxaxis.y);
     }
 

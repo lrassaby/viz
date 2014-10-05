@@ -8,6 +8,7 @@ public class TransitionChart {
     private Barchart barchart;
     private Linechart linechart;
     private Piechart piechart;
+    private StackedBar stackedbar;
     // data
     private String[] categories;
     private Table data;
@@ -19,6 +20,7 @@ public class TransitionChart {
         this.barchart = new Barchart(data, categories);
         this.linechart = new Linechart(data, categories);
         this.piechart = new Piechart(data, categories);
+        this.stackedbar = new StackedBar(data, categories);
         this.data = data;
         this.categories = categories;
         this.transition_start_frame = 0;
@@ -107,6 +109,8 @@ public class TransitionChart {
                 barchart.draw(1, Transition.NONE);
             } else if (chart_type == "Pie Chart") {
                 piechart.draw(1, Transition.NONE);
+            } else if (chart_type == "Stacked Bar") {
+                stackedbar.draw(1, Transition.NONE);
             }
         }
     }

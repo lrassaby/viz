@@ -49,7 +49,7 @@ public void setup () {
   String[] lines = loadStrings(filename);
   String[] categories = lines[0].split(",");
 
-  String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart"};
+  String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar"};
   buttons = new ButtonGroup(chart_texts);
   chart = new TransitionChart(data, categories);
   chart.setChartType(chart_texts[1]);
@@ -99,7 +99,7 @@ public class AxisChart {
         strokeWeight(2);
         stroke(c);
         fill(c);
-        line(origin.x, origin.y, topyaxis.x, topyaxis.y - 5);
+        line(origin.x, origin.y, topyaxis.x, topyaxis.y - 15);
         line(origin.x, origin.y, rightxaxis.x, rightxaxis.y);
     }
 
@@ -596,6 +596,69 @@ public class Piechart {
         }
     }
 };
+public class StackedBar extends AxisChart {
+    StackedBar(Table data, String[] categories) {
+        super(data, categories);
+    }
+
+    public void draw (float transition_completeness, Transition transition) {
+        origin.setXY(margins[0], height - margins[3]);
+        topyaxis.setXY(margins[0], margins[1]);
+        rightxaxis.setXY(width - margins[2], height - margins[3]);
+        float c = 0;
+        switch(transition) {
+            case NONE:
+            case LINETOBAR:
+            case BARTOLINE:
+                c = 0;
+                break;
+            case BARTOPIE:
+            case PIETOBAR:
+                c = lerp(255, 0, transition_completeness);
+                break;
+        }
+        int col = color(c, c, c);
+        drawAxes(col);
+        drawLabels(col);
+        drawData(transition_completeness, transition);
+    }
+
+
+    public void drawData (float transition_completeness, Transition transition) {
+        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
+        int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
+        strokeWeight(lerp(5, sectionWidth * 0.8f, transition_completeness));
+        stroke(0);
+        strokeCap(SQUARE);
+
+        switch(transition) {
+            case NONE:
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                    line(x, origin.y, x, y);
+                }
+                break;
+            case LINETOBAR:
+            case BARTOLINE:
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                    line(x, lerp(y, origin.y, transition_completeness), x, y);
+                }
+                break;
+            case BARTOPIE:
+            case PIETOBAR:
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                    line(x, origin.y, x, y);
+                }
+                break;
+        }
+        
+    }   
+};
 public class TransitionChart {
     // transitions
     private String prev_chart_type;
@@ -606,6 +669,7 @@ public class TransitionChart {
     private Barchart barchart;
     private Linechart linechart;
     private Piechart piechart;
+    private StackedBar stackedbar;
     // data
     private String[] categories;
     private Table data;
@@ -617,6 +681,7 @@ public class TransitionChart {
         this.barchart = new Barchart(data, categories);
         this.linechart = new Linechart(data, categories);
         this.piechart = new Piechart(data, categories);
+        this.stackedbar = new StackedBar(data, categories);
         this.data = data;
         this.categories = categories;
         this.transition_start_frame = 0;
@@ -705,6 +770,8 @@ public class TransitionChart {
                 barchart.draw(1, Transition.NONE);
             } else if (chart_type == "Pie Chart") {
                 piechart.draw(1, Transition.NONE);
+            } else if (chart_type == "Stacked Bar") {
+                stackedbar.draw(1, Transition.NONE);
             }
         }
     }
