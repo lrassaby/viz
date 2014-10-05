@@ -58,14 +58,16 @@ public class StackedBar extends AxisChart {
                         int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1), y = origin.y;
                         int prevy = origin.y;
                         for (int j = 1; j < categories.length; j++) {
-                            y -= int(data.getRow(i).getInt(categories[j]) * ratio);
+                            int finallength = int(data.getRow(i).getInt(categories[j]) * ratio);
                             stroke(colors[j - 1]);
                             if (j > 1) {
-                                line(x, prevy, x, lerp(prevy, y, (transition_completeness - 0.25) * 4.0/3.0));
+                                int newy = int(lerp(prevy, prevy - finallength, (transition_completeness - 0.25) * 4.0/3.0));
+                                line(x, prevy, x, newy);
+                                prevy = newy;
                             } else {
-                                line(x, prevy, x, y);
+                                line(x, prevy, x, prevy - finallength);
+                                prevy = prevy - finallength;
                             }
-                            prevy = y;
                         }
                     }
                 }
