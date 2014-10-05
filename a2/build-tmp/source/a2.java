@@ -781,6 +781,38 @@ public class TransitionChart {
                 stackedbar.draw(progress, Transition.BARTOSTACKED);
             } else if (prev_chart_type == "Stacked Bar" && chart_type == "Bar Chart") {
                 stackedbar.draw(1 - progress, Transition.STACKEDTOBAR);
+            } else if (prev_chart_type == "Stacked Bar" && chart_type == "Pie Chart") {
+                stackedbar.draw(1 - progress, Transition.STACKEDTOBAR);
+                if (progress > 0.99f) {
+                    transition_start_frame = 0;
+                    prev_chart_type = "Bar Chart";
+                }
+            } else if (prev_chart_type == "Pie Chart" && chart_type == "Stacked Bar") {
+                if (progress < 0.75f) {
+                    piechart.draw(1.0f - (progress * 4.0f/3), Transition.PIETOBAR);
+                } else {
+                    barchart.draw((progress - 0.75f) * 4.0f, Transition.PIETOBAR);
+                }
+                if (progress > 0.99f) {
+                    transition_start_frame = 0;
+                    prev_chart_type = "Bar Chart";
+                }
+            } else if (prev_chart_type == "Line Chart" && chart_type == "Stacked Bar") {
+                if (progress < 0.5f) {
+                    linechart.draw(1.0f - (progress * 2), Transition.LINETOBAR);
+                } else {
+                    barchart.draw((progress - 0.5f) * 2, Transition.LINETOBAR);
+                }
+                if (progress > 0.99f) {
+                    transition_start_frame = 0;
+                    prev_chart_type = "Bar Chart";
+                }
+            } else if (prev_chart_type == "Stacked Bar" && chart_type == "Line Chart") {
+                stackedbar.draw(1 - progress, Transition.STACKEDTOBAR);
+                if (progress > 0.99f) {
+                    transition_start_frame = 0;
+                    prev_chart_type = "Bar Chart";
+                }
             } else {
                 println("Transformation not yet implemented.");
                 in_transition = false;

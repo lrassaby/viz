@@ -95,6 +95,38 @@ public class TransitionChart {
                 stackedbar.draw(progress, Transition.BARTOSTACKED);
             } else if (prev_chart_type == "Stacked Bar" && chart_type == "Bar Chart") {
                 stackedbar.draw(1 - progress, Transition.STACKEDTOBAR);
+            } else if (prev_chart_type == "Stacked Bar" && chart_type == "Pie Chart") {
+                stackedbar.draw(1 - progress, Transition.STACKEDTOBAR);
+                if (progress > 0.99) {
+                    transition_start_frame = 0;
+                    prev_chart_type = "Bar Chart";
+                }
+            } else if (prev_chart_type == "Pie Chart" && chart_type == "Stacked Bar") {
+                if (progress < 0.75) {
+                    piechart.draw(1.0 - (progress * 4.0/3), Transition.PIETOBAR);
+                } else {
+                    barchart.draw((progress - 0.75) * 4.0, Transition.PIETOBAR);
+                }
+                if (progress > 0.99) {
+                    transition_start_frame = 0;
+                    prev_chart_type = "Bar Chart";
+                }
+            } else if (prev_chart_type == "Line Chart" && chart_type == "Stacked Bar") {
+                if (progress < 0.5) {
+                    linechart.draw(1.0 - (progress * 2), Transition.LINETOBAR);
+                } else {
+                    barchart.draw((progress - 0.5) * 2, Transition.LINETOBAR);
+                }
+                if (progress > 0.99) {
+                    transition_start_frame = 0;
+                    prev_chart_type = "Bar Chart";
+                }
+            } else if (prev_chart_type == "Stacked Bar" && chart_type == "Line Chart") {
+                stackedbar.draw(1 - progress, Transition.STACKEDTOBAR);
+                if (progress > 0.99) {
+                    transition_start_frame = 0;
+                    prev_chart_type = "Bar Chart";
+                }
             } else {
                 println("Transformation not yet implemented.");
                 in_transition = false;
