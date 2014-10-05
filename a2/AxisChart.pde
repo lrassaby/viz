@@ -1,20 +1,29 @@
 public class AxisChart {
     protected Table data;
     protected String[] categories;
-    protected float maxY;
+    protected float maxY; // for single columned 
+    protected float superMaxY; // for multi columned
     protected int[] margins = {80, 30, 120, 100};
     protected Point origin, topyaxis, rightxaxis;
 
     AxisChart (Table data, String[] categories) {
         this.data = data;
-        maxY = data.getRow(0).getInt(categories[1]);
+        this.categories = categories;
+        maxY = 0;
+        superMaxY = 0;
         for (TableRow row : data.rows()) {
-            int rowweight = row.getInt(categories[1]);
-            if (rowweight > maxY) {
-                maxY = rowweight;
+            int elemweight = row.getInt(categories[1]);
+            if (elemweight > maxY) {
+                maxY = elemweight;
+            }
+            int rowweight = 0;
+            for (int i = 1; i < categories.length; i++) {
+                rowweight += row.getInt(categories[i]);
+            }
+            if (rowweight > superMaxY) {
+                superMaxY = rowweight;
             }
         }
-        this.categories = categories;
         origin = new Point(margins[0], height - margins[3]);
         topyaxis = new Point(margins[0], margins[1]); 
         rightxaxis = new Point(width - margins[2], height - margins[3]);
@@ -29,7 +38,7 @@ public class AxisChart {
         line(origin.x, origin.y, rightxaxis.x, rightxaxis.y);
     }
 
-    protected void drawLabels(color c) {
+    protected void drawLabels(color c, boolean fullrow) {
         stroke(c);
         fill(c);
         textSize(16); 
@@ -54,7 +63,11 @@ public class AxisChart {
 
         // Y value labels
         textSize(12);
-        float ratio = float(origin.y - topyaxis.y) / maxY;
+        float max = maxY;
+        if (fullrow) {
+            max = superMaxY;
+        }
+        float ratio = float(origin.y - topyaxis.y) / max;
         int increment;
         try {
             increment = int(25/ratio);
@@ -65,7 +78,8 @@ public class AxisChart {
             increment = 1;
         }
 
-        for (int i = 0; i <= maxY * 1.03; i+= increment) {
+
+        for (int i = 0; i <= max * 1.03; i+= increment) {
             makeText(Integer.toString(i), origin.x - 10, int(-i * ratio + origin.y), 0);
         }
     }

@@ -10,6 +10,7 @@ public class Button {
   void draw() {
       strokeWeight(2);
       fill(c); 
+      stroke(0);
       rect(pos.x, pos.y, dim.w, dim.h, roundness); 
 
       fill(0);

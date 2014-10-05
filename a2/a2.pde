@@ -34,8 +34,8 @@ void setup () {
   String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar"};
   buttons = new ButtonGroup(chart_texts);
   chart = new TransitionChart(data, categories);
-  chart.setChartType(chart_texts[1]);
-  buttons.setSelection(chart_texts[1]);
+  chart.setChartType(chart_texts[0]);
+  buttons.setSelection(chart_texts[0]);
 }
 
 

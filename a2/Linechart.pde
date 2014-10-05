@@ -21,7 +21,7 @@ public class Linechart extends AxisChart {
         }
         color col = color(c, c, c);
         drawAxes(col);
-        drawLabels(col);
+        drawLabels(col, false);
         drawData(transition_completeness, transition);
     }
 

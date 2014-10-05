@@ -52,8 +52,8 @@ public void setup () {
   String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar"};
   buttons = new ButtonGroup(chart_texts);
   chart = new TransitionChart(data, categories);
-  chart.setChartType(chart_texts[1]);
-  buttons.setSelection(chart_texts[1]);
+  chart.setChartType(chart_texts[0]);
+  buttons.setSelection(chart_texts[0]);
 }
 
 
@@ -75,20 +75,30 @@ public void mouseClicked() {
 public class AxisChart {
     protected Table data;
     protected String[] categories;
-    protected float maxY;
+    protected float maxY; // for single columned 
+    protected float superMaxY; // for multi columned
     protected int[] margins = {80, 30, 120, 100};
     protected Point origin, topyaxis, rightxaxis;
 
     AxisChart (Table data, String[] categories) {
         this.data = data;
-        maxY = data.getRow(0).getInt(categories[1]);
+        this.categories = categories;
+        maxY = 0;
+        superMaxY = 0;
         for (TableRow row : data.rows()) {
-            int rowweight = row.getInt(categories[1]);
-            if (rowweight > maxY) {
-                maxY = rowweight;
+            int elemweight = row.getInt(categories[1]);
+            if (elemweight > maxY) {
+                maxY = elemweight;
+                println("maxY: "+maxY);
+            }
+            int rowweight = 0;
+            for (int i = 1; i < categories.length; i++) {
+                rowweight += row.getInt(categories[i]);
+            }
+            if (rowweight > superMaxY) {
+                superMaxY = rowweight;
             }
         }
-        this.categories = categories;
         origin = new Point(margins[0], height - margins[3]);
         topyaxis = new Point(margins[0], margins[1]); 
         rightxaxis = new Point(width - margins[2], height - margins[3]);
@@ -103,7 +113,7 @@ public class AxisChart {
         line(origin.x, origin.y, rightxaxis.x, rightxaxis.y);
     }
 
-    protected void drawLabels(int c) {
+    protected void drawLabels(int c, boolean fullrow) {
         stroke(c);
         fill(c);
         textSize(16); 
@@ -128,7 +138,11 @@ public class AxisChart {
 
         // Y value labels
         textSize(12);
-        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
+        float max = maxY;
+        if (fullrow) {
+            max = superMaxY;
+        }
+        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / max;
         int increment;
         try {
             increment = PApplet.parseInt(25/ratio);
@@ -139,7 +153,8 @@ public class AxisChart {
             increment = 1;
         }
 
-        for (int i = 0; i <= maxY * 1.03f; i+= increment) {
+
+        for (int i = 0; i <= max * 1.03f; i+= increment) {
             makeText(Integer.toString(i), origin.x - 10, PApplet.parseInt(-i * ratio + origin.y), 0);
         }
     }
@@ -169,7 +184,7 @@ public class Barchart extends AxisChart {
         }
         int col = color(c, c, c);
         drawAxes(col);
-        drawLabels(col);
+        drawLabels(col, false);
         drawData(transition_completeness, transition);
     }
 
@@ -221,6 +236,7 @@ public class Button {
   public void draw() {
       strokeWeight(2);
       fill(c); 
+      stroke(0);
       rect(pos.x, pos.y, dim.w, dim.h, roundness); 
 
       fill(0);
@@ -403,7 +419,7 @@ public class Linechart extends AxisChart {
         }
         int col = color(c, c, c);
         drawAxes(col);
-        drawLabels(col);
+        drawLabels(col, false);
         drawData(transition_completeness, transition);
     }
 
@@ -597,35 +613,31 @@ public class Piechart {
     }
 };
 public class StackedBar extends AxisChart {
+    private ColorGenerator colorgenerator;
+    private int[] colors;
+
     StackedBar(Table data, String[] categories) {
         super(data, categories);
+        colorgenerator = new ColorGenerator();
+        colors = new int[categories.length - 1];
+        for (int i = 0; i < colors.length; i++) {
+            colors[i] = colorgenerator.generate();
+        }
     }
 
     public void draw (float transition_completeness, Transition transition) {
         origin.setXY(margins[0], height - margins[3]);
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
-        float c = 0;
-        switch(transition) {
-            case NONE:
-            case LINETOBAR:
-            case BARTOLINE:
-                c = 0;
-                break;
-            case BARTOPIE:
-            case PIETOBAR:
-                c = lerp(255, 0, transition_completeness);
-                break;
-        }
-        int col = color(c, c, c);
+        int col = color(0, 0, 0);
         drawAxes(col);
-        drawLabels(col);
+        drawLabels(col, true);
         drawData(transition_completeness, transition);
     }
 
 
     public void drawData (float transition_completeness, Transition transition) {
-        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
+        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
         strokeWeight(lerp(5, sectionWidth * 0.8f, transition_completeness));
         stroke(0);
@@ -634,26 +646,18 @@ public class StackedBar extends AxisChart {
         switch(transition) {
             case NONE:
                 for (int i = 0; i < data.getRowCount(); i++) {
-                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
-                    line(x, origin.y, x, y);
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), y = origin.y;
+                    int prevy = origin.y;
+                    for (int j = 1; j < categories.length; j++) {
+                        y -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                        stroke(colors[j - 1]);
+                        line(x, prevy, x, y);
+                        prevy = y;
+                    }
                 }
                 break;
-            case LINETOBAR:
-            case BARTOLINE:
-                for (int i = 0; i < data.getRowCount(); i++) {
-                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
-                    line(x, lerp(y, origin.y, transition_completeness), x, y);
-                }
-                break;
-            case BARTOPIE:
-            case PIETOBAR:
-                for (int i = 0; i < data.getRowCount(); i++) {
-                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
-                    line(x, origin.y, x, y);
-                }
+            case BARTOSTACKED:
+            case STACKEDTOBAR:
                 break;
         }
         
