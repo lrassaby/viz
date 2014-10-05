@@ -512,8 +512,7 @@ public class Piechart {
         rightxaxis.setXY(width - margins[2], height - margins[3]);
 
         float angle = 0;
-        float ratio = PApplet.parseFloat(topyaxis.y-origin.y) / maxY;
-        float ratio2 = PApplet.parseFloat(origin.y-topyaxis.y) / maxY;
+        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
         int sectionWidth = abs((rightxaxis.x - origin.x) / data.getRowCount());
 
         switch(transition) {
@@ -528,7 +527,7 @@ public class Piechart {
             case PIETOBAR:
                 for (int i = 0; i < angles.length; i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                    int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
                     if (transition_completeness < 0.5f) {
                         fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness * 2));
                     } else {
@@ -566,7 +565,7 @@ public class Piechart {
                 for (int i = 0; i < angles.length; i++) {
                     int yval = data.getRow(i).getInt(categories[1]);
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                    int y = PApplet.parseInt(yval * ratio) + origin.y;
+                    int y = origin.y - PApplet.parseInt(yval * ratio);
                     if (transition_completeness < 0.5f) {
                         fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness * 2));
                     } else {
