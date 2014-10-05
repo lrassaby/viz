@@ -89,7 +89,6 @@ public class AxisChart {
             int elemweight = row.getInt(categories[1]);
             if (elemweight > maxY) {
                 maxY = elemweight;
-                println("maxY: "+maxY);
             }
             int rowweight = 0;
             for (int i = 1; i < categories.length; i++) {
@@ -113,7 +112,7 @@ public class AxisChart {
         line(origin.x, origin.y, rightxaxis.x, rightxaxis.y);
     }
 
-    protected void drawLabels(int c, boolean fullrow) {
+    protected void drawLabels(int c, float ratio) {
         stroke(c);
         fill(c);
         textSize(16); 
@@ -138,11 +137,7 @@ public class AxisChart {
 
         // Y value labels
         textSize(12);
-        float max = maxY;
-        if (fullrow) {
-            max = superMaxY;
-        }
-        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / max;
+        
         int increment;
         try {
             increment = PApplet.parseInt(25/ratio);
@@ -153,7 +148,7 @@ public class AxisChart {
             increment = 1;
         }
 
-
+        float max = PApplet.parseFloat(origin.y - topyaxis.y) / ratio;
         for (int i = 0; i <= max * 1.03f; i+= increment) {
             makeText(Integer.toString(i), origin.x - 10, PApplet.parseInt(-i * ratio + origin.y), 0);
         }
@@ -184,7 +179,7 @@ public class Barchart extends AxisChart {
         }
         int col = color(c, c, c);
         drawAxes(col);
-        drawLabels(col, false);
+        drawLabels(col, PApplet.parseFloat(origin.y - topyaxis.y) / maxY);
         drawData(transition_completeness, transition);
     }
 
@@ -419,7 +414,7 @@ public class Linechart extends AxisChart {
         }
         int col = color(c, c, c);
         drawAxes(col);
-        drawLabels(col, false);
+        drawLabels(col, PApplet.parseFloat(origin.y - topyaxis.y) / maxY);
         drawData(transition_completeness, transition);
     }
 
@@ -631,7 +626,7 @@ public class StackedBar extends AxisChart {
         rightxaxis.setXY(width - margins[2], height - margins[3]);
         int col = color(0, 0, 0);
         drawAxes(col);
-        drawLabels(col, true);
+        drawLabels(col, lerp(PApplet.parseFloat(origin.y - topyaxis.y) / maxY, PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY, transition_completeness));
         drawData(transition_completeness, transition);
     }
 
@@ -639,7 +634,7 @@ public class StackedBar extends AxisChart {
     public void drawData (float transition_completeness, Transition transition) {
         float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
-        strokeWeight(lerp(5, sectionWidth * 0.8f, transition_completeness));
+        strokeWeight(sectionWidth * 0.8f);
         stroke(0);
         strokeCap(SQUARE);
 
@@ -658,6 +653,32 @@ public class StackedBar extends AxisChart {
                 break;
             case BARTOSTACKED:
             case STACKEDTOBAR:
+                if (transition_completeness < 0.25f) {
+                    ratio = PApplet.parseFloat(origin.y - topyaxis.y) / lerp(maxY, superMaxY, transition_completeness * 4);
+                    stroke(lerpColor(color(0, 0, 0), colors[0], transition_completeness * 4));
+
+                    for (int i = 0; i < data.getRowCount(); i++) {
+                        int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                        int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                        line(x, origin.y, x, y);
+                    }
+                } else {
+                    for (int i = 0; i < data.getRowCount(); i++) {
+                        int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), y = origin.y;
+                        int prevy = origin.y;
+                        for (int j = 1; j < categories.length; j++) {
+                            y -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                            stroke(colors[j - 1]);
+                            if (j > 1) {
+                                line(x, prevy, x, lerp(prevy, y, (transition_completeness - 0.25f) * 4.0f/3.0f));
+                            } else {
+                                line(x, prevy, x, y);
+                            }
+                            prevy = y;
+                        }
+                    }
+                }
+               
                 break;
         }
         
@@ -756,6 +777,10 @@ public class TransitionChart {
                 } else {
                     linechart.draw((progress - 0.75f) * 4.0f, Transition.PIETOLINE);
                 }
+            } else if (prev_chart_type == "Bar Chart" && chart_type == "Stacked Bar") {
+                stackedbar.draw(progress, Transition.BARTOSTACKED);
+            } else if (prev_chart_type == "Stacked Bar" && chart_type == "Bar Chart") {
+                stackedbar.draw(1 - progress, Transition.STACKEDTOBAR);
             } else {
                 println("Transformation not yet implemented.");
                 in_transition = false;

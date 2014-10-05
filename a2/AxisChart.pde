@@ -38,7 +38,7 @@ public class AxisChart {
         line(origin.x, origin.y, rightxaxis.x, rightxaxis.y);
     }
 
-    protected void drawLabels(color c, boolean fullrow) {
+    protected void drawLabels(color c, float ratio) {
         stroke(c);
         fill(c);
         textSize(16); 
@@ -63,11 +63,7 @@ public class AxisChart {
 
         // Y value labels
         textSize(12);
-        float max = maxY;
-        if (fullrow) {
-            max = superMaxY;
-        }
-        float ratio = float(origin.y - topyaxis.y) / max;
+        
         int increment;
         try {
             increment = int(25/ratio);
@@ -78,7 +74,7 @@ public class AxisChart {
             increment = 1;
         }
 
-
+        float max = float(origin.y - topyaxis.y) / ratio;
         for (int i = 0; i <= max * 1.03; i+= increment) {
             makeText(Integer.toString(i), origin.x - 10, int(-i * ratio + origin.y), 0);
         }

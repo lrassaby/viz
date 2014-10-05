@@ -91,6 +91,10 @@ public class TransitionChart {
                 } else {
                     linechart.draw((progress - 0.75) * 4.0, Transition.PIETOLINE);
                 }
+            } else if (prev_chart_type == "Bar Chart" && chart_type == "Stacked Bar") {
+                stackedbar.draw(progress, Transition.BARTOSTACKED);
+            } else if (prev_chart_type == "Stacked Bar" && chart_type == "Bar Chart") {
+                stackedbar.draw(1 - progress, Transition.STACKEDTOBAR);
             } else {
                 println("Transformation not yet implemented.");
                 in_transition = false;

@@ -21,7 +21,7 @@ public class Barchart extends AxisChart {
         }
         color col = color(c, c, c);
         drawAxes(col);
-        drawLabels(col, false);
+        drawLabels(col, float(origin.y - topyaxis.y) / maxY);
         drawData(transition_completeness, transition);
     }
 

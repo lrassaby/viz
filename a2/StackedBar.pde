@@ -17,7 +17,7 @@ public class StackedBar extends AxisChart {
         rightxaxis.setXY(width - margins[2], height - margins[3]);
         color col = color(0, 0, 0);
         drawAxes(col);
-        drawLabels(col, true);
+        drawLabels(col, lerp(float(origin.y - topyaxis.y) / maxY, float(origin.y - topyaxis.y) / superMaxY, transition_completeness));
         drawData(transition_completeness, transition);
     }
 
@@ -25,7 +25,7 @@ public class StackedBar extends AxisChart {
     void drawData (float transition_completeness, Transition transition) {
         float ratio = float(origin.y - topyaxis.y) / superMaxY;
         int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
-        strokeWeight(lerp(5, sectionWidth * 0.8, transition_completeness));
+        strokeWeight(sectionWidth * 0.8);
         stroke(0);
         strokeCap(SQUARE);
 
@@ -44,6 +44,32 @@ public class StackedBar extends AxisChart {
                 break;
             case BARTOSTACKED:
             case STACKEDTOBAR:
+                if (transition_completeness < 0.25) {
+                    ratio = float(origin.y - topyaxis.y) / lerp(maxY, superMaxY, transition_completeness * 4);
+                    stroke(lerpColor(color(0, 0, 0), colors[0], transition_completeness * 4));
+
+                    for (int i = 0; i < data.getRowCount(); i++) {
+                        int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                        int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
+                        line(x, origin.y, x, y);
+                    }
+                } else {
+                    for (int i = 0; i < data.getRowCount(); i++) {
+                        int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1), y = origin.y;
+                        int prevy = origin.y;
+                        for (int j = 1; j < categories.length; j++) {
+                            y -= int(data.getRow(i).getInt(categories[j]) * ratio);
+                            stroke(colors[j - 1]);
+                            if (j > 1) {
+                                line(x, prevy, x, lerp(prevy, y, (transition_completeness - 0.25) * 4.0/3.0));
+                            } else {
+                                line(x, prevy, x, y);
+                            }
+                            prevy = y;
+                        }
+                    }
+                }
+               
                 break;
         }
         
