@@ -77,6 +77,12 @@ public class TransitionChart {
                 } else {
                     barchart.draw((progress - 0.75) * 4.0, Transition.PIETOBAR);
                 }
+            } else if (prev_chart_type == "Line Chart" && chart_type == "Pie Chart") {
+                if (progress < 0.25) {
+                    linechart.draw(1.0 - (progress * 4.0), Transition.LINETOPIE);
+                } else {
+                    piechart.draw((progress - 0.25) * 4.0/3, Transition.LINETOPIE);
+                }
             } else {
                 println("Transformation not yet implemented.");
                 in_transition = false;

@@ -42,6 +42,28 @@ public class Linechart extends AxisChart {
                     drawCircle(prev.x, prev.y, lerp(4, 12, transition_completeness));
                 }
                 break;
+            case LINETOPIE:
+                //float first = 0.5;
+                //float rat = 1/first;
+                //if (transition_completeness > first) {
+                  for (int i = 1; i < data.getRowCount(); i++) {
+                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                      int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
+                      
+                      line(prev.x, prev.y, lerp(prev.x, x,(transition_completeness)), lerp(prev.y, y,(transition_completeness)));
+                      prev.setXY(x, y);
+                      drawCircle(prev.x, prev.y, lerp(0, 12, transition_completeness));
+                  }
+                /*} else {
+                  for (int i = 0; i < data.getRowCount(); i++) {
+                      fill(204, 102, 0);
+                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                      int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
+                      prev.setXY(x, y);
+                      drawCircle(prev.x, prev.y, lerp(0, data.getRow(i).getInt(categories[1]), (1-transition_completeness*rat)));
+                  }
+                }*/
+                break;
         }
     }
 };

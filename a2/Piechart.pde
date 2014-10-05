@@ -7,6 +7,7 @@ public class Piechart {
     private int[] margins = {80, 30, 120, 100};
     private Point origin, topyaxis, rightxaxis;
     private float maxY;
+    private float[] diams;
 
     Piechart(Table data, String[] categories) {
         setData(data, categories);
@@ -17,12 +18,17 @@ public class Piechart {
         this.data = data;
         this.categories = categories;
         this.angles = new float[data.getRowCount()];
+        this.diams = new float[data.getRowCount()];
         int total_magnitude = 0;
         for (int i = 0; i < data.getRowCount(); i++) {
         	total_magnitude += data.getRow(i).getInt(categories[1]);
         }
         for (int i = 0; i < data.getRowCount(); i++) {
         	angles[i] = (float(data.getRow(i).getInt(categories[1])) / total_magnitude) * 360;
+        }
+        for (int i = 0; i < data.getRowCount(); i++) {
+          diams[i] = (float(data.getRow(i).getInt(categories[1])) / total_magnitude) * 
+                        (min(height, width - 120) - 40)*2;
         }
 
         colors = new color[angles.length];
@@ -49,7 +55,8 @@ public class Piechart {
         rightxaxis.setXY(width - margins[2], height - margins[3]);
 
         float angle = 0;
-        float ratio = float(topyaxis.y - origin.y) / maxY;
+        float ratio = float(topyaxis.y-origin.y) / maxY;
+        float ratio2 = float(origin.y-topyaxis.y) / maxY;
         int sectionWidth = abs((rightxaxis.x - origin.x) / data.getRowCount());
 
         switch(transition) {
@@ -97,6 +104,26 @@ public class Piechart {
                     angle += radians(angles[i]);
                 }
                 break;
+               case LINETOPIE:
+                 Point prev = new Point(0,0);
+                 if (transition_completeness < 0.5) {
+                   for (int i = 0; i < data.getRowCount(); i++) {
+                        fill(colors[i]);
+                        int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                        int y = origin.y - int(data.getRow(i).getInt(categories[1])*ratio2);
+                        prev.setXY(x, y);
+                        drawCircle(prev.x, prev.y, lerp(0, diams[i], (transition_completeness)*2.0));
+                   }
+                 } else {
+                   for (int i = 0; i < data.getRowCount(); i++) {
+                        fill(colors[i]);
+                        int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                        int y = origin.y - int(data.getRow(i).getInt(categories[1])*ratio2);
+                        prev.setXY(x, y);
+                        arc(prev.x, prev.y, lerp(0, diams[i], (transition_completeness)*2.0), lerp(0, diams[i], (transition_completeness)*2.0),
+                              lerp(0, radians(angles[i]), (transition_completeness)*2.0), PIE);
+                   }
+                 }
         }
     }
 };
