@@ -101,8 +101,9 @@ public class Piechart {
             case LINETOPIE:
             case PIETOLINE:
                 for (int i = 0; i < angles.length; i++) {
+                    int yval = data.getRow(i).getInt(categories[1]);
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-                    int y = int(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    int y = int(yval * ratio) + origin.y;
                     if (transition_completeness < 0.5) {
                         fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness * 2));
                     } else {
@@ -110,23 +111,27 @@ public class Piechart {
                     }
                     int arcx, arcy, diam;
                     float startr, endr;
-                    if (transition_completeness > 0.75) {
-                        arcx = int(lerp(x, width/2 - 50, (transition_completeness - 0.75) * 4));
-                        arcy = int(lerp(y, height/2, (transition_completeness - 0.75) * 4));
+                    if (transition_completeness > 0.5) {
+                        arcx = int(lerp(x, width/2 - 50, (transition_completeness - 0.5) * 2));
+                        arcy = int(lerp(y, height/2, (transition_completeness - 0.5) * 2));
                     } else {
                         arcx = x;
                         arcy = y;
                     }
                    
-                    if (transition_completeness < 0.75) {
-                        diam = int(lerp(12, (min(height, width - 120) - 40) / 2, transition_completeness * 4.0/3.0)) * 2;
+                    // d = sqrt(A/pi) * 2;
+                   
+                    float default_diam = (min(height, width - 120) - 40);
+                    float midway_diam = default_diam * sqrt(((float(yval)/maxY))/ PI);
+                    if (transition_completeness < 0.5) {
+                        diam = int(lerp(12, midway_diam, transition_completeness * 2));
                     } else {
-                        diam = (min(height, width - 120) - 40);
+                        diam = int(lerp(midway_diam, default_diam, (transition_completeness - 0.5) * 2.0));
                     }
 
-                    if (transition_completeness < 0.75) {
-                        startr = lerp(angle - PI, angle, transition_completeness * 4.0/3.0);
-                        endr = lerp(angle+radians(angles[i]) + PI, angle+radians(angles[i]), transition_completeness * 4.0/3.0);
+                    if (transition_completeness < 0.5) {
+                        startr = lerp(angle - PI, angle, transition_completeness * 2);
+                        endr = lerp(angle+radians(angles[i]) + PI, angle+radians(angles[i]), transition_completeness * 2);
                     } else {
                         startr = angle;
                         endr = angle+radians(angles[i]);

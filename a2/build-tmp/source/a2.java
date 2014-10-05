@@ -553,8 +553,9 @@ public class Piechart {
             case LINETOPIE:
             case PIETOLINE:
                 for (int i = 0; i < angles.length; i++) {
+                    int yval = data.getRow(i).getInt(categories[1]);
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                    int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    int y = PApplet.parseInt(yval * ratio) + origin.y;
                     if (transition_completeness < 0.5f) {
                         fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness * 2));
                     } else {
@@ -562,23 +563,27 @@ public class Piechart {
                     }
                     int arcx, arcy, diam;
                     float startr, endr;
-                    if (transition_completeness > 0.75f) {
-                        arcx = PApplet.parseInt(lerp(x, width/2 - 50, (transition_completeness - 0.75f) * 4));
-                        arcy = PApplet.parseInt(lerp(y, height/2, (transition_completeness - 0.75f) * 4));
+                    if (transition_completeness > 0.5f) {
+                        arcx = PApplet.parseInt(lerp(x, width/2 - 50, (transition_completeness - 0.5f) * 2));
+                        arcy = PApplet.parseInt(lerp(y, height/2, (transition_completeness - 0.5f) * 2));
                     } else {
                         arcx = x;
                         arcy = y;
                     }
                    
-                    if (transition_completeness < 0.75f) {
-                        diam = PApplet.parseInt(lerp(12, (min(height, width - 120) - 40) / 2, transition_completeness * 4.0f/3.0f)) * 2;
+                    // d = sqrt(A/pi) * 2;
+                   
+                    float default_diam = (min(height, width - 120) - 40);
+                    float midway_diam = default_diam * sqrt(((PApplet.parseFloat(yval)/maxY))/ PI);
+                    if (transition_completeness < 0.5f) {
+                        diam = PApplet.parseInt(lerp(12, midway_diam, transition_completeness * 2));
                     } else {
-                        diam = (min(height, width - 120) - 40);
+                        diam = PApplet.parseInt(lerp(midway_diam, default_diam, (transition_completeness - 0.5f) * 2.0f));
                     }
 
-                    if (transition_completeness < 0.75f) {
-                        startr = lerp(angle - PI, angle, transition_completeness * 4.0f/3.0f);
-                        endr = lerp(angle+radians(angles[i]) + PI, angle+radians(angles[i]), transition_completeness * 4.0f/3.0f);
+                    if (transition_completeness < 0.5f) {
+                        startr = lerp(angle - PI, angle, transition_completeness * 2);
+                        endr = lerp(angle+radians(angles[i]) + PI, angle+radians(angles[i]), transition_completeness * 2);
                     } else {
                         startr = angle;
                         endr = angle+radians(angles[i]);
