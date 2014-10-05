@@ -7,7 +7,6 @@ public class Piechart {
     private int[] margins = {80, 30, 120, 100};
     private Point origin, topyaxis, rightxaxis;
     private float maxY;
-    private float[] diams;
 
     Piechart(Table data, String[] categories) {
         setData(data, categories);
@@ -18,17 +17,12 @@ public class Piechart {
         this.data = data;
         this.categories = categories;
         this.angles = new float[data.getRowCount()];
-        this.diams = new float[data.getRowCount()];
         int total_magnitude = 0;
         for (int i = 0; i < data.getRowCount(); i++) {
         	total_magnitude += data.getRow(i).getInt(categories[1]);
         }
         for (int i = 0; i < data.getRowCount(); i++) {
         	angles[i] = (float(data.getRow(i).getInt(categories[1])) / total_magnitude) * 360;
-        }
-        for (int i = 0; i < data.getRowCount(); i++) {
-          diams[i] = (float(data.getRow(i).getInt(categories[1])) / total_magnitude) * 
-                        (min(height, width - 120) - 40)*2;
         }
 
         colors = new color[angles.length];
@@ -104,26 +98,44 @@ public class Piechart {
                     angle += radians(angles[i]);
                 }
                 break;
-               case LINETOPIE:
-                 Point prev = new Point(0,0);
-                 if (transition_completeness < 0.5) {
-                   for (int i = 0; i < data.getRowCount(); i++) {
+            case LINETOPIE:
+            case PIETOLINE:
+                for (int i = 0; i < angles.length; i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                    int y = int(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    if (transition_completeness < 0.5) {
+                        fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness * 2));
+                    } else {
                         fill(colors[i]);
-                        int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-                        int y = origin.y - int(data.getRow(i).getInt(categories[1])*ratio2);
-                        prev.setXY(x, y);
-                        drawCircle(prev.x, prev.y, lerp(0, diams[i], (transition_completeness)*2.0));
-                   }
-                 } else {
-                   for (int i = 0; i < data.getRowCount(); i++) {
-                        fill(colors[i]);
-                        int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-                        int y = origin.y - int(data.getRow(i).getInt(categories[1])*ratio2);
-                        prev.setXY(x, y);
-                        arc(prev.x, prev.y, lerp(0, diams[i], (transition_completeness)*2.0), lerp(0, diams[i], (transition_completeness)*2.0),
-                              lerp(0, radians(angles[i]), (transition_completeness)*2.0), PIE);
-                   }
-                 }
+                    }
+                    int arcx, arcy, diam;
+                    float startr, endr;
+                    if (transition_completeness > 0.75) {
+                        arcx = int(lerp(x, width/2 - 50, (transition_completeness - 0.75) * 4));
+                        arcy = int(lerp(y, height/2, (transition_completeness - 0.75) * 4));
+                    } else {
+                        arcx = x;
+                        arcy = y;
+                    }
+                   
+                    if (transition_completeness < 0.75) {
+                        diam = int(lerp(12, (min(height, width - 120) - 40) / 2, transition_completeness * 4.0/3.0)) * 2;
+                    } else {
+                        diam = (min(height, width - 120) - 40);
+                    }
+
+                    if (transition_completeness < 0.75) {
+                        startr = lerp(angle - PI, angle, transition_completeness * 4.0/3.0);
+                        endr = lerp(angle+radians(angles[i]) + PI, angle+radians(angles[i]), transition_completeness * 4.0/3.0);
+                    } else {
+                        startr = angle;
+                        endr = angle+radians(angles[i]);
+                    }
+
+                    arc(arcx, arcy, diam, diam, startr, endr, PIE);
+                    angle += radians(angles[i]);
+                }
+                break;
         }
     }
 };

@@ -8,6 +8,17 @@ public class Linechart extends AxisChart {
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
         float c = 0;
+        switch(transition) {
+            case NONE:
+            case LINETOBAR:
+            case BARTOLINE:
+                c = 0;
+                break;
+            case LINETOPIE:
+            case PIETOLINE:
+                c = lerp(255, 0, transition_completeness);
+                break;
+        }
         color col = color(c, c, c);
         drawAxes(col);
         drawLabels(col);
@@ -20,6 +31,7 @@ public class Linechart extends AxisChart {
         int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
         Point prev = new Point(origin.x + sectionWidth / 2 + int(sectionWidth * 0.1), origin.y - int(data.getRow(0).getInt(categories[1]) * ratio));
         stroke(0);
+        fill(0);
         switch (transition) {
             case NONE:
                 drawCircle(prev.x, prev.y, 12);
@@ -43,26 +55,15 @@ public class Linechart extends AxisChart {
                 }
                 break;
             case LINETOPIE:
-                //float first = 0.5;
-                //float rat = 1/first;
-                //if (transition_completeness > first) {
-                  for (int i = 1; i < data.getRowCount(); i++) {
-                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-                      int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
-                      
-                      line(prev.x, prev.y, lerp(prev.x, x,(transition_completeness)), lerp(prev.y, y,(transition_completeness)));
-                      prev.setXY(x, y);
-                      drawCircle(prev.x, prev.y, lerp(0, 12, transition_completeness));
-                  }
-                /*} else {
-                  for (int i = 0; i < data.getRowCount(); i++) {
-                      fill(204, 102, 0);
-                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-                      int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
-                      prev.setXY(x, y);
-                      drawCircle(prev.x, prev.y, lerp(0, data.getRow(i).getInt(categories[1]), (1-transition_completeness*rat)));
-                  }
-                }*/
+            case PIETOLINE:
+                for (int i = 1; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                    int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
+                    
+                    line(prev.x, prev.y, lerp(prev.x, x,(transition_completeness)), lerp(prev.y, y,(transition_completeness)));
+                    prev.setXY(x, y);
+                    drawCircle(prev.x, prev.y, 12);
+                }
                 break;
         }
     }

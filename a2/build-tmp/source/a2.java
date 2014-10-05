@@ -52,8 +52,8 @@ public void setup () {
   String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart"};
   buttons = new ButtonGroup(chart_texts);
   chart = new TransitionChart(data, categories);
-  chart.setChartType(chart_texts[0]);
-  buttons.setSelection(chart_texts[0]);
+  chart.setChartType(chart_texts[1]);
+  buttons.setSelection(chart_texts[1]);
 }
 
 
@@ -390,6 +390,17 @@ public class Linechart extends AxisChart {
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
         float c = 0;
+        switch(transition) {
+            case NONE:
+            case LINETOBAR:
+            case BARTOLINE:
+                c = 0;
+                break;
+            case LINETOPIE:
+            case PIETOLINE:
+                c = lerp(255, 0, transition_completeness);
+                break;
+        }
         int col = color(c, c, c);
         drawAxes(col);
         drawLabels(col);
@@ -402,6 +413,7 @@ public class Linechart extends AxisChart {
         int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
         Point prev = new Point(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio));
         stroke(0);
+        fill(0);
         switch (transition) {
             case NONE:
                 drawCircle(prev.x, prev.y, 12);
@@ -422,6 +434,17 @@ public class Linechart extends AxisChart {
                     line(prev.x, prev.y, lerp(prev.x, x, transition_completeness), lerp(prev.y, y, transition_completeness));
                     prev.setXY(x, y);
                     drawCircle(prev.x, prev.y, lerp(4, 12, transition_completeness));
+                }
+                break;
+            case LINETOPIE:
+            case PIETOLINE:
+                for (int i = 1; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                    
+                    line(prev.x, prev.y, lerp(prev.x, x,(transition_completeness)), lerp(prev.y, y,(transition_completeness)));
+                    prev.setXY(x, y);
+                    drawCircle(prev.x, prev.y, 12);
                 }
                 break;
         }
@@ -478,7 +501,8 @@ public class Piechart {
         rightxaxis.setXY(width - margins[2], height - margins[3]);
 
         float angle = 0;
-        float ratio = PApplet.parseFloat(topyaxis.y - origin.y) / maxY;
+        float ratio = PApplet.parseFloat(topyaxis.y-origin.y) / maxY;
+        float ratio2 = PApplet.parseFloat(origin.y-topyaxis.y) / maxY;
         int sectionWidth = abs((rightxaxis.x - origin.x) / data.getRowCount());
 
         switch(transition) {
@@ -522,6 +546,44 @@ public class Piechart {
                         startr = lerp(3 * HALF_PI - radians(angles[i]) / 2, angle, (transition_completeness - 0.5f) * 2);
                         endr = lerp(3 * HALF_PI + radians(angles[i]) / 2, angle+radians(angles[i]), (transition_completeness - 0.5f) * 2);
                     }
+                    arc(arcx, arcy, diam, diam, startr, endr, PIE);
+                    angle += radians(angles[i]);
+                }
+                break;
+            case LINETOPIE:
+            case PIETOLINE:
+                for (int i = 0; i < angles.length; i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio) + origin.y;
+                    if (transition_completeness < 0.5f) {
+                        fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness * 2));
+                    } else {
+                        fill(colors[i]);
+                    }
+                    int arcx, arcy, diam;
+                    float startr, endr;
+                    if (transition_completeness > 0.75f) {
+                        arcx = PApplet.parseInt(lerp(x, width/2 - 50, (transition_completeness - 0.75f) * 4));
+                        arcy = PApplet.parseInt(lerp(y, height/2, (transition_completeness - 0.75f) * 4));
+                    } else {
+                        arcx = x;
+                        arcy = y;
+                    }
+                   
+                    if (transition_completeness < 0.75f) {
+                        diam = PApplet.parseInt(lerp(12, (min(height, width - 120) - 40) / 2, transition_completeness * 4.0f/3.0f)) * 2;
+                    } else {
+                        diam = (min(height, width - 120) - 40);
+                    }
+
+                    if (transition_completeness < 0.75f) {
+                        startr = lerp(angle - PI, angle, transition_completeness * 4.0f/3.0f);
+                        endr = lerp(angle+radians(angles[i]) + PI, angle+radians(angles[i]), transition_completeness * 4.0f/3.0f);
+                    } else {
+                        startr = angle;
+                        endr = angle+radians(angles[i]);
+                    }
+
                     arc(arcx, arcy, diam, diam, startr, endr, PIE);
                     angle += radians(angles[i]);
                 }
@@ -607,6 +669,18 @@ public class TransitionChart {
                     piechart.draw(1.0f - (progress * 4.0f/3), Transition.PIETOBAR);
                 } else {
                     barchart.draw((progress - 0.75f) * 4.0f, Transition.PIETOBAR);
+                }
+            } else if (prev_chart_type == "Line Chart" && chart_type == "Pie Chart") {
+                if (progress < 0.25f) {
+                    linechart.draw(1.0f - (progress * 4.0f), Transition.LINETOPIE);
+                } else {
+                    piechart.draw((progress - 0.25f) * 4.0f/3, Transition.LINETOPIE);
+                }
+            } else if (prev_chart_type == "Pie Chart" && chart_type == "Line Chart") {
+                if (progress < 0.75f) {
+                    piechart.draw(1.0f - (progress * 4.0f/3), Transition.PIETOLINE);
+                } else {
+                    linechart.draw((progress - 0.75f) * 4.0f, Transition.PIETOLINE);
                 }
             } else {
                 println("Transformation not yet implemented.");
