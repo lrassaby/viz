@@ -9,6 +9,7 @@ public class TransitionChart {
     private Linechart linechart;
     private Piechart piechart;
     private StackedBar stackedbar;
+    private ThemeRiver themeriver;
     // data
     private String[] categories;
     private Table data;
@@ -21,6 +22,7 @@ public class TransitionChart {
         this.linechart = new Linechart(data, categories);
         this.piechart = new Piechart(data, categories);
         this.stackedbar = new StackedBar(data, categories);
+        this.themeriver = new ThemeRiver(data, categories);
         this.data = data;
         this.categories = categories;
         this.transition_start_frame = 0;
@@ -127,6 +129,12 @@ public class TransitionChart {
                     transition_start_frame = 0;
                     prev_chart_type = "Bar Chart";
                 }
+            } else if (prev_chart_type == "Line Chart" && chart_type == "ThemeRiver") {
+                if (progress < 0.25) {
+                  linechart.draw(1-(progress*4), Transition.LINETORIVER);
+                } else {
+                  themeriver.draw((progress - 0.25) * 4.0/3, Transition.LINETORIVER);
+                }
             } else {
                 println("Transformation not yet implemented.");
                 in_transition = false;
@@ -147,7 +155,9 @@ public class TransitionChart {
                 piechart.draw(1, Transition.NONE);
             } else if (chart_type == "Stacked Bar") {
                 stackedbar.draw(1, Transition.NONE);
-            }
+            }  else if (chart_type == "ThemeRiver") {
+                themeriver.draw(1, Transition.NONE);
+            } 
         }
     }
 };
