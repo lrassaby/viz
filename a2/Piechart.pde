@@ -12,6 +12,7 @@ public class Piechart extends CircleChart {
 
         float angle = 0;
         float ratio = float(origin.y - topyaxis.y) / maxY;
+        float superRatio = float(origin.y - topyaxis.y) / superMaxY;
         int sectionWidth = abs((rightxaxis.x - origin.x) / data.getRowCount());
         int default_diam = (min(height - margins[1], width - margins[3] - margins[0]));
 
@@ -101,6 +102,16 @@ public class Piechart extends CircleChart {
 
                     arc(arcx, arcy, diam, diam, startr, endr, PIE);
                     angle += radians(angles[i]);
+                }
+                break;
+            case PIETOROSE:
+            case ROSETOPIE:
+                for (int i = 0; i < angles.length; i++) {
+                    float angle_increment = serp(radians(const_angle),radians(angles[i]), transition_completeness);
+                    fill(lerpColor(colors[0], colors[i], transition_completeness));
+                    float diam = serp(data.getRow(i).getInt(categories[1]) * ratio, default_diam, transition_completeness);
+                    arc(width/2 - 50, height/2, diam, diam, angle, angle+angle_increment, PIE);
+                    angle += angle_increment;
                 }
                 break;
         }

@@ -132,9 +132,17 @@ public class TransitionChart {
                     prev_chart_type = "Bar Chart";
                 }
             } else if (prev_chart_type == "Pie Chart" && chart_type == "Rose Chart") {
-                rosechart.draw(progress, Transition.PIETOROSE);   
+                if (progress < 0.25) {
+                    piechart.draw(1-(progress*4), Transition.PIETOROSE);
+                } else {
+                    rosechart.draw((progress - 0.25) * 4.0/3, Transition.PIETOROSE);
+                }   
             } else if (prev_chart_type == "Rose Chart" && chart_type == "Pie Chart") {
-                rosechart.draw(1 - progress, Transition.ROSETOPIE);   
+                if (progress < 0.75) {
+                    rosechart.draw(1.0 - (progress * 4.0/3), Transition.ROSETOPIE);
+                } else {
+                    piechart.draw((progress - 0.75) * 4.0, Transition.ROSETOPIE);
+                }
             } else if (prev_chart_type == "Line Chart" && chart_type == "ThemeRiver") {
                 if (progress < 0.25) {
                   linechart.draw(1-(progress*4), Transition.LINETORIVER);

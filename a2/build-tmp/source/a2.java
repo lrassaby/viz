@@ -368,7 +368,7 @@ public class CircleChart {
     protected Point origin, topyaxis, rightxaxis;
     protected float maxY;
     protected float ratio;
-    protected float angle;
+    protected float const_angle;
     protected int superMaxY = 0;
     protected int total_magnitude = 0;
 
@@ -384,7 +384,7 @@ public class CircleChart {
             total_magnitude += data.getRow(i).getInt(categories[1]);
         }
      
-        angle = (360 / (float)(data.getRowCount())); 
+        const_angle = (360 / (float)(data.getRowCount())); 
         int colorcount = max(data.getRowCount(), categories.length);
         colors = new int[colorcount];
         for (int i = 0; i < colors.length; i++) {
@@ -584,6 +584,7 @@ public class Piechart extends CircleChart {
 
         float angle = 0;
         float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
+        float superRatio = PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY;
         int sectionWidth = abs((rightxaxis.x - origin.x) / data.getRowCount());
         int default_diam = (min(height - margins[1], width - margins[3] - margins[0]));
 
@@ -675,6 +676,16 @@ public class Piechart extends CircleChart {
                     angle += radians(angles[i]);
                 }
                 break;
+            case PIETOROSE:
+            case ROSETOPIE:
+                for (int i = 0; i < angles.length; i++) {
+                    float angle_increment = serp(radians(const_angle),radians(angles[i]), transition_completeness);
+                    fill(lerpColor(colors[0], colors[i], transition_completeness));
+                    float diam = serp(data.getRow(i).getInt(categories[1]) * ratio, default_diam, transition_completeness);
+                    arc(width/2 - 50, height/2, diam, diam, angle, angle+angle_increment, PIE);
+                    angle += angle_increment;
+                }
+                break;
         }
     }
 };
@@ -688,27 +699,50 @@ public class RoseChart extends CircleChart {
     public void draw (float transition_completeness, Transition transition) {
         strokeWeight(1);
 
-        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY;
-        int sectionWidth = abs((rightxaxis.x - origin.x) / data.getRowCount());
-        float start_angle = 0;
+        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
+        float superRatio = PApplet.parseFloat(origin.y - topyaxis.y)  / superMaxY;
+        float angle = 0;
 
         switch(transition) {
             case NONE:
                 for (int i = 0; i < data.getRowCount(); i++) {
                     int diam = 0;
                     for (int j = 1; j < categories.length; j++) {
-                        diam += PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                        diam += PApplet.parseInt(data.getRow(i).getInt(categories[j]) * superRatio);
                     }
                     for (int j = categories.length - 1; j >= 1; j--) {
                         fill(colors[j - 1]);
-                        arc(width/2 - 50, height/2, diam, diam, radians(start_angle), radians(start_angle+angle), PIE);
-                        diam -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                        arc(width/2 - 50, height/2, diam, diam, radians(angle), radians(angle+const_angle), PIE);
+                        diam -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * superRatio);
                     }
-                    start_angle += angle;
+                    angle += const_angle;
                 }
                 break;
             case ROSETOPIE:
             case PIETOROSE:
+                if (transition_completeness < 0.5f) {
+                    for (int i = 0; i < angles.length; i++) {
+                        float angle_increment = radians(const_angle);
+                        fill(colors[0]);
+                        float diam = serp(data.getRow(i).getInt(categories[1]) * ratio, data.getRow(i).getInt(categories[1]) * superRatio, transition_completeness * 2);
+                        arc(width/2 - 50, height/2, diam, diam, angle, angle+angle_increment, PIE);
+                        angle += angle_increment;
+                    }
+                } else {
+                    for (int i = 0; i < data.getRowCount(); i++) {
+                        int diam = 0;
+                        for (int j = 1; j < categories.length; j++) {
+                            diam += PApplet.parseInt(data.getRow(i).getInt(categories[j]) * superRatio);
+                        }
+                        for (int j = categories.length - 1; j >= 1; j--) {
+                            fill(colors[j - 1]);
+                            arc(width/2 - 50, height/2, diam, diam, radians(angle), radians(angle+const_angle), PIE);
+                            diam -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * superRatio);
+                        }
+                        angle += const_angle;
+                    }
+                }
+
                 break;
         }
     }
@@ -1064,9 +1098,17 @@ public class TransitionChart {
                     prev_chart_type = "Bar Chart";
                 }
             } else if (prev_chart_type == "Pie Chart" && chart_type == "Rose Chart") {
-                rosechart.draw(progress, Transition.PIETOROSE);   
+                if (progress < 0.25f) {
+                    piechart.draw(1-(progress*4), Transition.PIETOROSE);
+                } else {
+                    rosechart.draw((progress - 0.25f) * 4.0f/3, Transition.PIETOROSE);
+                }   
             } else if (prev_chart_type == "Rose Chart" && chart_type == "Pie Chart") {
-                rosechart.draw(1 - progress, Transition.ROSETOPIE);   
+                if (progress < 0.75f) {
+                    rosechart.draw(1.0f - (progress * 4.0f/3), Transition.ROSETOPIE);
+                } else {
+                    piechart.draw((progress - 0.75f) * 4.0f, Transition.ROSETOPIE);
+                }
             } else if (prev_chart_type == "Line Chart" && chart_type == "ThemeRiver") {
                 if (progress < 0.25f) {
                   linechart.draw(1-(progress*4), Transition.LINETORIVER);

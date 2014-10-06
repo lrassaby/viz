@@ -8,7 +8,7 @@ public class CircleChart {
     protected Point origin, topyaxis, rightxaxis;
     protected float maxY;
     protected float ratio;
-    protected float angle;
+    protected float const_angle;
     protected int superMaxY = 0;
     protected int total_magnitude = 0;
 
@@ -24,7 +24,7 @@ public class CircleChart {
             total_magnitude += data.getRow(i).getInt(categories[1]);
         }
      
-        angle = (360 / (float)(data.getRowCount())); 
+        const_angle = (360 / (float)(data.getRowCount())); 
         int colorcount = max(data.getRowCount(), categories.length);
         colors = new color[colorcount];
         for (int i = 0; i < colors.length; i++) {
