@@ -358,6 +358,74 @@ class ButtonGroup {
         return "";
     }
 };
+public class CircleChart {
+    protected Table data;
+    protected String[] categories;
+    protected float[] angles;
+    protected int[] colors;
+    protected ColorGenerator colorgenerator;
+    protected int[] margins = {100, 150, 220, 100};
+    protected Point origin, topyaxis, rightxaxis;
+    protected float maxY;
+    protected float ratio;
+    protected float angle;
+    protected int superMaxY = 0;
+    protected int total_magnitude = 0;
+
+    CircleChart (Table data, String[] categories) {
+        setData(data, categories);
+    }
+
+    public void setData(Table data, String[] categories) {
+        colorgenerator = new ColorGenerator();
+        this.data = data;
+        this.categories = categories;
+        for (int i = 0; i < data.getRowCount(); i++) {
+            total_magnitude += data.getRow(i).getInt(categories[1]);
+        }
+     
+        angle = (360 / (float)(data.getRowCount())); 
+        int colorcount = max(data.getRowCount(), categories.length);
+        colors = new int[colorcount];
+        for (int i = 0; i < colors.length; i++) {
+            colors[i] = colorgenerator.generate();
+        }
+
+        origin = new Point(margins[0], height - margins[3]);
+        topyaxis = new Point(margins[0], margins[1]); 
+        rightxaxis = new Point(width - margins[2], height - margins[3]);
+
+        maxY = data.getRow(0).getInt(categories[1]);
+        for (TableRow row : data.rows()) {
+            int rowweight = row.getInt(categories[1]);
+            if (rowweight > maxY) {
+                maxY = rowweight;
+            }
+        }
+
+        this.angles = new float[data.getRowCount()];
+        for (int i = 0; i < data.getRowCount(); i++) {
+            angles[i] = (PApplet.parseFloat(data.getRow(i).getInt(categories[1])) / total_magnitude) * 360;
+        }
+
+        for (TableRow row : data.rows()) {
+            int elemweight = row.getInt(categories[1]);
+            if (elemweight > maxY) {
+                maxY = elemweight;
+            }
+            int rowweight = 0;
+            for (int i = 1; i < categories.length; i++) {
+                rowweight += row.getInt(categories[i]);
+            }
+            if (rowweight > superMaxY) {
+                superMaxY = rowweight;
+            }
+        }
+
+        float temp = height/2  - 40; 
+        ratio = (PApplet.parseFloat(superMaxY) / temp);
+    }
+};
 public class Point {
     int x, y;
     String disp;
@@ -502,48 +570,10 @@ public class Linechart extends AxisChart {
         }
     }
 };
-public class Piechart {
-    private Table data;
-    private String[] categories;
-    private float[] angles;
-    private int[] colors;
-    private ColorGenerator colorgenerator;
-    protected int[] margins = {100, 150, 220, 100};
-    private Point origin, topyaxis, rightxaxis;
-    private float maxY;
+public class Piechart extends CircleChart {
 
     Piechart(Table data, String[] categories) {
-        setData(data, categories);
-    }
-
-    public void setData(Table data, String[] categories) {
-        colorgenerator = new ColorGenerator();
-        this.data = data;
-        this.categories = categories;
-        this.angles = new float[data.getRowCount()];
-        int total_magnitude = 0;
-        for (int i = 0; i < data.getRowCount(); i++) {
-        	total_magnitude += data.getRow(i).getInt(categories[1]);
-        }
-        for (int i = 0; i < data.getRowCount(); i++) {
-        	angles[i] = (PApplet.parseFloat(data.getRow(i).getInt(categories[1])) / total_magnitude) * 360;
-        }
-
-        colors = new int[angles.length];
-        for (int i = 0; i < colors.length; i++) {
-            colors[i] = colorgenerator.generate();
-        }
-        origin = new Point(margins[0], height - margins[3]);
-        topyaxis = new Point(margins[0], margins[1]); 
-        rightxaxis = new Point(width - margins[2], height - margins[3]);
-
-        maxY = data.getRow(0).getInt(categories[1]);
-        for (TableRow row : data.rows()) {
-            int rowweight = row.getInt(categories[1]);
-            if (rowweight > maxY) {
-                maxY = rowweight;
-            }
-        }
+        super(data, categories);
     }
 
     public void draw (float transition_completeness, Transition transition) {
@@ -555,7 +585,8 @@ public class Piechart {
         float angle = 0;
         float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
         int sectionWidth = abs((rightxaxis.x - origin.x) / data.getRowCount());
-        int default_diam = (min(height - margins[1], width - margins[3]));
+        int default_diam = (min(height - margins[1], width - margins[3] - margins[0]));
+
         switch(transition) {
             case NONE:
                 for (int i = 0; i < angles.length; i++) {
@@ -647,67 +678,12 @@ public class Piechart {
         }
     }
 };
-public class RoseChart {
-    private Table data;
-    private String[] categories;
-    private int[] colors;
-    private ColorGenerator colorgenerator;
-    private int[] margins = {100, 150, 220, 100};
-    private Point origin, topyaxis, rightxaxis;
-    private float maxY;
-    private float ratio;
-    private float angle;
-    private int superMaxY = 0;
-    private String[] Radii;
-    private int total_magnitude = 0;
+public class RoseChart extends CircleChart {
 
     RoseChart(Table data, String[] categories) {
-        setData(data, categories);
+        super(data, categories);
     }
 
-    public void setData(Table data, String[] categories) {
-        colorgenerator = new ColorGenerator();
-        this.data = data;
-        this.categories = categories;
-        for (int i = 0; i < data.getRowCount(); i++) {
-        	total_magnitude += data.getRow(i).getInt(categories[1]);
-        }
-     
-        angle = (360 / (float)(data.getRowCount())); 
-
-        colors = new int[data.getRowCount()];
-        for (int i = 0; i < colors.length; i++) {
-            colors[i] = colorgenerator.generate();
-        }
-        origin = new Point(margins[0], height - margins[3]);
-        topyaxis = new Point(margins[0], margins[1]); 
-        rightxaxis = new Point(width - margins[2], height - margins[3]);
-
-        maxY = data.getRow(0).getInt(categories[1]);
-        for (TableRow row : data.rows()) {
-            int rowweight = row.getInt(categories[1]);
-            if (rowweight > maxY) {
-                maxY = rowweight;
-            }
-        }
-
-        for (TableRow row : data.rows()) {
-            int elemweight = row.getInt(categories[1]);
-            if (elemweight > maxY) {
-                maxY = elemweight;
-            }
-            int rowweight = 0;
-            for (int i = 1; i < categories.length; i++) {
-                rowweight += row.getInt(categories[i]);
-            }
-            if (rowweight > superMaxY) {
-                superMaxY = rowweight;
-            }
-        }
-
-        float temp = height/2  - 40; 
-        ratio = (PApplet.parseFloat(superMaxY) / temp);
-    }
 
     public void draw (float transition_completeness, Transition transition) {
         strokeWeight(1);
@@ -730,41 +706,10 @@ public class RoseChart {
                     }
                     start_angle += angle;
                 }
-            // case ROSETOPIE:
-            // case PIETOROSE:
-            //     if (transition_completeness < 0.25) {
-            //         int currRadius = height/2 - 40;
-            //         int start = 0;
-
-            //         for (int i = 0; i < data.getRowCount(); i++) {
-            //             for (int j = 1; j < categories.length; j++) {
-            //                 currRadius -= int(data.getRow(i).getInt(categories[j]) * ratio);
-            //                 fill(colors[j - 1]);
-            //                 float end_angle = serp(start, start+ ((float(data.getRow(i).getInt(categories[1])) / total_magnitude) * 360), transition_completeness * 4);
-            //                 arc(width/2 - 50, height/2, currRadius, currRadius, radians(start), radians(start+end_angle), PIE);
-            //             }
-            //         }
-            //     } else {
-            //         float currRadius = height/2 - 40;
-            //         float start = 0;
-            //         float end_angle;
-            //         for (int i = 0; i < data.getRowCount(); i++) {
-            //             end_angle = (float(data.getRow(i).getInt(categories[1])) / total_magnitude) * 360;
-            //             for (int j = 1; j < categories.length; j++) {
-            //                 int finallength = int(data.getRow(i).getInt(categories[j]) * ratio);
-            //                 stroke(colors[j - 1]);
-            //                 if (j > 1) {
-            //                     int newlength = int(serp(radius, radius - finallength, (transition_completeness - 0.25) * 4.0/3.0));
-            //                     currRadius -= finallength;
-            //                 } else {
-            //                     arc(width/2 - 50, height/2, newlength, newlength, radians(start), radians(start+end_angle), PIE);
-            //                     currRadius -= finallength;
-            //                     start += end_angle;
-            //                 }
-            //             }
-            //         }
-                // }
-            break;
+                break;
+            case ROSETOPIE:
+            case PIETOROSE:
+                break;
         }
     }
 };
@@ -853,7 +798,7 @@ public class ThemeRiver extends AxisChart {
     ThemeRiver(Table data, String[] categories) {
         super(data, categories);
         colorgenerator = new ColorGenerator();
-        colors = new int[data.getRowCount()];
+        colors = new int[categories.length-1];
         for (int i = 0; i < colors.length; i++) {
             colors[i] = colorgenerator.generate();
         }
@@ -894,9 +839,9 @@ public class ThemeRiver extends AxisChart {
             case NONE:
                
                 for (int j = categories.length-1; j > 0; j--) {
-                  fill(colors[j]);
+                  fill(colors[j-1]);
                   prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f),origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j]) * ratio));
-                  println("got heeerrr");
+
                   if(j > 1) {
                     for (int k = j-1; k >= 1; k--) {
                         prev.y -= PApplet.parseInt(data.getRow(0).getInt(categories[k]) * ratio);
@@ -1002,7 +947,7 @@ public class TransitionChart {
     private String[] categories;
     private Table data;
     // constants
-    private final float transition_time = 3;
+    private final float transition_time = 2;
     private final float transition_frames = transition_time * 60.0f;
 
     TransitionChart(Table data, String[] categories) {

@@ -15,7 +15,7 @@ public class TransitionChart {
     private String[] categories;
     private Table data;
     // constants
-    private final float transition_time = 3;
+    private final float transition_time = 2;
     private final float transition_frames = transition_time * 60.0;
 
     TransitionChart(Table data, String[] categories) {
