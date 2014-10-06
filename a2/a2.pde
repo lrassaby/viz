@@ -31,7 +31,7 @@ void setup () {
   Table data = loadTable(filename, "header");
   String[] lines = loadStrings(filename);
   String[] categories = lines[0].split(",");
-  String[] chart_texts =  {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "Rose Chart", "ThemeRiver"};
+  String[] chart_texts =  {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "ThemeRiver", "Rose Chart"};
 
   buttons = new ButtonGroup(chart_texts);
   chart = new TransitionChart(data, categories);
