@@ -729,6 +729,7 @@ public class RoseChart extends CircleChart {
                         angle += angle_increment;
                     }
                 } else {
+                    angle = 0;
                     for (int i = 0; i < data.getRowCount(); i++) {
                         int diam = 0;
                         for (int j = 1; j < categories.length; j++) {
@@ -736,10 +737,19 @@ public class RoseChart extends CircleChart {
                         }
                         for (int j = categories.length - 1; j >= 1; j--) {
                             fill(colors[j - 1]);
-                            arc(width/2 - 50, height/2, diam, diam, radians(angle), radians(angle+const_angle), PIE);
+                            float diam_interp = serp(0, diam, (transition_completeness - 0.5f) * 2);
+                            arc(width/2 - 50, height/2, diam_interp, diam_interp, radians(angle), radians(angle+const_angle), PIE);
                             diam -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * superRatio);
                         }
                         angle += const_angle;
+                    }
+                    angle = 0;
+                    for (int i = 0; i < angles.length; i++) {
+                        float angle_increment = radians(const_angle);
+                        fill(colors[0]);
+                        float diam = data.getRow(i).getInt(categories[1]) * superRatio;
+                        arc(width/2 - 50, height/2, diam, diam, angle, angle+angle_increment, PIE);
+                        angle += angle_increment;
                     }
                 }
 
