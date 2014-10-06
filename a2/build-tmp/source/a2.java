@@ -30,21 +30,23 @@ public void setup () {
   String filename = null;
   try { 
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-  } 
-  catch (Exception e) { 
+  } catch (Exception e) { 
     e.printStackTrace();
   } 
+
   try {
       filename = JOptionPane.showInputDialog(frame, "Input file (type csv)", "data.csv");
   } catch (Exception e) {
       println("Process cancelled.");
       exit();
   }
+
   if (filename == null) {
       println("Process cancelled.");
       exit();
   }
   
+<<<<<<< HEAD
   Table data = loadTable(filename, "header");
   String[] lines = loadStrings(filename);
   String[] categories = lines[0].split(",");
@@ -54,6 +56,25 @@ public void setup () {
   chart = new TransitionChart(data, categories);
   chart.setChartType(chart_texts[0]);
   buttons.setSelection(chart_texts[0]);
+=======
+  Table data = null;
+  String[] lines = null;
+  String[] categories = null;
+
+  try {
+      data = loadTable(filename, "header");
+      lines = loadStrings(filename);
+      categories = lines[0].split(",");   
+      String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "ThemeRiver"};
+      buttons = new ButtonGroup(chart_texts);
+      chart = new TransitionChart(data, categories);
+      chart.setChartType(chart_texts[0]);
+      buttons.setSelection(chart_texts[0]);
+  } catch (Exception e) {
+      println("Bad file. Process cancelled.");
+      exit();
+  }
+>>>>>>> 79eeeaa01523aa6a01401165312af078bb8bfc13
 }
 
 
@@ -459,6 +480,29 @@ public class Linechart extends AxisChart {
                     drawCircle(prev.x, prev.y, 12);
                 }
                 break;
+            case LINETORIVER:
+                //noFill();
+                beginShape();
+                curveVertex(prev.x, prev.y);
+                curveVertex(prev.x, prev.y);
+                for (int i = 1; i < data.getRowCount(); i++) {
+                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                      int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                      curveVertex(x, y);
+                      prev.setXY(x, y);
+                      fill(0,0,0);
+                      drawCircle(prev.x, prev.y, serp(0, 12, transition_completeness));
+                      noFill();
+                }
+                endShape();
+                /*for (int i = 1; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                    int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
+                    
+                    line(prev.x, prev.y, serp(prev.x, x,(transition_completeness)), serp(prev.y, y,(transition_completeness)));
+                    prev.setXY(x, y);
+                    drawCircle(prev.x, prev.y, serp(0, 12, transition_completeness));
+                }*/
         }
     }
 };
@@ -809,6 +853,99 @@ public class StackedBar extends AxisChart {
         
     }   
 };
+public class ThemeRiver extends AxisChart {
+    ThemeRiver(Table data, String[] categories) {
+        super(data, categories);
+    }
+
+    public void draw (float transition_completeness, Transition transition) {
+        origin.setXY(margins[0], height - margins[3]);
+        topyaxis.setXY(margins[0], margins[1]);
+        rightxaxis.setXY(width - margins[2], height - margins[3]);
+        float c = 0;
+        switch(transition) {
+            case NONE:
+            case LINETOBAR:
+            case BARTOLINE:
+                c = 0;
+                break;
+            case LINETOPIE:
+            case PIETOLINE:
+                c = lerp(255, 0, transition_completeness);
+                break;
+        }
+        int col = color(c, c, c);
+        drawAxes(col);
+
+                  drawLabels(col, serp(PApplet.parseFloat(origin.y - topyaxis.y) / maxY, PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY, transition_completeness));
+
+        drawData(transition_completeness, transition);
+    }
+
+    public void drawData (float transition_completeness, Transition transition) {
+        strokeWeight(2);
+        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY;
+        int sectionWidth = abs(((rightxaxis.x - origin.x) / data.getRowCount()));
+        Point prev = new Point(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio));
+        stroke(0);
+        fill(0);
+        switch (transition) {
+            case NONE:
+
+                for (int j = 1; j < categories.length; j++) {
+                  noFill();
+                  beginShape();
+                  curveVertex(prev.x, prev.y);
+                  curveVertex(prev.x, prev.y);
+                  for (int i = 1; i < data.getRowCount(); i++) {
+                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                      int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                      curveVertex(x, y);
+                      prev.setXY(x, y);
+                  }
+                  endShape();
+                  if (j < categories.length-1)
+                    prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(data.getRow(0).getInt(categories[j+1]) * ratio));
+
+                }
+                break;
+            case LINETORIVER:
+                ratio = PApplet.parseFloat(origin.y - topyaxis.y) / serp(maxY, superMaxY, transition_completeness);
+
+                prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio));
+                noFill();
+                beginShape();
+                curveVertex(prev.x, prev.y);
+                curveVertex(prev.x, prev.y);
+                for (int i = 1; i < data.getRowCount(); i++) {
+                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                      int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                      curveVertex(x, y);
+                      prev.setXY(x, y);
+                }
+                endShape();
+                prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio));
+                for (int j = 2; j < categories.length; j++) {
+                  noFill();
+                  beginShape();
+                  curveVertex(prev.x, serp(PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio), PApplet.parseInt(data.getRow(1).getInt(categories[j]) * ratio), transition_completeness));
+                  curveVertex(prev.x, serp(PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio), PApplet.parseInt(data.getRow(1).getInt(categories[j]) * ratio),transition_completeness));
+                  for (int i = 0; i < data.getRowCount(); i++) {
+                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                      int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                      curveVertex(x, serp(PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio), y, 1-transition_completeness));
+                      prev.setXY(x, y);
+                  }
+                  endShape();
+                  if (j < categories.length-1)
+                    prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(data.getRow(0).getInt(categories[j+1]) * ratio));
+
+                }
+
+                break;
+        }
+    }
+};
 public class TransitionChart {
     // transitions
     private String prev_chart_type;
@@ -820,7 +957,11 @@ public class TransitionChart {
     private Linechart linechart;
     private Piechart piechart;
     private StackedBar stackedbar;
+<<<<<<< HEAD
     private RoseChart rosechart;
+=======
+    private ThemeRiver themeriver;
+>>>>>>> 79eeeaa01523aa6a01401165312af078bb8bfc13
     // data
     private String[] categories;
     private Table data;
@@ -833,7 +974,11 @@ public class TransitionChart {
         this.linechart = new Linechart(data, categories);
         this.piechart = new Piechart(data, categories);
         this.stackedbar = new StackedBar(data, categories);
+<<<<<<< HEAD
         this.rosechart = new RoseChart(data, categories);
+=======
+        this.themeriver = new ThemeRiver(data, categories);
+>>>>>>> 79eeeaa01523aa6a01401165312af078bb8bfc13
         this.data = data;
         this.categories = categories;
         this.transition_start_frame = 0;
@@ -940,12 +1085,22 @@ public class TransitionChart {
                     transition_start_frame = 0;
                     prev_chart_type = "Bar Chart";
                 }
+<<<<<<< HEAD
             } else if (prev_chart_type == "Pie Chart" && chart_type == "Rose Chart") {
                 rosechart.draw(progress, Transition.PIETOROSE);   
             } else if (prev_chart_type == "Rose Chart" && chart_type == "Pie Chart") {
                 rosechart.draw(1 - progress, Transition.ROSETOPIE);   
             }
              else {
+=======
+            } else if (prev_chart_type == "Line Chart" && chart_type == "ThemeRiver") {
+                if (progress < 0.25f) {
+                  linechart.draw(1-(progress*4), Transition.LINETORIVER);
+                } else {
+                  themeriver.draw((progress - 0.25f) * 4.0f/3, Transition.LINETORIVER);
+                }
+            } else {
+>>>>>>> 79eeeaa01523aa6a01401165312af078bb8bfc13
                 println("Transformation not yet implemented.");
                 in_transition = false;
                 transition_start_frame = 0;
@@ -965,9 +1120,15 @@ public class TransitionChart {
                 piechart.draw(1, Transition.NONE);
             } else if (chart_type == "Stacked Bar") {
                 stackedbar.draw(1, Transition.NONE);
+<<<<<<< HEAD
             } else if (chart_type == "Rose Chart") {
                 rosechart.draw(1, Transition.NONE);
             }
+=======
+            }  else if (chart_type == "ThemeRiver") {
+                themeriver.draw(1, Transition.NONE);
+            } 
+>>>>>>> 79eeeaa01523aa6a01401165312af078bb8bfc13
         }
     }
 };
