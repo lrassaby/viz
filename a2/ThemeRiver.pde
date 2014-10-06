@@ -22,7 +22,7 @@ public class ThemeRiver extends AxisChart {
         color col = color(c, c, c);
         drawAxes(col);
 
-                  drawLabels(col, serp(float(origin.y - topyaxis.y) / maxY, float(origin.y - topyaxis.y) / superMaxY, transition_completeness));
+        drawLabels(col, serp(float(origin.y - topyaxis.y) / maxY, float(origin.y - topyaxis.y) / superMaxY, transition_completeness));
 
         drawData(transition_completeness, transition);
     }
@@ -36,51 +36,59 @@ public class ThemeRiver extends AxisChart {
         fill(0);
         switch (transition) {
             case NONE:
-
+                color[] colors = {color(255, 0, 0), color(0, 255, 0), color(0, 0, 255)};
                 for (int j = 1; j < categories.length; j++) {
-                  noFill();
+                  fill(colors[j-1]);
+                  prev.setXY(origin.x + sectionWidth / 2 + int(sectionWidth * 0.1),origin.y - int(data.getRow(0).getInt(categories[j]) * ratio));
                   beginShape();
                   curveVertex(prev.x, prev.y);
                   curveVertex(prev.x, prev.y);
-                  for (int i = 1; i < data.getRowCount(); i++) {
-                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-                      int y = origin.y - int(data.getRow(i).getInt(categories[j]) * ratio);
+                  int x = 0;
+                  int y = 0;
+                  for (int i = 0; i < data.getRowCount(); i++) {
+                      x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                      y = origin.y - int(data.getRow(i).getInt(categories[j]) * ratio);
                       curveVertex(x, y);
                       prev.setXY(x, y);
                   }
+                  curveVertex(x,y);
                   endShape();
                   if (j < categories.length-1)
-                    prev.setXY(origin.x + sectionWidth / 2 + int(sectionWidth * 0.1), int(data.getRow(0).getInt(categories[j+1]) * ratio));
+                    prev.setXY(origin.x + sectionWidth / 2 + int(sectionWidth * 0.1), origin.y - int(data.getRow(0).getInt(categories[j+1]) * ratio));
 
                 }
                 break;
             case LINETORIVER:
                 ratio = float(origin.y - topyaxis.y) / serp(maxY, superMaxY, transition_completeness);
 
-                prev.setXY(origin.x + sectionWidth / 2 + int(sectionWidth * 0.1), int(data.getRow(0).getInt(categories[1]) * ratio));
+                prev.setXY(origin.x + sectionWidth / 2 + int(sectionWidth * 0.1), origin.y - int(data.getRow(0).getInt(categories[1]) * ratio));
                 noFill();
                 beginShape();
                 curveVertex(prev.x, prev.y);
                 curveVertex(prev.x, prev.y);
-                for (int i = 1; i < data.getRowCount(); i++) {
-                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-                      int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
+                int x = 0;
+                int y = 0;
+                for (int i = 0; i < data.getRowCount(); i++) {
+                      x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                      y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
                       curveVertex(x, y);
                       prev.setXY(x, y);
                 }
+                curveVertex(x, y);
                 endShape();
-                prev.setXY(origin.x + sectionWidth / 2 + int(sectionWidth * 0.1), int(data.getRow(0).getInt(categories[1]) * ratio));
                 for (int j = 2; j < categories.length; j++) {
+                  prev.setXY(origin.x + sectionWidth / 2 + int(sectionWidth * 0.1), origin.y - int(data.getRow(0).getInt(categories[j]) * ratio));
                   noFill();
                   beginShape();
-                  curveVertex(prev.x, serp(int(data.getRow(0).getInt(categories[1]) * ratio), int(data.getRow(1).getInt(categories[j]) * ratio), transition_completeness));
-                  curveVertex(prev.x, serp(int(data.getRow(0).getInt(categories[1]) * ratio), int(data.getRow(1).getInt(categories[j]) * ratio),transition_completeness));
+                  curveVertex(prev.x, serp(origin.y - int(data.getRow(0).getInt(categories[1]) * ratio), origin.y - int(data.getRow(0).getInt(categories[j]) * ratio), transition_completeness));
+                  curveVertex(prev.x, serp(origin.y - int(data.getRow(0).getInt(categories[1]) * ratio), origin.y - int(data.getRow(0).getInt(categories[j]) * ratio),transition_completeness));
                   for (int i = 0; i < data.getRowCount(); i++) {
-                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-                      int y = origin.y - int(data.getRow(i).getInt(categories[j]) * ratio);
-                      curveVertex(x, serp(int(data.getRow(i).getInt(categories[1]) * ratio), y, 1-transition_completeness));
+                      x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                      y = origin.y - int(data.getRow(i).getInt(categories[j]) * ratio);
+                      curveVertex(x, serp(int(data.getRow(i).getInt(categories[1]) * ratio), y, transition_completeness));
                       prev.setXY(x, y);
                   }
+                  curveVertex(x, y);
                   endShape();
                   if (j < categories.length-1)
                     prev.setXY(origin.x + sectionWidth / 2 + int(sectionWidth * 0.1), int(data.getRow(0).getInt(categories[j+1]) * ratio));
