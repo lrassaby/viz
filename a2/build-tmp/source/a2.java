@@ -848,8 +848,15 @@ public class StackedBar extends AxisChart {
     }   
 };
 public class ThemeRiver extends AxisChart {
+   private ColorGenerator colorgenerator;
+   private int[] colors;
     ThemeRiver(Table data, String[] categories) {
         super(data, categories);
+        colorgenerator = new ColorGenerator();
+        colors = new int[data.getRowCount()];
+        for (int i = 0; i < colors.length; i++) {
+            colors[i] = colorgenerator.generate();
+        }
     }
 
     public void draw (float transition_completeness, Transition transition) {
@@ -885,27 +892,49 @@ public class ThemeRiver extends AxisChart {
         fill(0);
         switch (transition) {
             case NONE:
-                int[] colors = {color(255, 0, 0), color(0, 255, 0), color(0, 0, 255)};
-                for (int j = 1; j < categories.length; j++) {
-                  fill(colors[j-1]);
+               
+                for (int j = categories.length-1; j > 0; j--) {
+                  fill(colors[j]);
                   prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f),origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j]) * ratio));
+                  println("got heeerrr");
+                  if(j > 1) {
+                    for (int k = j-1; k >= 1; k--) {
+                        prev.y -= PApplet.parseInt(data.getRow(0).getInt(categories[k]) * ratio);
+                    }
+                  }
+                  
                   beginShape();
                   curveVertex(prev.x, prev.y);
                   curveVertex(prev.x, prev.y);
                   int x = 0;
                   int y = 0;
+                  int origY = 0;
                   for (int i = 0; i < data.getRowCount(); i++) {
                       x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
                       y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                      if(j > 1) {
+                        for (int k = j-1; k >= 1; k--) {
+                          y -= PApplet.parseInt(data.getRow(i).getInt(categories[k]) * ratio);
+                        }
+                      }
+                      if (i == 0) {
+                        origY = y;
+                      }
                       curveVertex(x, y);
                       prev.setXY(x, y);
                   }
                   curveVertex(x,y);
+                  strokeWeight(1);
+                  vertex(origin.x + sectionWidth * (data.getRowCount()-1) + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y);
+                  vertex(origin.x + sectionWidth / 2, origin.y);
+                  vertex(origin.x + sectionWidth / 2, origY);
+                  //strokeWeight(2);
                   endShape();
-                  if (j < categories.length-1)
-                    prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j+1]) * ratio));
+                  if (j > 1)
+                    prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j-1]) * ratio));
 
                 }
+                
                 break;
             case LINETORIVER:
                 ratio = PApplet.parseFloat(origin.y - topyaxis.y) / serp(maxY, superMaxY, transition_completeness);
@@ -927,6 +956,9 @@ public class ThemeRiver extends AxisChart {
                 endShape();
                 for (int j = 2; j < categories.length; j++) {
                   prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j]) * ratio));
+                  for (int k = j-1; k >= 1; k--) {
+                     prev.y -= PApplet.parseInt(data.getRow(0).getInt(categories[k]) * ratio);
+                  }
                   noFill();
                   beginShape();
                   curveVertex(prev.x, serp(origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j]) * ratio), transition_completeness));
@@ -934,6 +966,11 @@ public class ThemeRiver extends AxisChart {
                   for (int i = 0; i < data.getRowCount(); i++) {
                       x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
                       y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                      if(j > 1) {
+                        for (int k = j-1; k >= 1; k--) {
+                          y -= PApplet.parseInt(data.getRow(i).getInt(categories[k]) * ratio);
+                        }
+                      }
                       curveVertex(x, serp(PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio), y, transition_completeness));
                       prev.setXY(x, y);
                   }
