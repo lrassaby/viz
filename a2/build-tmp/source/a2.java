@@ -35,7 +35,7 @@ public void setup () {
   } 
 
   try {
-      filename = JOptionPane.showInputDialog(frame, "Input file (type csv)", "data.csv");
+      filename = JOptionPane.showInputDialog(frame, "Input file (type csv)", "Dataset2.csv");
   } catch (Exception e) {
       println("Process cancelled.");
       exit();
@@ -723,7 +723,7 @@ public class RoseChart {
                     for (int j = 1; j < categories.length; j++) {
                         diam += PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
                     }
-                    for (int j = 1; j < categories.length; j++) {
+                    for (int j = categories.length - 1; j >= 1; j--) {
                         fill(colors[j - 1]);
                         arc(width/2 - 50, height/2, diam, diam, radians(start_angle), radians(start_angle+angle), PIE);
                         diam -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
