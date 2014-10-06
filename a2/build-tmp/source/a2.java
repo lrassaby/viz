@@ -49,7 +49,7 @@ public void setup () {
   Table data = loadTable(filename, "header");
   String[] lines = loadStrings(filename);
   String[] categories = lines[0].split(",");
-  String[] chart_texts =  {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "Rose Chart", "ThemeRiver"};
+  String[] chart_texts =  {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "ThemeRiver", "Rose Chart"};
 
   buttons = new ButtonGroup(chart_texts);
   chart = new TransitionChart(data, categories);
@@ -652,7 +652,7 @@ public class RoseChart {
     private String[] categories;
     private int[] colors;
     private ColorGenerator colorgenerator;
-    private int[] margins = {80, 30, 120, 100};
+    private int[] margins = {100, 150, 220, 100};
     private Point origin, topyaxis, rightxaxis;
     private float maxY;
     private float ratio;
@@ -711,23 +711,22 @@ public class RoseChart {
 
     public void draw (float transition_completeness, Transition transition) {
         strokeWeight(1);
-        origin.setXY(margins[0], height - margins[3]);
-        topyaxis.setXY(margins[0], margins[1]);
-        rightxaxis.setXY(width - margins[2], height - margins[3]);
 
-        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
+        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY;
         int sectionWidth = abs((rightxaxis.x - origin.x) / data.getRowCount());
         float start_angle = 0;
 
         switch(transition) {
             case NONE:
                 for (int i = 0; i < data.getRowCount(); i++) {
-                      int prevy = height/2 - 40;
-                      int y = height/2 - 40;
+                    int diam = 0;
                     for (int j = 1; j < categories.length; j++) {
-                        y -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                        diam += PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                    }
+                    for (int j = 1; j < categories.length; j++) {
                         fill(colors[j - 1]);
-                        arc(width/2 - 50, height/2, y, y, radians(start_angle), radians(start_angle+angle), PIE);
+                        arc(width/2 - 50, height/2, diam, diam, radians(start_angle), radians(start_angle+angle), PIE);
+                        diam -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
                     }
                     start_angle += angle;
                 }
