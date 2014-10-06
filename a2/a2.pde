@@ -17,7 +17,7 @@ void setup () {
   } 
 
   try {
-      filename = JOptionPane.showInputDialog(frame, "Input file (type csv)", "data.csv");
+      filename = JOptionPane.showInputDialog(frame, "Input file (type csv)", "Dataset2.csv");
   } catch (Exception e) {
       println("Process cancelled.");
       exit();
