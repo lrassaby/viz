@@ -9,6 +9,7 @@ public class TransitionChart {
     private Linechart linechart;
     private Piechart piechart;
     private StackedBar stackedbar;
+    private RoseChart rosechart;
     // data
     private String[] categories;
     private Table data;
@@ -21,6 +22,7 @@ public class TransitionChart {
         this.linechart = new Linechart(data, categories);
         this.piechart = new Piechart(data, categories);
         this.stackedbar = new StackedBar(data, categories);
+        this.rosechart = new RoseChart(data, categories);
         this.data = data;
         this.categories = categories;
         this.transition_start_frame = 0;
@@ -127,7 +129,12 @@ public class TransitionChart {
                     transition_start_frame = 0;
                     prev_chart_type = "Bar Chart";
                 }
-            } else {
+            } else if (prev_chart_type == "Pie Chart" && chart_type == "Rose Chart") {
+                rosechart.draw(progress, Transition.PIETOROSE);   
+            } else if (prev_chart_type == "Rose Chart" && chart_type == "Pie Chart") {
+                rosechart.draw(1 - progress, Transition.ROSETOPIE);   
+            }
+             else {
                 println("Transformation not yet implemented.");
                 in_transition = false;
                 transition_start_frame = 0;
@@ -147,6 +154,8 @@ public class TransitionChart {
                 piechart.draw(1, Transition.NONE);
             } else if (chart_type == "Stacked Bar") {
                 stackedbar.draw(1, Transition.NONE);
+            } else if (chart_type == "Rose Chart") {
+                rosechart.draw(1, Transition.NONE);
             }
         }
     }
