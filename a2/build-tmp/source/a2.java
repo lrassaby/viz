@@ -46,26 +46,20 @@ public void setup () {
       exit();
   }
   
-<<<<<<< HEAD
   Table data = loadTable(filename, "header");
   String[] lines = loadStrings(filename);
   String[] categories = lines[0].split(",");
+  String[] chart_texts =  {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "Rose Chart", "ThemeRiver"};
 
-  String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "Rose Chart"};
   buttons = new ButtonGroup(chart_texts);
   chart = new TransitionChart(data, categories);
   chart.setChartType(chart_texts[0]);
   buttons.setSelection(chart_texts[0]);
-=======
-  Table data = null;
-  String[] lines = null;
-  String[] categories = null;
 
   try {
       data = loadTable(filename, "header");
       lines = loadStrings(filename);
       categories = lines[0].split(",");   
-      String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "ThemeRiver"};
       buttons = new ButtonGroup(chart_texts);
       chart = new TransitionChart(data, categories);
       chart.setChartType(chart_texts[0]);
@@ -74,7 +68,6 @@ public void setup () {
       println("Bad file. Process cancelled.");
       exit();
   }
->>>>>>> 79eeeaa01523aa6a01401165312af078bb8bfc13
 }
 
 
@@ -957,11 +950,8 @@ public class TransitionChart {
     private Linechart linechart;
     private Piechart piechart;
     private StackedBar stackedbar;
-<<<<<<< HEAD
     private RoseChart rosechart;
-=======
     private ThemeRiver themeriver;
->>>>>>> 79eeeaa01523aa6a01401165312af078bb8bfc13
     // data
     private String[] categories;
     private Table data;
@@ -974,11 +964,8 @@ public class TransitionChart {
         this.linechart = new Linechart(data, categories);
         this.piechart = new Piechart(data, categories);
         this.stackedbar = new StackedBar(data, categories);
-<<<<<<< HEAD
         this.rosechart = new RoseChart(data, categories);
-=======
         this.themeriver = new ThemeRiver(data, categories);
->>>>>>> 79eeeaa01523aa6a01401165312af078bb8bfc13
         this.data = data;
         this.categories = categories;
         this.transition_start_frame = 0;
@@ -1085,14 +1072,10 @@ public class TransitionChart {
                     transition_start_frame = 0;
                     prev_chart_type = "Bar Chart";
                 }
-<<<<<<< HEAD
             } else if (prev_chart_type == "Pie Chart" && chart_type == "Rose Chart") {
                 rosechart.draw(progress, Transition.PIETOROSE);   
             } else if (prev_chart_type == "Rose Chart" && chart_type == "Pie Chart") {
                 rosechart.draw(1 - progress, Transition.ROSETOPIE);   
-            }
-             else {
-=======
             } else if (prev_chart_type == "Line Chart" && chart_type == "ThemeRiver") {
                 if (progress < 0.25f) {
                   linechart.draw(1-(progress*4), Transition.LINETORIVER);
@@ -1100,7 +1083,6 @@ public class TransitionChart {
                   themeriver.draw((progress - 0.25f) * 4.0f/3, Transition.LINETORIVER);
                 }
             } else {
->>>>>>> 79eeeaa01523aa6a01401165312af078bb8bfc13
                 println("Transformation not yet implemented.");
                 in_transition = false;
                 transition_start_frame = 0;
@@ -1120,15 +1102,11 @@ public class TransitionChart {
                 piechart.draw(1, Transition.NONE);
             } else if (chart_type == "Stacked Bar") {
                 stackedbar.draw(1, Transition.NONE);
-<<<<<<< HEAD
             } else if (chart_type == "Rose Chart") {
                 rosechart.draw(1, Transition.NONE);
-            }
-=======
             }  else if (chart_type == "ThemeRiver") {
                 themeriver.draw(1, Transition.NONE);
             } 
->>>>>>> 79eeeaa01523aa6a01401165312af078bb8bfc13
         }
     }
 };

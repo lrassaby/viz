@@ -28,26 +28,20 @@ void setup () {
       exit();
   }
   
-<<<<<<< HEAD
   Table data = loadTable(filename, "header");
   String[] lines = loadStrings(filename);
   String[] categories = lines[0].split(",");
+  String[] chart_texts =  {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "Rose Chart", "ThemeRiver"};
 
-  String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "Rose Chart"};
   buttons = new ButtonGroup(chart_texts);
   chart = new TransitionChart(data, categories);
   chart.setChartType(chart_texts[0]);
   buttons.setSelection(chart_texts[0]);
-=======
-  Table data = null;
-  String[] lines = null;
-  String[] categories = null;
 
   try {
       data = loadTable(filename, "header");
       lines = loadStrings(filename);
       categories = lines[0].split(",");   
-      String[] chart_texts = {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "ThemeRiver"};
       buttons = new ButtonGroup(chart_texts);
       chart = new TransitionChart(data, categories);
       chart.setChartType(chart_texts[0]);
@@ -56,7 +50,6 @@ void setup () {
       println("Bad file. Process cancelled.");
       exit();
   }
->>>>>>> 79eeeaa01523aa6a01401165312af078bb8bfc13
 }
 
 
