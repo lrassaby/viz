@@ -3,7 +3,7 @@ public class AxisChart {
     protected String[] categories;
     protected float maxY; // for single columned 
     protected float superMaxY; // for multi columned
-    protected int[] margins = {80, 30, 120, 100};
+    protected int[] margins = {100, 150, 220, 100};
     protected Point origin, topyaxis, rightxaxis;
 
     AxisChart (Table data, String[] categories) {

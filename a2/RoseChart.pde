@@ -58,7 +58,6 @@ public class RoseChart {
 
         float temp = height/2  - 40; 
         ratio = (float(superMaxY) / temp);
-        println(ratio);
     }
 
     void draw (float transition_completeness, Transition transition) {

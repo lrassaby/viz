@@ -91,7 +91,7 @@ public class AxisChart {
     protected String[] categories;
     protected float maxY; // for single columned 
     protected float superMaxY; // for multi columned
-    protected int[] margins = {80, 30, 120, 100};
+    protected int[] margins = {100, 150, 220, 100};
     protected Point origin, topyaxis, rightxaxis;
 
     AxisChart (Table data, String[] categories) {
@@ -320,7 +320,7 @@ class ButtonGroup {
     ButtonGroup (String[] chart_texts) {
         selection = chart_texts[0];
         buttons = new Button[chart_texts.length]; 
-        Dimensions buttondim = new Dimensions(90, (height - 80) / buttons.length);
+        Dimensions buttondim = new Dimensions(90, (height - 110) / buttons.length);
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new Button(new Point(), buttondim, 7, color(255, 153, 51), chart_texts[i]);
         }
@@ -328,7 +328,7 @@ class ButtonGroup {
 
     public void draw() {
         for (int i = 0; i < buttons.length; i++) {
-            buttons[i].dim.setWH(90, (height - 80) / buttons.length);
+            buttons[i].dim.setWH(90, (height - 110) / buttons.length);
             buttons[i].pos.setXY(width - buttons[0].dim.w - 20, 30 + i * (buttons[i].dim.h + 10));
             if (buttons[i].getText() == selection) {
                 buttons[i].setColor(40, 190, 100);
@@ -478,15 +478,18 @@ public class Linechart extends AxisChart {
                 beginShape();
                 curveVertex(prev.x, prev.y);
                 curveVertex(prev.x, prev.y);
+                int x = 0;
+                int y = 0;
                 for (int i = 1; i < data.getRowCount(); i++) {
-                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                      int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                      x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                      y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
                       curveVertex(x, y);
                       prev.setXY(x, y);
                       fill(0,0,0);
                       drawCircle(prev.x, prev.y, serp(0, 12, transition_completeness));
                       noFill();
                 }
+                curveVertex(x,y);
                 endShape();
                 /*for (int i = 1; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
@@ -505,7 +508,7 @@ public class Piechart {
     private float[] angles;
     private int[] colors;
     private ColorGenerator colorgenerator;
-    private int[] margins = {80, 30, 120, 100};
+    protected int[] margins = {100, 150, 220, 100};
     private Point origin, topyaxis, rightxaxis;
     private float maxY;
 
@@ -552,12 +555,12 @@ public class Piechart {
         float angle = 0;
         float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
         int sectionWidth = abs((rightxaxis.x - origin.x) / data.getRowCount());
-
+        int default_diam = (min(height - margins[1], width - margins[3]));
         switch(transition) {
             case NONE:
                 for (int i = 0; i < angles.length; i++) {
                     fill(colors[i]);
-                    arc(width/2 - 50, height/2, (min(height, width - 120) - 40), (min(height, width - 120) - 40), angle, angle+radians(angles[i]), PIE);
+                    arc(width/2 - 50, height/2, default_diam, default_diam, angle, angle+radians(angles[i]), PIE);
                     angle += radians(angles[i]);
                 }
                 break;
@@ -582,9 +585,9 @@ public class Piechart {
                     }
                    
                     if (transition_completeness < 0.5f) {
-                        diam = PApplet.parseInt(serp(origin.y - y, (min(height, width - 120) - 40) / 2, transition_completeness * 2)) * 2;
+                        diam = PApplet.parseInt(serp(origin.y - y, default_diam / 2, transition_completeness * 2)) * 2;
                     } else {
-                        diam = (min(height, width - 120) - 40);
+                        diam = default_diam;
                     }
 
                     if (transition_completeness < 0.5f) {
@@ -621,7 +624,7 @@ public class Piechart {
                    
                     // d = sqrt(A/pi) * 2;
                    
-                    float default_diam = (min(height, width - 120) - 40);
+                    diam = default_diam;
                     float midway_diam = default_diam * sqrt(((PApplet.parseFloat(yval)/maxY))/ PI);
                     if (transition_completeness < 0.5f) {
                         diam = PApplet.parseInt(serp(12, midway_diam, transition_completeness * 2));
@@ -704,7 +707,6 @@ public class RoseChart {
 
         float temp = height/2  - 40; 
         ratio = (PApplet.parseFloat(superMaxY) / temp);
-        println(ratio);
     }
 
     public void draw (float transition_completeness, Transition transition) {
@@ -870,7 +872,7 @@ public class ThemeRiver extends AxisChart {
         int col = color(c, c, c);
         drawAxes(col);
 
-                  drawLabels(col, serp(PApplet.parseFloat(origin.y - topyaxis.y) / maxY, PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY, transition_completeness));
+        drawLabels(col, serp(PApplet.parseFloat(origin.y - topyaxis.y) / maxY, PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY, transition_completeness));
 
         drawData(transition_completeness, transition);
     }
@@ -884,51 +886,59 @@ public class ThemeRiver extends AxisChart {
         fill(0);
         switch (transition) {
             case NONE:
-
+                int[] colors = {color(255, 0, 0), color(0, 255, 0), color(0, 0, 255)};
                 for (int j = 1; j < categories.length; j++) {
-                  noFill();
+                  fill(colors[j-1]);
+                  prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f),origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j]) * ratio));
                   beginShape();
                   curveVertex(prev.x, prev.y);
                   curveVertex(prev.x, prev.y);
-                  for (int i = 1; i < data.getRowCount(); i++) {
-                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                      int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                  int x = 0;
+                  int y = 0;
+                  for (int i = 0; i < data.getRowCount(); i++) {
+                      x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                      y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
                       curveVertex(x, y);
                       prev.setXY(x, y);
                   }
+                  curveVertex(x,y);
                   endShape();
                   if (j < categories.length-1)
-                    prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(data.getRow(0).getInt(categories[j+1]) * ratio));
+                    prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j+1]) * ratio));
 
                 }
                 break;
             case LINETORIVER:
                 ratio = PApplet.parseFloat(origin.y - topyaxis.y) / serp(maxY, superMaxY, transition_completeness);
 
-                prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio));
+                prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio));
                 noFill();
                 beginShape();
                 curveVertex(prev.x, prev.y);
                 curveVertex(prev.x, prev.y);
-                for (int i = 1; i < data.getRowCount(); i++) {
-                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                      int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                int x = 0;
+                int y = 0;
+                for (int i = 0; i < data.getRowCount(); i++) {
+                      x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                      y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
                       curveVertex(x, y);
                       prev.setXY(x, y);
                 }
+                curveVertex(x, y);
                 endShape();
-                prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio));
                 for (int j = 2; j < categories.length; j++) {
+                  prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j]) * ratio));
                   noFill();
                   beginShape();
-                  curveVertex(prev.x, serp(PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio), PApplet.parseInt(data.getRow(1).getInt(categories[j]) * ratio), transition_completeness));
-                  curveVertex(prev.x, serp(PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio), PApplet.parseInt(data.getRow(1).getInt(categories[j]) * ratio),transition_completeness));
+                  curveVertex(prev.x, serp(origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j]) * ratio), transition_completeness));
+                  curveVertex(prev.x, serp(origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j]) * ratio),transition_completeness));
                   for (int i = 0; i < data.getRowCount(); i++) {
-                      int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                      int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
-                      curveVertex(x, serp(PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio), y, 1-transition_completeness));
+                      x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                      y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                      curveVertex(x, serp(PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio), y, transition_completeness));
                       prev.setXY(x, y);
                   }
+                  curveVertex(x, y);
                   endShape();
                   if (j < categories.length-1)
                     prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(data.getRow(0).getInt(categories[j+1]) * ratio));

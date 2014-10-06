@@ -4,7 +4,7 @@ public class Piechart {
     private float[] angles;
     private color[] colors;
     private ColorGenerator colorgenerator;
-    private int[] margins = {80, 30, 120, 100};
+    protected int[] margins = {100, 150, 220, 100};
     private Point origin, topyaxis, rightxaxis;
     private float maxY;
 
@@ -51,12 +51,12 @@ public class Piechart {
         float angle = 0;
         float ratio = float(origin.y - topyaxis.y) / maxY;
         int sectionWidth = abs((rightxaxis.x - origin.x) / data.getRowCount());
-
+        int default_diam = (min(height - margins[1], width - margins[3]));
         switch(transition) {
             case NONE:
                 for (int i = 0; i < angles.length; i++) {
                     fill(colors[i]);
-                    arc(width/2 - 50, height/2, (min(height, width - 120) - 40), (min(height, width - 120) - 40), angle, angle+radians(angles[i]), PIE);
+                    arc(width/2 - 50, height/2, default_diam, default_diam, angle, angle+radians(angles[i]), PIE);
                     angle += radians(angles[i]);
                 }
                 break;
@@ -81,9 +81,9 @@ public class Piechart {
                     }
                    
                     if (transition_completeness < 0.5) {
-                        diam = int(serp(origin.y - y, (min(height, width - 120) - 40) / 2, transition_completeness * 2)) * 2;
+                        diam = int(serp(origin.y - y, default_diam / 2, transition_completeness * 2)) * 2;
                     } else {
-                        diam = (min(height, width - 120) - 40);
+                        diam = default_diam;
                     }
 
                     if (transition_completeness < 0.5) {
@@ -120,7 +120,7 @@ public class Piechart {
                    
                     // d = sqrt(A/pi) * 2;
                    
-                    float default_diam = (min(height, width - 120) - 40);
+                    diam = default_diam;
                     float midway_diam = default_diam * sqrt(((float(yval)/maxY))/ PI);
                     if (transition_completeness < 0.5) {
                         diam = int(serp(12, midway_diam, transition_completeness * 2));

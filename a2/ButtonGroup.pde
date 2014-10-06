@@ -5,7 +5,7 @@ class ButtonGroup {
     ButtonGroup (String[] chart_texts) {
         selection = chart_texts[0];
         buttons = new Button[chart_texts.length]; 
-        Dimensions buttondim = new Dimensions(90, (height - 80) / buttons.length);
+        Dimensions buttondim = new Dimensions(90, (height - 110) / buttons.length);
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new Button(new Point(), buttondim, 7, color(255, 153, 51), chart_texts[i]);
         }
@@ -13,7 +13,7 @@ class ButtonGroup {
 
     public void draw() {
         for (int i = 0; i < buttons.length; i++) {
-            buttons[i].dim.setWH(90, (height - 80) / buttons.length);
+            buttons[i].dim.setWH(90, (height - 110) / buttons.length);
             buttons[i].pos.setXY(width - buttons[0].dim.w - 20, 30 + i * (buttons[i].dim.h + 10));
             if (buttons[i].getText() == selection) {
                 buttons[i].setColor(40, 190, 100);
