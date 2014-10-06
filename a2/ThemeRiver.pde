@@ -4,7 +4,7 @@ public class ThemeRiver extends AxisChart {
     ThemeRiver(Table data, String[] categories) {
         super(data, categories);
         colorgenerator = new ColorGenerator();
-        colors = new color[data.getRowCount()];
+        colors = new color[categories.length-1];
         for (int i = 0; i < colors.length; i++) {
             colors[i] = colorgenerator.generate();
         }
@@ -45,9 +45,9 @@ public class ThemeRiver extends AxisChart {
             case NONE:
                
                 for (int j = categories.length-1; j > 0; j--) {
-                  fill(colors[j]);
+                  fill(colors[j-1]);
                   prev.setXY(origin.x + sectionWidth / 2 + int(sectionWidth * 0.1),origin.y - int(data.getRow(0).getInt(categories[j]) * ratio));
-                  println("got heeerrr");
+
                   if(j > 1) {
                     for (int k = j-1; k >= 1; k--) {
                         prev.y -= int(data.getRow(0).getInt(categories[k]) * ratio);
