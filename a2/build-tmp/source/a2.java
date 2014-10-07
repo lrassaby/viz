@@ -145,12 +145,12 @@ public class AxisChart {
             makeText(data.getRow(i).getString(categories[0]), x, y, -HALF_PI / 2);
         }
         /* Y labels */
-        // Y-axis label
-        textSize(16); 
-        makeText(categories[1], topyaxis.x - 60, topyaxis.y + 50, -HALF_PI);
-
         // Y value labels
         if (ratio < 100) {
+            // Y-axis label
+            textSize(16); 
+            makeText(categories[1], topyaxis.x - 60, topyaxis.y + 50, -HALF_PI);
+
             textSize(12);
         
             int increment;
@@ -542,6 +542,7 @@ public class Linechart extends AxisChart {
                 }
                 break;
             case LINETORIVER:
+            case RIVERTOLINE:
                 //noFill();
                 beginShape();
                 curveVertex(prev.x, prev.y);
@@ -559,14 +560,6 @@ public class Linechart extends AxisChart {
                 }
                 curveVertex(x,y);
                 endShape();
-                /*for (int i = 1; i < data.getRowCount(); i++) {
-                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-                    int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
-                    
-                    line(prev.x, prev.y, serp(prev.x, x,(transition_completeness)), serp(prev.y, y,(transition_completeness)));
-                    prev.setXY(x, y);
-                    drawCircle(prev.x, prev.y, serp(0, 12, transition_completeness));
-                }*/
         }
     }
 };
