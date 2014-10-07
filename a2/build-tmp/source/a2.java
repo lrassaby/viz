@@ -23,65 +23,65 @@ ButtonGroup buttons;
 
 
 public void setup () {
-    frame.setResizable(true);
-    size(900, 700);
-    frameRate(60);
+  frame.setResizable(true);
+  size(900, 700);
+  frameRate(60);
 
-    String filename = null;
-    try {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
+  String filename = null;
+  try { 
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+  } catch (Exception e) { 
+    e.printStackTrace();
+  } 
 
-    try {
-        filename = JOptionPane.showInputDialog(frame, "Input file (type csv)", "Dataset2.csv");
-    } catch (Exception e) {
-        println("Process cancelled.");
-        exit();
-    }
+  try {
+      filename = JOptionPane.showInputDialog(frame, "Input file (type csv)", "Dataset2.csv");
+  } catch (Exception e) {
+      println("Process cancelled.");
+      exit();
+  }
 
-    if (filename == null) {
-        println("Process cancelled.");
-        exit();
-    }
+  if (filename == null) {
+      println("Process cancelled.");
+      exit();
+  }
+  
+  Table data = loadTable(filename, "header");
+  String[] lines = loadStrings(filename);
+  String[] categories = lines[0].split(",");
+  String[] chart_texts =  {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "ThemeRiver", "Rose Chart"};
 
-    Table data = loadTable(filename, "header");
-    String[] lines = loadStrings(filename);
-    String[] categories = lines[0].split(",");
-    String[] chart_texts =  {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "ThemeRiver", "Rose Chart"};
+  buttons = new ButtonGroup(chart_texts);
+  chart = new TransitionChart(data, categories);
+  chart.setChartType(chart_texts[0]);
+  buttons.setSelection(chart_texts[0]);
 
-    buttons = new ButtonGroup(chart_texts);
-    chart = new TransitionChart(data, categories);
-    chart.setChartType(chart_texts[0]);
-    buttons.setSelection(chart_texts[0]);
-
-    try {
-        data = loadTable(filename, "header");
-        lines = loadStrings(filename);
-        categories = lines[0].split(",");
-        buttons = new ButtonGroup(chart_texts);
-        chart = new TransitionChart(data, categories);
-        chart.setChartType(chart_texts[0]);
-        buttons.setSelection(chart_texts[0]);
-    } catch (Exception e) {
-        println("Bad file. Process cancelled.");
-        exit();
-    }
+  try {
+      data = loadTable(filename, "header");
+      lines = loadStrings(filename);
+      categories = lines[0].split(",");   
+      buttons = new ButtonGroup(chart_texts);
+      chart = new TransitionChart(data, categories);
+      chart.setChartType(chart_texts[0]);
+      buttons.setSelection(chart_texts[0]);
+  } catch (Exception e) {
+      println("Bad file. Process cancelled.");
+      exit();
+  }
 }
 
 
 public void draw() {
-    background(255, 255, 255);
-    chart.draw();
-    buttons.draw();
+  background(255, 255, 255);
+  chart.draw();
+  buttons.draw();
 }
 
 public void mouseClicked() {
-    String clicked = buttons.getClicked();
-    if (clicked != chart.getChartType() && chart.setChartType(clicked)) {
-        buttons.setSelection(clicked);
-    }
+  String clicked = buttons.getClicked();
+  if (clicked != chart.getChartType() && chart.setChartType(clicked)) {
+    buttons.setSelection(clicked);
+  }
 }
 
 
@@ -145,12 +145,12 @@ public class AxisChart {
             makeText(data.getRow(i).getString(categories[0]), x, y, -HALF_PI / 2);
         }
         /* Y labels */
+        // Y-axis label
+        textSize(16); 
+        makeText(categories[1], topyaxis.x - 60, topyaxis.y + 50, -HALF_PI);
+
         // Y value labels
         if (ratio < 100) {
-            // Y-axis label
-            textSize(16); 
-            makeText(categories[1], topyaxis.x - 60, topyaxis.y + 50, -HALF_PI);
-
             textSize(12);
         
             int increment;
@@ -544,22 +544,15 @@ public class Linechart extends AxisChart {
             case LINETORIVER:
             case RIVERTOLINE:
                 //noFill();
-                beginShape();
-                curveVertex(prev.x, prev.y);
-                curveVertex(prev.x, prev.y);
-                int x = 0;
-                int y = 0;
-                for (int i = 1; i < data.getRowCount(); i++) {
-                      x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                      y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
-                      curveVertex(x, y);
-                      prev.setXY(x, y);
-                      fill(0,0,0);
-                      drawCircle(prev.x, prev.y, serp(0, 12, transition_completeness));
-                      noFill();
+                ratio = serp(PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY, ratio, transition_completeness);
+                prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio));
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                    line(prev.x, prev.y, x, y);
+                    prev.setXY(x, y);
+                    drawCircle(prev.x, prev.y, serp(0, 12, transition_completeness));
                 }
-                curveVertex(x,y);
-                endShape();
         }
     }
 };
@@ -855,12 +848,11 @@ public class ThemeRiver extends AxisChart {
             break;
         case LINETOPIE:
         case PIETOLINE:
-            c = lerp(255, 0, transition_completeness);
+            c = serp(255, 0, transition_completeness);
             break;
         }
         int col = color(c, c, c);
         drawAxes(col);
-
         drawLabels(col, serp(PApplet.parseFloat(origin.y - topyaxis.y) / maxY, 150, transition_completeness));
         drawData(transition_completeness, transition);
     }
@@ -1053,7 +1045,7 @@ public class TransitionChart {
                 if (chart_type == "Stacked Bar") {
                     PieBar();
                 } else if (chart_type == "ThemeRiver") {
-                    LineThemeRiver();
+                    LinePie();
                 }
             } else if (prev_chart_type == "Line Chart") {
                 if (chart_type == "Stacked Bar") {

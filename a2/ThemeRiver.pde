@@ -24,7 +24,7 @@ public class ThemeRiver extends AxisChart {
             break;
         case LINETOPIE:
         case PIETOLINE:
-            c = lerp(255, 0, transition_completeness);
+            c = serp(255, 0, transition_completeness);
             break;
         }
         color col = color(c, c, c);

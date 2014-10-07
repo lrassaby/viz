@@ -84,7 +84,7 @@ public class TransitionChart {
                 if (chart_type == "Stacked Bar") {
                     PieBar();
                 } else if (chart_type == "ThemeRiver") {
-                    LineThemeRiver();
+                    LinePie();
                 }
             } else if (prev_chart_type == "Line Chart") {
                 if (chart_type == "Stacked Bar") {
