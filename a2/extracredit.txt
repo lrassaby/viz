@@ -1,0 +1,6 @@
+There were several components that we implemented that were beyond the 
+requirements for the assignment:
+- Completed all additional requirements
+- GUI for starting the project
+- Very clean, modular code that makes developing a new transition relatively simple 
+- Cool colors and generation based on the golden ratio, for maximal clarity

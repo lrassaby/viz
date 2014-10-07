@@ -1,0 +1,7 @@
+Louis Rassaby, Jim Bonish, Suzie Church
+10/6/2014
+---------------------------------------
+ - Louis set up the infrastructure for the transitions and worked on all charts
+   and the transitions between them
+ - Jim worked mainly on the ThemeRiver and the transitions to and from it
+ - Suzie worked mainly on the pie chart and rose chart and some transitions
