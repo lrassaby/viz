@@ -72,12 +72,8 @@ public class ThemeRiver extends AxisChart {
                 for (int i = 0; i < data.getRowCount(); i++) {
                     newY = startYs[i];
                     prev.x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-                    if (j > 1) {
-                        for (int k = j; k > 1; k--) {
-                            newY -= int(data.getRow(i).getInt(categories[k]) * ratio);
-                        }
-                    }
-                        newY -= int(data.getRow(i).getInt(categories[j]) * ratio);
+                    newY -= int(data.getRow(i).getInt(categories[j]) * ratio);
+                    startYs[i] -= int(data.getRow(i).getInt(categories[j]) * ratio);
                    
                     curveVertex(prev.x, newY);
                     if (i == 0) {
