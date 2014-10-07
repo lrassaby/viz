@@ -7,6 +7,9 @@ public class RoseChart extends CircleChart {
 
     void draw (float transition_completeness, Transition transition) {
         strokeWeight(1);
+        origin.setXY(margins[0], height - margins[3]);
+        topyaxis.setXY(margins[0], margins[1]);
+        rightxaxis.setXY(width - margins[2], height - margins[3]);
 
         float ratio = float(origin.y - topyaxis.y) / maxY;
         float superRatio = float(origin.y - topyaxis.y)  / superMaxY;
