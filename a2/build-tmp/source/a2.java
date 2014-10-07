@@ -925,7 +925,49 @@ public class ThemeRiver extends AxisChart {
             break;
         case LINETORIVER:
         case RIVERTOLINE:
+            middle = (origin.y + topyaxis.y) / 2;
+            startYs = new int[data.getRowCount()];
+            colTotal = 0;
+            int y = 0;
+            //bottom line
+            noFill();
+            beginShape();
+            for (int i = 0; i < data.getRowCount(); i++) {
+                y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                colTotal = 0;
+                prev.x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                for (int j = 1; j < categories.length; j++) {
+                    colTotal += PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                }
+                startYs[i] = middle + colTotal / 2; 
+                curveVertex(prev.x, serp(y, middle + colTotal / 2, transition_completeness));
+                if (i == 0) {
+                    curveVertex(prev.x, serp(y, middle + colTotal / 2, transition_completeness));
+                }
+            }
+            curveVertex(prev.x, serp(y, middle + colTotal / 2, transition_completeness));
+            endShape();
 
+            //rest of lines
+            for (int j = 1; j < categories.length; j++) {
+                beginShape();
+                int newY = 0;
+                y = 0;
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                    newY = startYs[i];
+                    prev.x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    newY -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                    startYs[i] -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                   
+                    curveVertex(prev.x, serp(y, newY, transition_completeness));
+                    if (i == 0) {
+                        curveVertex(prev.x, serp(y, newY, transition_completeness));
+                    }
+                }
+                curveVertex(prev.x, serp(y, newY, transition_completeness));
+                endShape();
+            }
 
 
             break;
