@@ -1,10 +1,10 @@
 class ButtonGroup {
     private Button[] buttons;
     private String selection;
-    
+
     ButtonGroup (String[] chart_texts) {
         selection = chart_texts[0];
-        buttons = new Button[chart_texts.length]; 
+        buttons = new Button[chart_texts.length];
         Dimensions buttondim = new Dimensions(90, (height - 110) / buttons.length);
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new Button(new Point(), buttondim, 7, color(255, 153, 51), chart_texts[i]);
@@ -35,7 +35,7 @@ class ButtonGroup {
         for (int i = 0; i < buttons.length; i++) {
             buttons[i].intersect(mouseX, mouseY);
             boolean selected = buttons[i].getIsect();
-            if (selected) { 
+            if (selected) {
                 buttons[i].setSelected(false);
                 return buttons[i].getText();
             }

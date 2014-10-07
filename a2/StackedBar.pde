@@ -29,51 +29,51 @@ public class StackedBar extends AxisChart {
         stroke(0);
         strokeCap(SQUARE);
 
-        switch(transition) {
-            case NONE:
+        switch (transition) {
+        case NONE:
+            for (int i = 0; i < data.getRowCount(); i++) {
+                int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1), y = origin.y;
+                int prevy = origin.y;
+                for (int j = 1; j < categories.length; j++) {
+                    y -= int(data.getRow(i).getInt(categories[j]) * ratio);
+                    stroke(colors[j - 1]);
+                    line(x, prevy, x, y);
+                    prevy = y;
+                }
+            }
+            break;
+        case BARTOSTACKED:
+        case STACKEDTOBAR:
+            if (transition_completeness < 0.25) {
+                ratio = float(origin.y - topyaxis.y) / serp(maxY, superMaxY, transition_completeness * 4);
+                stroke(lerpColor(color(0, 0, 0), colors[0], transition_completeness * 4));
+
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                    int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
+                    line(x, origin.y, x, y);
+                }
+            } else {
                 for (int i = 0; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1), y = origin.y;
                     int prevy = origin.y;
                     for (int j = 1; j < categories.length; j++) {
-                        y -= int(data.getRow(i).getInt(categories[j]) * ratio);
+                        int finallength = int(data.getRow(i).getInt(categories[j]) * ratio);
                         stroke(colors[j - 1]);
-                        line(x, prevy, x, y);
-                        prevy = y;
-                    }
-                }
-                break;
-            case BARTOSTACKED:
-            case STACKEDTOBAR:
-                if (transition_completeness < 0.25) {
-                    ratio = float(origin.y - topyaxis.y) / serp(maxY, superMaxY, transition_completeness * 4);
-                    stroke(lerpColor(color(0, 0, 0), colors[0], transition_completeness * 4));
-
-                    for (int i = 0; i < data.getRowCount(); i++) {
-                        int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-                        int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
-                        line(x, origin.y, x, y);
-                    }
-                } else {
-                    for (int i = 0; i < data.getRowCount(); i++) {
-                        int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1), y = origin.y;
-                        int prevy = origin.y;
-                        for (int j = 1; j < categories.length; j++) {
-                            int finallength = int(data.getRow(i).getInt(categories[j]) * ratio);
-                            stroke(colors[j - 1]);
-                            if (j > 1) {
-                                int newy = int(serp(prevy, prevy - finallength, (transition_completeness - 0.25) * 4.0/3.0));
-                                line(x, prevy, x, newy);
-                                prevy = newy;
-                            } else {
-                                line(x, prevy, x, prevy - finallength);
-                                prevy = prevy - finallength;
-                            }
+                        if (j > 1) {
+                            int newy = int(serp(prevy, prevy - finallength, (transition_completeness - 0.25) * 4.0 / 3.0));
+                            line(x, prevy, x, newy);
+                            prevy = newy;
+                        } else {
+                            line(x, prevy, x, prevy - finallength);
+                            prevy = prevy - finallength;
                         }
                     }
                 }
-               
-                break;
+            }
+
+            break;
         }
-        
-    }   
+
+    }
 };

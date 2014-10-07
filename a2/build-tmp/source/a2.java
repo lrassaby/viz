@@ -1138,6 +1138,13 @@ public class TransitionChart {
                 themeriver.draw((progress - 0.25f) * 4.0f/3, Transition.LINETORIVER);
             }
             continueTransformation("ThemeRiver");
+        } else if (prev_chart_type == "ThemeRiver") {
+             if (progress < 0.75f) {
+                themeriver.draw(1.0f - (progress * 4.0f/3), Transition.RIVERTOLINE);
+            } else {
+                linechart.draw((progress - 0.75f) * 4.0f, Transition.RIVERTOLINE);
+            }
+            continueTransformation("Line Chart");
         }
     }
 
