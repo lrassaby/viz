@@ -203,6 +203,13 @@ public class TransitionChart {
                 themeriver.draw((progress - 0.25) * 4.0/3, Transition.LINETORIVER);
             }
             continueTransformation("ThemeRiver");
+        } else if (prev_chart_type == "ThemeRiver") {
+             if (progress < 0.75) {
+                themeriver.draw(1.0 - (progress * 4.0/3), Transition.RIVERTOLINE);
+            } else {
+                linechart.draw((progress - 0.75) * 4.0, Transition.RIVERTOLINE);
+            }
+            continueTransformation("Line Chart");
         }
     }
 
