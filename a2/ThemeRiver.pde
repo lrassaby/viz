@@ -30,7 +30,7 @@ public class ThemeRiver extends AxisChart {
         color col = color(c, c, c);
         drawAxes(col);
 
-        drawLabels(col, serp(float(origin.y - topyaxis.y) / maxY, float(origin.y - topyaxis.y) / superMaxY, transition_completeness));
+        drawLabels(col, serp(float(origin.y - topyaxis.y) / maxY, 150, transition_completeness));
         drawData(transition_completeness, transition);
     }
 
@@ -56,7 +56,7 @@ public class ThemeRiver extends AxisChart {
                 for (int j = 1; j < categories.length; j++) {
                     colTotal += int(data.getRow(i).getInt(categories[j]) * ratio);
                 }
-                startYs[i] = middle + colTotal / 2; println(startYs[i]);
+                startYs[i] = middle + colTotal / 2; 
                 curveVertex(prev.x, middle + colTotal / 2);
                 if (i == 0) {
                     curveVertex(prev.x, middle + colTotal / 2);
@@ -84,10 +84,9 @@ public class ThemeRiver extends AxisChart {
                 endShape();
             }
 
-
-
             break;
         case LINETORIVER:
+        case RIVERTOLINE:
 
 
 

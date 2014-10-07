@@ -23,65 +23,65 @@ ButtonGroup buttons;
 
 
 public void setup () {
-  frame.setResizable(true);
-  size(900, 700);
-  frameRate(60);
+    frame.setResizable(true);
+    size(900, 700);
+    frameRate(60);
 
-  String filename = null;
-  try { 
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-  } catch (Exception e) { 
-    e.printStackTrace();
-  } 
+    String filename = null;
+    try {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
 
-  try {
-      filename = JOptionPane.showInputDialog(frame, "Input file (type csv)", "Dataset2.csv");
-  } catch (Exception e) {
-      println("Process cancelled.");
-      exit();
-  }
+    try {
+        filename = JOptionPane.showInputDialog(frame, "Input file (type csv)", "Dataset2.csv");
+    } catch (Exception e) {
+        println("Process cancelled.");
+        exit();
+    }
 
-  if (filename == null) {
-      println("Process cancelled.");
-      exit();
-  }
-  
-  Table data = loadTable(filename, "header");
-  String[] lines = loadStrings(filename);
-  String[] categories = lines[0].split(",");
-  String[] chart_texts =  {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "ThemeRiver", "Rose Chart"};
+    if (filename == null) {
+        println("Process cancelled.");
+        exit();
+    }
 
-  buttons = new ButtonGroup(chart_texts);
-  chart = new TransitionChart(data, categories);
-  chart.setChartType(chart_texts[0]);
-  buttons.setSelection(chart_texts[0]);
+    Table data = loadTable(filename, "header");
+    String[] lines = loadStrings(filename);
+    String[] categories = lines[0].split(",");
+    String[] chart_texts =  {"Bar Chart", "Line Chart", "Pie Chart", "Stacked Bar", "ThemeRiver", "Rose Chart"};
 
-  try {
-      data = loadTable(filename, "header");
-      lines = loadStrings(filename);
-      categories = lines[0].split(",");   
-      buttons = new ButtonGroup(chart_texts);
-      chart = new TransitionChart(data, categories);
-      chart.setChartType(chart_texts[0]);
-      buttons.setSelection(chart_texts[0]);
-  } catch (Exception e) {
-      println("Bad file. Process cancelled.");
-      exit();
-  }
+    buttons = new ButtonGroup(chart_texts);
+    chart = new TransitionChart(data, categories);
+    chart.setChartType(chart_texts[0]);
+    buttons.setSelection(chart_texts[0]);
+
+    try {
+        data = loadTable(filename, "header");
+        lines = loadStrings(filename);
+        categories = lines[0].split(",");
+        buttons = new ButtonGroup(chart_texts);
+        chart = new TransitionChart(data, categories);
+        chart.setChartType(chart_texts[0]);
+        buttons.setSelection(chart_texts[0]);
+    } catch (Exception e) {
+        println("Bad file. Process cancelled.");
+        exit();
+    }
 }
 
 
 public void draw() {
-  background(255, 255, 255);
-  chart.draw();
-  buttons.draw();
+    background(255, 255, 255);
+    chart.draw();
+    buttons.draw();
 }
 
 public void mouseClicked() {
-  String clicked = buttons.getClicked();
-  if (clicked != chart.getChartType() && chart.setChartType(clicked)) {
-    buttons.setSelection(clicked);
-  }
+    String clicked = buttons.getClicked();
+    if (clicked != chart.getChartType() && chart.setChartType(clicked)) {
+        buttons.setSelection(clicked);
+    }
 }
 
 
@@ -150,25 +150,25 @@ public class AxisChart {
         makeText(categories[1], topyaxis.x - 60, topyaxis.y + 50, -HALF_PI);
 
         // Y value labels
-        textSize(12);
+        if (ratio < 100) {
+            textSize(12);
         
-        int increment;
-        try {
-            increment = PApplet.parseInt(25/ratio);
-        } catch (Exception e) {
-            increment = 30;
-        }
-        if (increment < 1) {
-            increment = 1;
-        }
+            int increment;
+            try {
+                increment = PApplet.parseInt(25/ratio);
+            } catch (Exception e) {
+                increment = 30;
+            }
+            if (increment < 1) {
+                increment = 1;
+            }
 
-        float max = PApplet.parseFloat(origin.y - topyaxis.y) / ratio;
-        for (int i = 0; i <= max * 1.03f; i+= increment) {
-            makeText(Integer.toString(i), origin.x - 10, PApplet.parseInt(-i * ratio + origin.y), 0);
-        }
+            float max = PApplet.parseFloat(origin.y - topyaxis.y) / ratio;
+            for (int i = 0; i <= max * 1.03f; i+= increment) {
+                makeText(Integer.toString(i), origin.x - 10, PApplet.parseInt(-i * ratio + origin.y), 0);
+            }
+        } 
     }
-
-
 };
 public class Barchart extends AxisChart {
     Barchart(Table data, String[] categories) {
@@ -316,10 +316,10 @@ public class Button {
 class ButtonGroup {
     private Button[] buttons;
     private String selection;
-    
+
     ButtonGroup (String[] chart_texts) {
         selection = chart_texts[0];
-        buttons = new Button[chart_texts.length]; 
+        buttons = new Button[chart_texts.length];
         Dimensions buttondim = new Dimensions(90, (height - 110) / buttons.length);
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new Button(new Point(), buttondim, 7, color(255, 153, 51), chart_texts[i]);
@@ -350,7 +350,7 @@ class ButtonGroup {
         for (int i = 0; i < buttons.length; i++) {
             buttons[i].intersect(mouseX, mouseY);
             boolean selected = buttons[i].getIsect();
-            if (selected) { 
+            if (selected) {
                 buttons[i].setSelected(false);
                 return buttons[i].getText();
             }
@@ -383,8 +383,8 @@ public class CircleChart {
         for (int i = 0; i < data.getRowCount(); i++) {
             total_magnitude += data.getRow(i).getInt(categories[1]);
         }
-     
-        const_angle = (360 / (float)(data.getRowCount())); 
+
+        const_angle = (360 / (float)(data.getRowCount()));
         int colorcount = max(data.getRowCount(), categories.length);
         colors = new int[colorcount];
         for (int i = 0; i < colors.length; i++) {
@@ -392,7 +392,7 @@ public class CircleChart {
         }
 
         origin = new Point(margins[0], height - margins[3]);
-        topyaxis = new Point(margins[0], margins[1]); 
+        topyaxis = new Point(margins[0], margins[1]);
         rightxaxis = new Point(width - margins[2], height - margins[3]);
 
         maxY = data.getRow(0).getInt(categories[1]);
@@ -422,7 +422,7 @@ public class CircleChart {
             }
         }
 
-        float temp = height/2  - 40; 
+        float temp = height / 2  - 40;
         ratio = (PApplet.parseFloat(superMaxY) / temp);
     }
 };
@@ -588,104 +588,104 @@ public class Piechart extends CircleChart {
         int sectionWidth = abs((rightxaxis.x - origin.x) / data.getRowCount());
         int default_diam = (min(height - margins[1], width - margins[3] - margins[0]));
 
-        switch(transition) {
-            case NONE:
-                for (int i = 0; i < angles.length; i++) {
+        switch (transition) {
+        case NONE:
+            for (int i = 0; i < angles.length; i++) {
+                fill(colors[i]);
+                arc(width / 2 - 50, height / 2, default_diam, default_diam, angle, angle + radians(angles[i]), PIE);
+                angle += radians(angles[i]);
+            }
+            break;
+        case BARTOPIE:
+        case PIETOBAR:
+            for (int i = 0; i < angles.length; i++) {
+                int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                if (transition_completeness < 0.5f) {
+                    fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness * 2));
+                } else {
                     fill(colors[i]);
-                    arc(width/2 - 50, height/2, default_diam, default_diam, angle, angle+radians(angles[i]), PIE);
-                    angle += radians(angles[i]);
                 }
-                break;
-            case BARTOPIE:
-            case PIETOBAR:
-                for (int i = 0; i < angles.length; i++) {
-                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
-                    if (transition_completeness < 0.5f) {
-                        fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness * 2));
-                    } else {
-                        fill(colors[i]);
-                    }
-                    int arcx, arcy, diam;
-                    float startr, endr;
-                    if (transition_completeness > 0.5f) {
-                        arcx = PApplet.parseInt(serp(x, width/2 - 50, (transition_completeness - 0.5f) * 2));
-                        arcy = PApplet.parseInt(serp(origin.y, height/2, (transition_completeness - 0.5f) * 2));
-                    } else {
-                        arcx = x;
-                        arcy = origin.y;
-                    }
-                   
-                    if (transition_completeness < 0.5f) {
-                        diam = PApplet.parseInt(serp(origin.y - y, default_diam / 2, transition_completeness * 2)) * 2;
-                    } else {
-                        diam = default_diam;
-                    }
+                int arcx, arcy, diam;
+                float startr, endr;
+                if (transition_completeness > 0.5f) {
+                    arcx = PApplet.parseInt(serp(x, width / 2 - 50, (transition_completeness - 0.5f) * 2));
+                    arcy = PApplet.parseInt(serp(origin.y, height / 2, (transition_completeness - 0.5f) * 2));
+                } else {
+                    arcx = x;
+                    arcy = origin.y;
+                }
 
-                    if (transition_completeness < 0.5f) {
-                        startr = serp(3 * HALF_PI - 0.01f, 3 * HALF_PI - radians(angles[i]) / 2, transition_completeness * 2);
-                        endr = serp(3 * HALF_PI + 0.01f, 3 * HALF_PI + radians(angles[i]) / 2, transition_completeness * 2);
-                    } else {
-                        startr = serp(3 * HALF_PI - radians(angles[i]) / 2, angle, (transition_completeness - 0.5f) * 2);
-                        endr = serp(3 * HALF_PI + radians(angles[i]) / 2, angle+radians(angles[i]), (transition_completeness - 0.5f) * 2);
-                    }
-                    arc(arcx, arcy, diam, diam, startr, endr, PIE);
-                    angle += radians(angles[i]);
-                }
-                break;
-            case LINETOPIE:
-            case PIETOLINE:
-                for (int i = 0; i < angles.length; i++) {
-                    int yval = data.getRow(i).getInt(categories[1]);
-                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                    int y = origin.y - PApplet.parseInt(yval * ratio);
-                    if (transition_completeness < 0.5f) {
-                        fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness * 2));
-                    } else {
-                        fill(colors[i]);
-                    }
-                    int arcx, arcy, diam;
-                    float startr, endr;
-                    if (transition_completeness > 0.5f) {
-                        arcx = PApplet.parseInt(serp(x, width/2 - 50, (transition_completeness - 0.5f) * 2));
-                        arcy = PApplet.parseInt(serp(y, height/2, (transition_completeness - 0.5f) * 2));
-                    } else {
-                        arcx = x;
-                        arcy = y;
-                    }
-                   
-                    // d = sqrt(A/pi) * 2;
-                   
+                if (transition_completeness < 0.5f) {
+                    diam = PApplet.parseInt(serp(origin.y - y, default_diam / 2, transition_completeness * 2)) * 2;
+                } else {
                     diam = default_diam;
-                    float midway_diam = default_diam * sqrt(((PApplet.parseFloat(yval)/maxY))/ PI);
-                    if (transition_completeness < 0.5f) {
-                        diam = PApplet.parseInt(serp(12, midway_diam, transition_completeness * 2));
-                    } else {
-                        diam = PApplet.parseInt(serp(midway_diam, default_diam, (transition_completeness - 0.5f) * 2.0f));
-                    }
-
-                    if (transition_completeness < 0.5f) {
-                        startr = serp(angle - PI, angle, transition_completeness * 2);
-                        endr = serp(angle+radians(angles[i]) + PI, angle+radians(angles[i]), transition_completeness * 2);
-                    } else {
-                        startr = angle;
-                        endr = angle+radians(angles[i]);
-                    }
-
-                    arc(arcx, arcy, diam, diam, startr, endr, PIE);
-                    angle += radians(angles[i]);
                 }
-                break;
-            case PIETOROSE:
-            case ROSETOPIE:
-                for (int i = 0; i < angles.length; i++) {
-                    float angle_increment = serp(radians(const_angle),radians(angles[i]), transition_completeness);
-                    fill(lerpColor(colors[0], colors[i], transition_completeness));
-                    float diam = serp(data.getRow(i).getInt(categories[1]) * ratio, default_diam, transition_completeness);
-                    arc(width/2 - 50, height/2, diam, diam, angle, angle+angle_increment, PIE);
-                    angle += angle_increment;
+
+                if (transition_completeness < 0.5f) {
+                    startr = serp(3 * HALF_PI - 0.01f, 3 * HALF_PI - radians(angles[i]) / 2, transition_completeness * 2);
+                    endr = serp(3 * HALF_PI + 0.01f, 3 * HALF_PI + radians(angles[i]) / 2, transition_completeness * 2);
+                } else {
+                    startr = serp(3 * HALF_PI - radians(angles[i]) / 2, angle, (transition_completeness - 0.5f) * 2);
+                    endr = serp(3 * HALF_PI + radians(angles[i]) / 2, angle + radians(angles[i]), (transition_completeness - 0.5f) * 2);
                 }
-                break;
+                arc(arcx, arcy, diam, diam, startr, endr, PIE);
+                angle += radians(angles[i]);
+            }
+            break;
+        case LINETOPIE:
+        case PIETOLINE:
+            for (int i = 0; i < angles.length; i++) {
+                int yval = data.getRow(i).getInt(categories[1]);
+                int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                int y = origin.y - PApplet.parseInt(yval * ratio);
+                if (transition_completeness < 0.5f) {
+                    fill(lerpColor(color(0, 0, 0), colors[i], transition_completeness * 2));
+                } else {
+                    fill(colors[i]);
+                }
+                int arcx, arcy, diam;
+                float startr, endr;
+                if (transition_completeness > 0.5f) {
+                    arcx = PApplet.parseInt(serp(x, width / 2 - 50, (transition_completeness - 0.5f) * 2));
+                    arcy = PApplet.parseInt(serp(y, height / 2, (transition_completeness - 0.5f) * 2));
+                } else {
+                    arcx = x;
+                    arcy = y;
+                }
+
+                // d = sqrt(A/pi) * 2;
+
+                diam = default_diam;
+                float midway_diam = default_diam * sqrt(((PApplet.parseFloat(yval) / maxY)) / PI);
+                if (transition_completeness < 0.5f) {
+                    diam = PApplet.parseInt(serp(12, midway_diam, transition_completeness * 2));
+                } else {
+                    diam = PApplet.parseInt(serp(midway_diam, default_diam, (transition_completeness - 0.5f) * 2.0f));
+                }
+
+                if (transition_completeness < 0.5f) {
+                    startr = serp(angle - PI, angle, transition_completeness * 2);
+                    endr = serp(angle + radians(angles[i]) + PI, angle + radians(angles[i]), transition_completeness * 2);
+                } else {
+                    startr = angle;
+                    endr = angle + radians(angles[i]);
+                }
+
+                arc(arcx, arcy, diam, diam, startr, endr, PIE);
+                angle += radians(angles[i]);
+            }
+            break;
+        case PIETOROSE:
+        case ROSETOPIE:
+            for (int i = 0; i < angles.length; i++) {
+                float angle_increment = serp(radians(const_angle), radians(angles[i]), transition_completeness);
+                fill(lerpColor(colors[0], colors[i], transition_completeness));
+                float diam = serp(data.getRow(i).getInt(categories[1]) * ratio, default_diam, transition_completeness);
+                arc(width / 2 - 50, height / 2, diam, diam, angle, angle + angle_increment, PIE);
+                angle += angle_increment;
+            }
+            break;
         }
     }
 };
@@ -703,8 +703,33 @@ public class RoseChart extends CircleChart {
         float superRatio = PApplet.parseFloat(origin.y - topyaxis.y)  / superMaxY;
         float angle = 0;
 
-        switch(transition) {
-            case NONE:
+        switch (transition) {
+        case NONE:
+            for (int i = 0; i < data.getRowCount(); i++) {
+                int diam = 0;
+                for (int j = 1; j < categories.length; j++) {
+                    diam += PApplet.parseInt(data.getRow(i).getInt(categories[j]) * superRatio);
+                }
+                for (int j = categories.length - 1; j >= 1; j--) {
+                    fill(colors[j - 1]);
+                    arc(width / 2 - 50, height / 2, diam, diam, radians(angle), radians(angle + const_angle), PIE);
+                    diam -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * superRatio);
+                }
+                angle += const_angle;
+            }
+            break;
+        case ROSETOPIE:
+        case PIETOROSE:
+            if (transition_completeness < 0.5f) {
+                for (int i = 0; i < angles.length; i++) {
+                    float angle_increment = radians(const_angle);
+                    fill(colors[0]);
+                    float diam = serp(data.getRow(i).getInt(categories[1]) * ratio, data.getRow(i).getInt(categories[1]) * superRatio, transition_completeness * 2);
+                    arc(width / 2 - 50, height / 2, diam, diam, angle, angle + angle_increment, PIE);
+                    angle += angle_increment;
+                }
+            } else {
+                angle = 0;
                 for (int i = 0; i < data.getRowCount(); i++) {
                     int diam = 0;
                     for (int j = 1; j < categories.length; j++) {
@@ -712,48 +737,23 @@ public class RoseChart extends CircleChart {
                     }
                     for (int j = categories.length - 1; j >= 1; j--) {
                         fill(colors[j - 1]);
-                        arc(width/2 - 50, height/2, diam, diam, radians(angle), radians(angle+const_angle), PIE);
+                        float diam_interp = serp(0, diam, (transition_completeness - 0.5f) * 2);
+                        arc(width / 2 - 50, height / 2, diam_interp, diam_interp, radians(angle), radians(angle + const_angle), PIE);
                         diam -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * superRatio);
                     }
                     angle += const_angle;
                 }
-                break;
-            case ROSETOPIE:
-            case PIETOROSE:
-                if (transition_completeness < 0.5f) {
-                    for (int i = 0; i < angles.length; i++) {
-                        float angle_increment = radians(const_angle);
-                        fill(colors[0]);
-                        float diam = serp(data.getRow(i).getInt(categories[1]) * ratio, data.getRow(i).getInt(categories[1]) * superRatio, transition_completeness * 2);
-                        arc(width/2 - 50, height/2, diam, diam, angle, angle+angle_increment, PIE);
-                        angle += angle_increment;
-                    }
-                } else {
-                    angle = 0;
-                    for (int i = 0; i < data.getRowCount(); i++) {
-                        int diam = 0;
-                        for (int j = 1; j < categories.length; j++) {
-                            diam += PApplet.parseInt(data.getRow(i).getInt(categories[j]) * superRatio);
-                        }
-                        for (int j = categories.length - 1; j >= 1; j--) {
-                            fill(colors[j - 1]);
-                            float diam_interp = serp(0, diam, (transition_completeness - 0.5f) * 2);
-                            arc(width/2 - 50, height/2, diam_interp, diam_interp, radians(angle), radians(angle+const_angle), PIE);
-                            diam -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * superRatio);
-                        }
-                        angle += const_angle;
-                    }
-                    angle = 0;
-                    for (int i = 0; i < angles.length; i++) {
-                        float angle_increment = radians(const_angle);
-                        fill(colors[0]);
-                        float diam = data.getRow(i).getInt(categories[1]) * superRatio;
-                        arc(width/2 - 50, height/2, diam, diam, angle, angle+angle_increment, PIE);
-                        angle += angle_increment;
-                    }
+                angle = 0;
+                for (int i = 0; i < angles.length; i++) {
+                    float angle_increment = radians(const_angle);
+                    fill(colors[0]);
+                    float diam = data.getRow(i).getInt(categories[1]) * superRatio;
+                    arc(width / 2 - 50, height / 2, diam, diam, angle, angle + angle_increment, PIE);
+                    angle += angle_increment;
                 }
+            }
 
-                break;
+            break;
         }
     }
 };
@@ -788,61 +788,61 @@ public class StackedBar extends AxisChart {
         stroke(0);
         strokeCap(SQUARE);
 
-        switch(transition) {
-            case NONE:
+        switch (transition) {
+        case NONE:
+            for (int i = 0; i < data.getRowCount(); i++) {
+                int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), y = origin.y;
+                int prevy = origin.y;
+                for (int j = 1; j < categories.length; j++) {
+                    y -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                    stroke(colors[j - 1]);
+                    line(x, prevy, x, y);
+                    prevy = y;
+                }
+            }
+            break;
+        case BARTOSTACKED:
+        case STACKEDTOBAR:
+            if (transition_completeness < 0.25f) {
+                ratio = PApplet.parseFloat(origin.y - topyaxis.y) / serp(maxY, superMaxY, transition_completeness * 4);
+                stroke(lerpColor(color(0, 0, 0), colors[0], transition_completeness * 4));
+
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
+                    line(x, origin.y, x, y);
+                }
+            } else {
                 for (int i = 0; i < data.getRowCount(); i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), y = origin.y;
                     int prevy = origin.y;
                     for (int j = 1; j < categories.length; j++) {
-                        y -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                        int finallength = PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
                         stroke(colors[j - 1]);
-                        line(x, prevy, x, y);
-                        prevy = y;
-                    }
-                }
-                break;
-            case BARTOSTACKED:
-            case STACKEDTOBAR:
-                if (transition_completeness < 0.25f) {
-                    ratio = PApplet.parseFloat(origin.y - topyaxis.y) / serp(maxY, superMaxY, transition_completeness * 4);
-                    stroke(lerpColor(color(0, 0, 0), colors[0], transition_completeness * 4));
-
-                    for (int i = 0; i < data.getRowCount(); i++) {
-                        int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                        int y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
-                        line(x, origin.y, x, y);
-                    }
-                } else {
-                    for (int i = 0; i < data.getRowCount(); i++) {
-                        int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), y = origin.y;
-                        int prevy = origin.y;
-                        for (int j = 1; j < categories.length; j++) {
-                            int finallength = PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
-                            stroke(colors[j - 1]);
-                            if (j > 1) {
-                                int newy = PApplet.parseInt(serp(prevy, prevy - finallength, (transition_completeness - 0.25f) * 4.0f/3.0f));
-                                line(x, prevy, x, newy);
-                                prevy = newy;
-                            } else {
-                                line(x, prevy, x, prevy - finallength);
-                                prevy = prevy - finallength;
-                            }
+                        if (j > 1) {
+                            int newy = PApplet.parseInt(serp(prevy, prevy - finallength, (transition_completeness - 0.25f) * 4.0f / 3.0f));
+                            line(x, prevy, x, newy);
+                            prevy = newy;
+                        } else {
+                            line(x, prevy, x, prevy - finallength);
+                            prevy = prevy - finallength;
                         }
                     }
                 }
-               
-                break;
+            }
+
+            break;
         }
-        
-    }   
+
+    }
 };
 public class ThemeRiver extends AxisChart {
-   private ColorGenerator colorgenerator;
-   private int[] colors;
+    private ColorGenerator colorgenerator;
+    private int[] colors;
     ThemeRiver(Table data, String[] categories) {
         super(data, categories);
         colorgenerator = new ColorGenerator();
-        colors = new int[categories.length-1];
+        colors = new int[categories.length - 1];
 
         for (int i = 0; i < colors.length; i++) {
             colors[i] = colorgenerator.generate();
@@ -854,21 +854,21 @@ public class ThemeRiver extends AxisChart {
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
         float c = 0;
-        switch(transition) {
-            case NONE:
-            case LINETOBAR:
-            case BARTOLINE:
-                c = 0;
-                break;
-            case LINETOPIE:
-            case PIETOLINE:
-                c = lerp(255, 0, transition_completeness);
-                break;
+        switch (transition) {
+        case NONE:
+        case LINETOBAR:
+        case BARTOLINE:
+            c = 0;
+            break;
+        case LINETOPIE:
+        case PIETOLINE:
+            c = lerp(255, 0, transition_completeness);
+            break;
         }
         int col = color(c, c, c);
         drawAxes(col);
 
-        drawLabels(col, serp(PApplet.parseFloat(origin.y - topyaxis.y) / maxY, PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY, transition_completeness));
+        drawLabels(col, serp(PApplet.parseFloat(origin.y - topyaxis.y) / maxY, 150, transition_completeness));
         drawData(transition_completeness, transition);
     }
 
@@ -879,57 +879,56 @@ public class ThemeRiver extends AxisChart {
         Point prev = new Point(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio));
         stroke(0);
         fill(0);
-        
+
         switch (transition) {
-            case NONE:
-                int middle = (origin.y + topyaxis.y)/2;
-                int[] startYs = new int[data.getRowCount()];
-                int colTotal = 0;
-                //bottom line
-                noFill();
-                beginShape();
-                for (int i = 0; i < data.getRowCount(); i++) {
-                  colTotal = 0;
-                  prev.x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                  for (int j = 1; j < categories.length; j++) {
-                     colTotal += PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
-                  }
-                  startYs[i] = middle + colTotal/2;println(startYs[i]);
-                  curveVertex(prev.x, middle + colTotal/2);
-                  if (i == 0) {curveVertex(prev.x, middle + colTotal/2);}
-                }
-                curveVertex(prev.x, middle + colTotal/2);
-                endShape();
-                
-                //rest of lines
+        case NONE:
+            int middle = (origin.y + topyaxis.y) / 2;
+            int[] startYs = new int[data.getRowCount()];
+            int colTotal = 0;
+            //bottom line
+            noFill();
+            beginShape();
+            for (int i = 0; i < data.getRowCount(); i++) {
+                colTotal = 0;
+                prev.x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
                 for (int j = 1; j < categories.length; j++) {
-                  beginShape();
-                  int newY = 0;
-                  for (int i = 0; i < data.getRowCount(); i++) {
+                    colTotal += PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                }
+                startYs[i] = middle + colTotal / 2; 
+                curveVertex(prev.x, middle + colTotal / 2);
+                if (i == 0) {
+                    curveVertex(prev.x, middle + colTotal / 2);
+                }
+            }
+            curveVertex(prev.x, middle + colTotal / 2);
+            endShape();
+
+            //rest of lines
+            for (int j = 1; j < categories.length; j++) {
+                beginShape();
+                int newY = 0;
+                for (int i = 0; i < data.getRowCount(); i++) {
                     newY = startYs[i];
                     prev.x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                    if (j > 1) {
-                      for (int k = j; k > 1; k--) {
-                        newY -= PApplet.parseInt(data.getRow(i).getInt(categories[k]) * ratio);
-                      }
-                    } else {
-                      newY -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
-                    }
+                    newY -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                    startYs[i] -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                   
                     curveVertex(prev.x, newY);
-                    if (i == 0) {curveVertex(prev.x, newY);}
-                   }
-                   curveVertex(prev.x, newY);
-                   endShape();
+                    if (i == 0) {
+                        curveVertex(prev.x, newY);
+                    }
                 }
-                
-                
-                  
-                break;
-            case LINETORIVER:
+                curveVertex(prev.x, newY);
+                endShape();
+            }
 
-                
+            break;
+        case LINETORIVER:
+        case RIVERTOLINE:
 
-                break;
+
+
+            break;
         }
     }
 };

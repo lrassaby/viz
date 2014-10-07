@@ -62,23 +62,23 @@ public class AxisChart {
         makeText(categories[1], topyaxis.x - 60, topyaxis.y + 50, -HALF_PI);
 
         // Y value labels
-        textSize(12);
+        if (ratio < 100) {
+            textSize(12);
         
-        int increment;
-        try {
-            increment = int(25/ratio);
-        } catch (Exception e) {
-            increment = 30;
-        }
-        if (increment < 1) {
-            increment = 1;
-        }
+            int increment;
+            try {
+                increment = int(25/ratio);
+            } catch (Exception e) {
+                increment = 30;
+            }
+            if (increment < 1) {
+                increment = 1;
+            }
 
-        float max = float(origin.y - topyaxis.y) / ratio;
-        for (int i = 0; i <= max * 1.03; i+= increment) {
-            makeText(Integer.toString(i), origin.x - 10, int(-i * ratio + origin.y), 0);
-        }
+            float max = float(origin.y - topyaxis.y) / ratio;
+            for (int i = 0; i <= max * 1.03; i+= increment) {
+                makeText(Integer.toString(i), origin.x - 10, int(-i * ratio + origin.y), 0);
+            }
+        } 
     }
-
-
 };
