@@ -843,6 +843,7 @@ public class ThemeRiver extends AxisChart {
         super(data, categories);
         colorgenerator = new ColorGenerator();
         colors = new int[categories.length-1];
+
         for (int i = 0; i < colors.length; i++) {
             colors[i] = colorgenerator.generate();
         }
@@ -868,7 +869,6 @@ public class ThemeRiver extends AxisChart {
         drawAxes(col);
 
         drawLabels(col, serp(PApplet.parseFloat(origin.y - topyaxis.y) / maxY, PApplet.parseFloat(origin.y - topyaxis.y) / superMaxY, transition_completeness));
-
         drawData(transition_completeness, transition);
     }
 
@@ -879,96 +879,55 @@ public class ThemeRiver extends AxisChart {
         Point prev = new Point(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio));
         stroke(0);
         fill(0);
+        
         switch (transition) {
             case NONE:
-               
-                for (int j = categories.length-1; j > 0; j--) {
-                  fill(colors[j-1]);
-                  prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f),origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j]) * ratio));
-
-                  if(j > 1) {
-                    for (int k = j-1; k >= 1; k--) {
-                        prev.y -= PApplet.parseInt(data.getRow(0).getInt(categories[k]) * ratio);
-                    }
-                  }
-                  
-                  beginShape();
-                  curveVertex(prev.x, prev.y);
-                  curveVertex(prev.x, prev.y);
-                  int x = 0;
-                  int y = 0;
-                  int origY = 0;
-                  for (int i = 0; i < data.getRowCount(); i++) {
-                      x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                      y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
-                      if(j > 1) {
-                        for (int k = j-1; k >= 1; k--) {
-                          y -= PApplet.parseInt(data.getRow(i).getInt(categories[k]) * ratio);
-                        }
-                      }
-                      if (i == 0) {
-                        origY = y;
-                      }
-                      curveVertex(x, y);
-                      prev.setXY(x, y);
-                  }
-                  curveVertex(x,y);
-                  strokeWeight(1);
-                  vertex(origin.x + sectionWidth * (data.getRowCount()-1) + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y);
-                  vertex(origin.x + sectionWidth / 2, origin.y);
-                  vertex(origin.x + sectionWidth / 2, origY);
-                  //strokeWeight(2);
-                  endShape();
-                  if (j > 1)
-                    prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j-1]) * ratio));
-
-                }
-                
-                break;
-            case LINETORIVER:
-                ratio = PApplet.parseFloat(origin.y - topyaxis.y) / serp(maxY, superMaxY, transition_completeness);
-
-                prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio));
+                int middle = (origin.y + topyaxis.y)/2;
+                int[] startYs = new int[data.getRowCount()];
+                int colTotal = 0;
+                //bottom line
                 noFill();
                 beginShape();
-                curveVertex(prev.x, prev.y);
-                curveVertex(prev.x, prev.y);
-                int x = 0;
-                int y = 0;
                 for (int i = 0; i < data.getRowCount(); i++) {
-                      x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                      y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio);
-                      curveVertex(x, y);
-                      prev.setXY(x, y);
+                  colTotal = 0;
+                  prev.x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                  for (int j = 1; j < categories.length; j++) {
+                     colTotal += PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                  }
+                  startYs[i] = middle + colTotal/2;println(startYs[i]);
+                  curveVertex(prev.x, middle + colTotal/2);
+                  if (i == 0) {curveVertex(prev.x, middle + colTotal/2);}
                 }
-                curveVertex(x, y);
+                curveVertex(prev.x, middle + colTotal/2);
                 endShape();
-                for (int j = 2; j < categories.length; j++) {
-                  prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j]) * ratio));
-                  for (int k = j-1; k >= 1; k--) {
-                     prev.y -= PApplet.parseInt(data.getRow(0).getInt(categories[k]) * ratio);
-                  }
-                  noFill();
+                
+                //rest of lines
+                for (int j = 1; j < categories.length; j++) {
                   beginShape();
-                  curveVertex(prev.x, serp(origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j]) * ratio), transition_completeness));
-                  curveVertex(prev.x, serp(origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[1]) * ratio), origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[j]) * ratio),transition_completeness));
+                  int newY = 0;
                   for (int i = 0; i < data.getRowCount(); i++) {
-                      x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
-                      y = origin.y - PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
-                      if(j > 1) {
-                        for (int k = j-1; k >= 1; k--) {
-                          y -= PApplet.parseInt(data.getRow(i).getInt(categories[k]) * ratio);
-                        }
+                    newY = startYs[i];
+                    prev.x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    if (j > 1) {
+                      for (int k = j; k > 1; k--) {
+                        newY -= PApplet.parseInt(data.getRow(i).getInt(categories[k]) * ratio);
                       }
-                      curveVertex(x, serp(PApplet.parseInt(data.getRow(i).getInt(categories[1]) * ratio), y, transition_completeness));
-                      prev.setXY(x, y);
-                  }
-                  curveVertex(x, y);
-                  endShape();
-                  if (j < categories.length-1)
-                    prev.setXY(origin.x + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f), PApplet.parseInt(data.getRow(0).getInt(categories[j+1]) * ratio));
-
+                    } else {
+                      newY -= PApplet.parseInt(data.getRow(i).getInt(categories[j]) * ratio);
+                    }
+                    curveVertex(prev.x, newY);
+                    if (i == 0) {curveVertex(prev.x, newY);}
+                   }
+                   curveVertex(prev.x, newY);
+                   endShape();
                 }
+                
+                
+                  
+                break;
+            case LINETORIVER:
+
+                
 
                 break;
         }
@@ -1174,9 +1133,9 @@ public class TransitionChart {
     public void LineThemeRiver () {
         if (prev_chart_type == "Line Chart") {
             if (progress < 0.25f) {
-              linechart.draw(1-(progress*4), Transition.LINETORIVER);
+                linechart.draw(1-(progress*4), Transition.LINETORIVER);
             } else {
-              themeriver.draw((progress - 0.25f) * 4.0f/3, Transition.LINETORIVER);
+                themeriver.draw((progress - 0.25f) * 4.0f/3, Transition.LINETORIVER);
             }
             continueTransformation("ThemeRiver");
         }

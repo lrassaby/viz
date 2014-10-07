@@ -198,9 +198,9 @@ public class TransitionChart {
     public void LineThemeRiver () {
         if (prev_chart_type == "Line Chart") {
             if (progress < 0.25) {
-              linechart.draw(1-(progress*4), Transition.LINETORIVER);
+                linechart.draw(1-(progress*4), Transition.LINETORIVER);
             } else {
-              themeriver.draw((progress - 0.25) * 4.0/3, Transition.LINETORIVER);
+                themeriver.draw((progress - 0.25) * 4.0/3, Transition.LINETORIVER);
             }
             continueTransformation("ThemeRiver");
         }
