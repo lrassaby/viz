@@ -69,22 +69,15 @@ public class Linechart extends AxisChart {
             case LINETORIVER:
             case RIVERTOLINE:
                 //noFill();
-                beginShape();
-                curveVertex(prev.x, prev.y);
-                curveVertex(prev.x, prev.y);
-                int x = 0;
-                int y = 0;
-                for (int i = 1; i < data.getRowCount(); i++) {
-                      x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
-                      y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
-                      curveVertex(x, y);
-                      prev.setXY(x, y);
-                      fill(0,0,0);
-                      drawCircle(prev.x, prev.y, serp(0, 12, transition_completeness));
-                      noFill();
+                ratio = serp(float(origin.y - topyaxis.y) / superMaxY, ratio, transition_completeness);
+                prev.setXY(origin.x + sectionWidth / 2 + int(sectionWidth * 0.1), origin.y - int(data.getRow(0).getInt(categories[1]) * ratio));
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                    int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
+                    line(prev.x, prev.y, x, y);
+                    prev.setXY(x, y);
+                    drawCircle(prev.x, prev.y, serp(0, 12, transition_completeness));
                 }
-                curveVertex(x,y);
-                endShape();
         }
     }
 };

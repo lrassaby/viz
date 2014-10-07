@@ -29,7 +29,6 @@ public class ThemeRiver extends AxisChart {
         }
         color col = color(c, c, c);
         drawAxes(col);
-
         drawLabels(col, serp(float(origin.y - topyaxis.y) / maxY, 150, transition_completeness));
         drawData(transition_completeness, transition);
     }
