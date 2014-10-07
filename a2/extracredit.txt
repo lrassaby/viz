@@ -4,3 +4,4 @@ requirements for the assignment:
 - GUI for starting the project
 - Very clean, modular code that makes developing a new transition relatively simple 
 - Cool colors and generation based on the golden ratio, for maximal clarity
+- Elegant charts and transitions 
