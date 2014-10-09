@@ -22,19 +22,28 @@ class Data {
     }
 
     private DataPoint[] data = null;
+    private final int MARKED1 = 4;
+    private final int MARKED2 = 9;
 
     Data() {
         // NUM is a global varibale in support.pde
         data = new DataPoint[NUM];
 
-        /**
-         ** finish this: how to generate a dataset and mark two of the datapoints
-         ** 
-         **/
+        for (int i = 0; i < NUM; i++) {
+            data[i].value = random(0, 100.0);
+            if (i == MARKED1 || i == MARKED2)
+                data[i].marked = true;
+            else
+                data[i].marked = false;
+        }
     }
-    
-        /**
-         ** finish this: the rest methods and variables you may want to use
-         ** 
-         **/
+
+    float getValueAt(int i) {
+        return data[i].value;
+    }
+
+    boolean getMarkAt(int i) {
+        return data[i].isMarked();
+    }
+
 }
