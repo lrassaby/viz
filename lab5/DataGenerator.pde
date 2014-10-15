@@ -21,28 +21,25 @@ class Data {
         }
     }
 
-    private DataPoint[] data = null;
-    private final int MARKED1 = 4;
-    private final int MARKED2 = 9;
+    public DataPoint[] data = null;
 
-    Data() {
+    Data(int marked1, int marked2) {
         // NUM is a global varibale in support.pde
         data = new DataPoint[NUM];
 
         for (int i = 0; i < NUM; i++) {
-            data[i].value = random(0, 100.0);
-            if (i == MARKED1 || i == MARKED2)
-                data[i].marked = true;
-            else
-                data[i].marked = false;
+            data[i] = new DataPoint(random(2.0, 10.0), false);
+            if (i == marked1 || i == marked2) {
+                data[i].setMark(true);
+            }
         }
     }
 
-    float getValueAt(int i) {
+    float getValue(int i) {
         return data[i].value;
     }
 
-    boolean getMarkAt(int i) {
+    boolean getMark(int i) {
         return data[i].isMarked();
     }
 

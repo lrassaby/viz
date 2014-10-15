@@ -18,12 +18,13 @@ Table expData = null;
  */
 
 String[] vis = {
-    "BarChart", "PieChart", "StackedBarChart", "TreeMap", "LineChart"
+    "BarChart", "PieChart", "TreeMap"
 };
 
 /**
  * add the data for this judgement from the participant to the table.
  */ 
+//void saveJudgement(float truePerc, float reportPerc, float error, int partipantID, String v) {
 void saveJudgement() {
     if (expData == null) {
         expData = new Table();
@@ -43,12 +44,12 @@ void saveJudgement() {
     /**
      ** finish this: decide the current visualization
      **/
-    newRow.setString("Vis", "" + DECIDE_YOURSELF);
+    newRow.setString("Vis", vis[chartType]);
 
     /**
      ** finish this: decide current vis id
      **/
-    newRow.setInt("VisID", DECIDE_YOURSELF);
+    newRow.setInt("VisID", chartType);
     newRow.setFloat("Error", error);
     newRow.setFloat("TruePerc", truePerc);
     newRow.setFloat("ReportPerc", reportPerc);

@@ -1,17 +1,31 @@
 import java.util.*;
 public class Tree implements SquarifiedChart {
-    private Node root;
+    private ArrayList<Node> nodes = new ArrayList<Node>();
     private HashMap tree;
     private boolean clicked;
     private int[] margins = {20, 20, 20, 20}; // left, top, right, bottom
     private String hovertext;
     private ColorGenerator colors;
+    private Node root;
 
-    Tree (String filename) {
-        colors = new ColorGenerator();
-        readInput(filename);
-        root = getRoot(tree);
-        preprocessTree(root);
+    Tree (Data data) {
+        //colors = new ColorGenerator();
+        //readInput(filename);
+        for (int i = 0; i < NUM; i++) {
+          nodes.add(new Node(Integer.toString(i), null, int(data.getValue(i)), data.getMark(i), null, data));
+        }
+        Collections.sort(nodes, new Comparator<Node>() {
+          @Override
+          public int compare(Node a, Node b) {
+            return Integer.compare(b.size, a.size);
+          }
+        });
+        root = new Node(data, nodes);
+        
+        margins[0] = 10 + int(chartLeftX);
+        margins[1] = int(chartLeftY) + 20; 
+        margins[2] = width - int(chartSize) - int(chartLeftX) + 10;
+        margins[3] = height - int(chartSize) - int(chartLeftY) + 10;
     }
 
     public void setClicked (boolean val){
@@ -83,11 +97,11 @@ public class Tree implements SquarifiedChart {
         }
     }
 
-    private void readInput(String filename) {
+    /*private void readInput(String filename) {
       tree = new HashMap();
       String lines[] = loadStrings(filename);
 
-      /* takes in leaves */
+      /* takes in leaves 
       int num_leaves = parseInt(lines[0]);
       for (int i = 1; i <= num_leaves; i++) {
         String[] temp = split(lines[i], ' ');
@@ -96,7 +110,7 @@ public class Tree implements SquarifiedChart {
         tree.put(temp[0], new Node(temp[0], parseInt(temp[1]), true, this));
       }
 
-      /* take in relationships */
+      /* take in relationships 
       int num_rels = parseInt(lines[num_leaves+1]);
       for (int i = num_leaves + 2; i < num_rels + num_leaves + 2; i++) {
         String[] temp = split(lines[i], ' ');
@@ -109,15 +123,15 @@ public class Tree implements SquarifiedChart {
           tree.put(temp[1], new Node(temp[1], 0, false, this)); // add the child (size 0)
         }
 
-        /* add the child to the parent and the parent to the child */
+        /* add the child to the parent and the parent to the child 
         Node par = (Node)tree.get(temp[0]);
         Node chi = (Node)tree.get(temp[1]);
-        par.c = colors.generate();
+        //par.c = colors.generate();
         
         par.children.add(chi);
         chi.parent = par;
       }
-    }
+    }*/
 
     private Node getRoot(HashMap tree) {
       Node root = null;

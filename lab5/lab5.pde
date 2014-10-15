@@ -1,11 +1,19 @@
 import controlP5.*;
 
 final int DECIDE_YOURSELF = -1; // This is a placeholder for variables you will replace.
-
+final int NUM_TRIALS = 20;
 /**
  * This is a global variable for the dataset in your visualization. You'll be overwriting it each trial.
  */
 Data d = null;
+Table table = null;
+Barchart barchart = null;
+Piechart piechart = null;
+Tree tree = null;
+int chartType = int(random(0.0, 2.99));
+//int chartType = 1;
+int marked1;
+int marked2;
 
 void setup() {
     totalWidth = displayWidth;
@@ -16,7 +24,7 @@ void setup() {
     size((int) totalWidth, (int) totalHeight);
     //if you have a Retina display, use the line below (looks better)
     //size((int) totalWidth, (int) totalHeight, "processing.core.PGraphicsRetina2D");
-
+    
     background(255);
     frame.setTitle("Comp150-07 Visualization, Lab 5, Experiment");
 
@@ -28,24 +36,37 @@ void setup() {
     /**
      ** Finish this: decide how to generate the dataset you are using (see DataGenerator)
      **/
-    d = null;
-
+    marked1 = int(random(0.0, NUM - 0.1));
+    marked2 = int(random(0.0, NUM - 0.1));
+    if (marked2 == marked1) {
+      marked2 = 0;
+    }
+    if (marked2 == marked1) {
+      marked2 = 1;
+    }
+    d = new Data(marked1, marked2);
+    
+    
+    
     /**
      ** Finish this: how to generate participant IDs
      ** You can write a short alphanumeric ID generator (cool) or modify this for each participant (less cool).
      **/
-    partipantID = DECIDE_YOURSELF;
+    partipantID = 5;
 }
 
 void draw() {
     textSize(fontSize);
+    barchart = new Barchart(d, null,chartLeftX, chartLeftY, chartSize);
+    piechart = new Piechart(d, null,chartLeftX, chartLeftY, chartSize);
+    tree     = new Tree(d);
     /**
      ** add more: you may need to draw more stuff on your screen
      **/
     if (index < 0 && page1) {
         drawIntro();
         page1 = false;
-    } else if (index >= 0 && index < vis.length) {
+    } else if (index >= 0 && index < vis.length * NUM_TRIALS) {
         if (index == 0 && page2) {
             clearIntro();
             drawTextField();
@@ -56,33 +77,23 @@ void draw() {
         /**
          **  Finish this: decide the chart type. You can do this randomly.
          **/
-        int chartType = DECIDE_YOURSELF;
-
-        switch (chartType) {
-            case -1: // This is a placeholder, you can remove it and use the other cases for the final version
-                 stroke(0);
-                 strokeWeight(1);
-                 fill(255);
-                 rectMode(CORNER);
+        stroke(0);
+        strokeWeight(1);
+        fill(255);
+        rectMode(CORNER);
                  /*
                   * all your charts must be inside this rectangle
                   */
-                 rect(chartLeftX, chartLeftY, chartSize, chartSize);
-                 break;
+        rect(chartLeftX, chartLeftY, chartSize, chartSize);
+        switch (chartType) {
             case 0:
-                /**
-                 ** finish this: 1st visualization
-                 **/
+                barchart.draw(1, Transition.NONE);
                 break;
             case 1:
-                /**
-                 ** finish this: 2nd visualization
-                 **/
+                piechart.draw(1, Transition.NONE);
                 break;
             case 2:
-                /**
-                 ** finish this: 3rd visualization
-                 **/
+                tree.draw();
                 break;
             case 3:
                 /**
@@ -98,7 +109,7 @@ void draw() {
 
         drawWarning();
 
-    } else if (index > vis.length - 1 && pagelast) {
+    } else if (index > vis.length*NUM_TRIALS - 1 && pagelast) {
         drawThanks();
         drawClose();
         pagelast = false;
@@ -122,33 +133,52 @@ public void next() {
     } else if (num > 100) {
         warning = "Please input a number between 0 - 100!";
     } else {
-        if (index >= 0 && index < vis.length) {
+        if (index >= 0 && index < vis.length * NUM_TRIALS) {
             float ans = parseFloat(cp5.get(Textfield.class, "answer").getText());
 
             /**
              ** Finish this: decide how to compute the right answer
              **/
-            truePerc = DECIDE_YOURSELF; // hint: from your list of DataPoints, extract the two marked ones to calculate the "true" percentage
-
-            reportPerc = ans / 100.0; // this is the participant's response
+            truePerc = d.getValue(marked1)/d.getValue(marked2); // hint: from your list of DataPoints, extract the two marked ones to calculate the "true" percentage
+            if (truePerc > 1) {truePerc = 1/truePerc;}
+            truePerc = truePerc * 100.0;
+            
+            reportPerc = ans; // this is the participant's response
             
             /**
              ** Finish this: decide how to compute the log error from Cleveland and McGill (see the handout for details)
              **/
-            error = DECIDE_YOURSELF;
-
+            float off = 1.0/8.0;
+            float ab = abs(reportPerc - truePerc);
+            error = log(ab + off)/log(2);
+            
+            //saveJudgement(truePerc, reportPerc, error, partipantID, chartType);
             saveJudgement();
         }
 
         /**
          ** Finish this: decide the dataset (similar to how you did in setup())
          **/
-        d = null;
+        marked1 = int(random(0.0, NUM - 0.1));
+        marked2 = int(random(0.0, NUM - 0.1));
+        if (marked2 == marked1) {
+          marked2 = 0;
+        }
+        if (marked2 == marked1) {
+          marked2 = 1;
+        }
+        d = new Data(marked1, marked2);
 
         cp5.get(Textfield.class, "answer").clear();
         index++;
+        if ((index) % vis.length == 0 ) {
+          chartType = int(random(0.0, 2.99));
+        }
+        else {
+          chartType = (chartType + 1)%(vis.length);
+        }
 
-        if (index == vis.length - 1) {
+        if (index == vis.length*NUM_TRIALS - 1) {
             pagelast = true;
         }
     }

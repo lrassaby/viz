@@ -1,5 +1,5 @@
 public class CircleChart {
-    protected Table data;
+    protected Data data;
     protected String[] categories;
     protected float[] angles;
     protected color[] colors;
@@ -10,45 +10,52 @@ public class CircleChart {
     protected float ratio;
     protected float const_angle;
     protected int superMaxY = 0;
-    protected int total_magnitude = 0;
+    protected float total_magnitude = 0;
 
-    CircleChart (Table data, String[] categories) {
-        setData(data, categories);
+    CircleChart (Data data, String[] categories, float chartLeftX, float chartLeftY, float chartSize) {
+        setData(data, categories, chartLeftX, chartLeftY, chartSize);
     }
 
-    void setData(Table data, String[] categories) {
+    void setData(Data data, String[] categories, float chartLeftX, float chartLeftY, float chartSize) {
         colorgenerator = new ColorGenerator();
         this.data = data;
         this.categories = categories;
-        for (int i = 0; i < data.getRowCount(); i++) {
-            total_magnitude += data.getRow(i).getInt(categories[1]);
+        maxY = data.getValue(0);
+        for (int i = 0; i < NUM; i++) {
+            total_magnitude += data.getValue(i);
+            if (data.getValue(i) > maxY) {
+              maxY = data.getValue(i);
+            }
         }
 
-        const_angle = (360 / (float)(data.getRowCount()));
-        int colorcount = max(data.getRowCount(), categories.length);
+        const_angle = (360 / (float)(NUM));
+        int colorcount = NUM;
         colors = new color[colorcount];
         for (int i = 0; i < colors.length; i++) {
             colors[i] = colorgenerator.generate();
         }
-
+        margins[0] = 10 + int(chartLeftX);
+        margins[1] = int(chartLeftY) + 20; 
+        margins[2] = width - int(chartSize) - int(chartLeftX) + 10;
+        margins[3] = height - int(chartSize) - int(chartLeftY) + 10;
         origin = new Point(margins[0], height - margins[3]);
         topyaxis = new Point(margins[0], margins[1]);
         rightxaxis = new Point(width - margins[2], height - margins[3]);
 
-        maxY = data.getRow(0).getInt(categories[1]);
-        for (TableRow row : data.rows()) {
+        
+        /*for (TableRow row : data.rows()) {
             int rowweight = row.getInt(categories[1]);
             if (rowweight > maxY) {
                 maxY = rowweight;
             }
+        }*/
+
+        this.angles = new float[NUM];
+        for (int i = 0; i < NUM; i++) {
+            angles[i] = ((data.getValue(i) / total_magnitude) * 360.0);
         }
 
-        this.angles = new float[data.getRowCount()];
-        for (int i = 0; i < data.getRowCount(); i++) {
-            angles[i] = (float(data.getRow(i).getInt(categories[1])) / total_magnitude) * 360;
-        }
-
-        for (TableRow row : data.rows()) {
+        /*for (TableRow row : data.rows()) {
             int elemweight = row.getInt(categories[1]);
             if (elemweight > maxY) {
                 maxY = elemweight;
@@ -60,9 +67,9 @@ public class CircleChart {
             if (rowweight > superMaxY) {
                 superMaxY = rowweight;
             }
-        }
+        }*/
 
         float temp = height / 2  - 40;
-        ratio = (float(superMaxY) / temp);
+        ratio = ((maxY) / temp);
     }
 };

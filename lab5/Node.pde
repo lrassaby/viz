@@ -8,6 +8,8 @@ public class Node {
   public boolean intersect = false;
   public Color c;
   public String category;
+  public Data data = null;
+  public boolean marked = false;
 
   private static final int XMIN = 0, XMAX = 1, YMIN = 2, YMAX = 3;
   public ArrayList<Node> children = new ArrayList<Node>();
@@ -17,18 +19,19 @@ public class Node {
 
   public Node() {
   }
-  public Node(String nm, int sz, boolean lf, SquarifiedChart sqc) {
-    name = nm;
-    size = sz;
-    isLeaf = lf;
-    sqchart = sqc;
+  public Node(Data data, ArrayList<Node> nodes) {
+    children = nodes;
+    this.data = data;
+    isLeaf = false;
   }
-  public Node(String nm, String ds, int sz, boolean lf, SquarifiedChart sqc) {
+  public Node(String nm, String ds, int sz, boolean lf, SquarifiedChart sqc, Data data) {
     name = nm;
     displaystring = ds;
     size = sz;
-    isLeaf = lf;
+    isLeaf = true;
+    marked = lf;
     sqchart = sqc;
+    this.data = data;
   }
   public float spacing = 4;
   
@@ -45,11 +48,15 @@ public class Node {
 
   private void drawChildren(Canvas canvas) {
     if (!isLeaf && children.size() > 0) {
-      drawElements(children, canvas, size, 0);
+      int mag = 0;
+      for (int i = 0; i < NUM; i++) {
+        mag += data.getValue(i);
+      }
+      drawElements(children, canvas, mag, 0);
     }
   }
 
-  private void drawElements(ArrayList<Node> elements, Canvas canvas, int total_magnitude,
+  public void drawElements(ArrayList<Node> elements, Canvas canvas, int total_magnitude,
                             int index) {
     ArrayList<Node> side = new ArrayList<Node>();
     ArrayList<Rect> oldSide = null;
@@ -141,12 +148,11 @@ public class Node {
   private void drawSide(ArrayList<Rect> rectangles, Canvas canvas) {
     float x = canvas.x;
     float y = canvas.y;
-
     for (Rect r : rectangles) {
       float w = canvas.w <= canvas.h ? r.d_short : r.d_long;
       float h = canvas.w <= canvas.h ? r.d_long : r.d_short;
 
-      Node n = sqchart.getNode(r.name);
+      /*Node n = sqchart.getNode(r.name);
       if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
         if (c != null) {
           fill(c.r, c.g, c.b);
@@ -160,14 +166,22 @@ public class Node {
       } else {
         fill(230);
         n.intersect = false;
-      }
+      }*/
 
 
       stroke(0);
       strokeWeight(1);
       rect(x, y, w, h);
-
-      fill(0);
+      //println(r.name);
+      if(r.name != null) {
+        if(data.getMark(int(r.name))) {
+          fill(0);
+          ellipse( x + w / 2, y + h / 2, 5, 5);
+          //println(r.name+": " + data.getValue(int(r.name)));
+        }
+        fill(255);
+      }
+      /*fill(0);
       stroke(0);
       textSize(12); 
       textAlign(CENTER, CENTER); 
@@ -176,7 +190,7 @@ public class Node {
         text(n.displaystring, x + w / 2, y + h / 2);
       } else {
         text(n.name, x + w / 2, y + h / 2);
-      }
+      }*/
 
       if (canvas.w <= canvas.h) {
         x += w;
