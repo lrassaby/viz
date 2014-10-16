@@ -354,21 +354,21 @@ public void submitQuery() {
     for (int i = 0; i < 12; i++) {
         if (checkboxMon.getState(i)) {
             selectedMon = true;
-            where_clause += "month = '" + checkboxMon.getItem(i).getName() + "' or";
+            where_clause += "month = '" + checkboxMon.getItem(i).getName() + "' or ";
         }
     }
 
-    where_clause = where_clause.substring(0, where_clause.length() - 3);
+    where_clause = where_clause.substring(0, where_clause.length() - 4);
     where_clause += ") and";
 
     for (int i = 0; i < 7; i++) {
         if (checkboxDay.getState(i)) {
             selectedDay = true;
-            where_clause += "day = '" + checkboxDay.getItem(i).getName() + "' or";
+            where_clause += "day = '" + checkboxDay.getItem(i).getName() + "' or ";
         }
     }
 
-    where_clause = where_clause.substring(0, where_clause.length() - 3);
+    where_clause = where_clause.substring(0, where_clause.length() - 4);
     where_clause += ");";
 
     String sql = "select * from forestfire\n";
