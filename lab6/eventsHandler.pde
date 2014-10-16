@@ -49,6 +49,39 @@ void submitQuery() {
      **
      ** checkboxDay (Mon-Sun) is similar with checkboxMon
      **/
+
+    String where_clause = "where (";
+    boolean selectedMon = false;
+    boolean selectedDay = false;
+    for (int i = 0; i < 12; i++) {
+        if (checkboxMon.getState(i)) {
+            selectedMon = true;
+            where_clause += "month = '" + checkboxMon.getItem(i).getName() + "' or";
+        }
+    }
+
+    where_clause = where_clause.substring(0, where_clause.length() - 3);
+    where_clause += ") and";
+
+    for (int i = 0; i < 7; i++) {
+        if (checkboxDay.getState(i)) {
+            selectedDay = true;
+            where_clause += "day = '" + checkboxDay.getItem(i).getName() + "' or";
+        }
+    }
+
+    where_clause = where_clause.substring(0, where_clause.length() - 3);
+    where_clause += ");";
+
+    String sql = "select * from forestfire\n";
+    if (selectedMon && selectedDay) {
+        sql += where_clause;
+    }  
+    else 
+        sql = null; 
+
+    println(sql + "\n");
+
     println("the " + checkboxMon.getItem(0).getName() + " is " + checkboxMon.getState(0));
 
 
@@ -65,7 +98,6 @@ void submitQuery() {
      ** finish the sql
      ** do read information from the ResultSet
      **/
-    String sql = null;
     ResultSet rs = null;
 
     try {
