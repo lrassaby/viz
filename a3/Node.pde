@@ -59,11 +59,10 @@ public class Node {
             y_acceleration = (force / mass) * y_component;   
         }
 
-        x_velocity += (y_acceleration * (1 / frameRate)) * UPDATE_MULTIPLE;
-        y_velocity += (y_acceleration * (1 / frameRate)) * UPDATE_MULTIPLE;
+        x_velocity += (y_acceleration * (1 / frameRate));
+        y_velocity += (y_acceleration * (1 / frameRate));
 		x += (x_velocity * (1 / frameRate)) * UPDATE_MULTIPLE;
 		y += (y_velocity * (1 / frameRate)) * UPDATE_MULTIPLE;
-		x_velocity += (x_acceleration * (1 / frameRate)) * UPDATE_MULTIPLE;
-		y_velocity += (y_acceleration * (1 / frameRate)) * UPDATE_MULTIPLE;
 	}
 }
+
