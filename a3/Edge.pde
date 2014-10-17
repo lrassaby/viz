@@ -2,6 +2,15 @@ public class Edge {
 	Node A; 
 	Node B;
 
-	//function: coulombs
-	//function: hookes
+	public Edge() {
+
+	}
+
+	public void draw() {
+
+	}
+	
+	public float hookes_law() {
+		
+	}
 }
