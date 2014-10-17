@@ -3,13 +3,26 @@ public class NodeSystem {
   public ArrayList<Edge> edges;
 
   public NodeSystem(String filename) {
-    nodes = new HashMap();
+    nodes = new ArrayList<Node>();
     edges = new ArrayList<Edge>();
     readInput(filename);
   }
 
   public void draw() {
+    for (Node n : nodes) {
+      n.draw();
+    }
+    for (Edge e : edges) {
+      e.draw();
+    }
+    update();
   }  
+
+  public void update() {
+    for (Node n : nodes) {
+      n.update();
+    }
+  }
   
   private void readInput(String filename) {
     HashMap nodes_map = new HashMap();

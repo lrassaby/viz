@@ -3,11 +3,11 @@ public class Node {
 	public ArrayList<Node> nodes;
 	public String id;
 	public float x, y, mass, system_mass;
-    public float velocity, x_vel_direction, y_vel_direction; 
-	public float acceleration, x_accel_direction, y_accel_direction;
+    public float x_velocity, y_velocity; 
+	public float x_acceleration, y_acceleration;
 	public float radius;
 	public boolean hover;
-	public final float AREA_MULTIPLE = 100;
+	public final float AREA_MULTIPLE = 10000;
 	public final float UPDATE_MULTIPLE = 1;
     public final float COULOMB_MULTIPLE = 1;
 
@@ -32,15 +32,15 @@ public class Node {
 	}
 
 	public float coulombForce(Node node) {
-        return (COULOMB_MULTIPLE * node.mass * this.mass) / (distance(node) ^ 2);
+        return (COULOMB_MULTIPLE * node.mass * this.mass) / pow(distance(node), 2);
 	}
 
     public float distance(Node node) {
-        sqrt((this.x - node.x) ^ 2 + (this.y - node.y) ^ 2);
+        return sqrt(pow((this.x - node.x), 2) + pow((this.y - node.y), 2));
     }
 
 	public boolean intersect() {
-        return sqrt((mouseX - this.x) ^ 2 + (mouseY - this.y) ^ 2) < radius;
+        return sqrt(pow((mouseX - this.x), 2) + pow((mouseY - this.y), 2)) < radius;
 	}
 
 	public void update() {
@@ -52,14 +52,14 @@ public class Node {
             }
         }
         for (Edge e : edges) {
-            float force = e.hookesForce(n);
-            float x_component = e.a.label == this.label ? (e.a.x - e.b.x) : (e.b.x - e.a.x);
-            float y_component = e.a.label == this.label ? (e.a.y - e.b.y) : (e.b.y - e.a.y);
+            float force = e.hookesForce();
+            float x_component = e.a.id == this.id ? (e.a.x - e.b.x) : (e.b.x - e.a.x);
+            float y_component = e.a.id == this.id ? (e.a.y - e.b.y) : (e.b.y - e.a.y);
             x_acceleration = (force / mass) * x_component;
             y_acceleration = (force / mass) * y_component;   
         }
 
-        x_velocity += (y_acceleration * (1 / frameRate));
+        x_velocity += (x_acceleration * (1 / frameRate));
         y_velocity += (y_acceleration * (1 / frameRate));
 		x += (x_velocity * (1 / frameRate)) * UPDATE_MULTIPLE;
 		y += (y_velocity * (1 / frameRate)) * UPDATE_MULTIPLE;
