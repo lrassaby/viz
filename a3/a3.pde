@@ -3,3 +3,7 @@ void setup () {
   size(1000, 800);
   NodeSystem diagram = new NodeSystem("data.csv");
 }
+
+void draw() {
+    diagram.draw();
+}
