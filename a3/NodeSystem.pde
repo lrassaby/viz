@@ -32,8 +32,9 @@ public class NodeSystem {
             String[] temp = split(lines[i], ',');
             // temp[0], temp[1] are the names of the nodes
             // temp[2] is the optimal length of the spring
-            println(temp[0] + " " + temp[1] + " " + temp[2]);
-            //edges.add(new Edge(nodes.get(temp[0]), nodes.get(temp[1]), float(parseInt(temp[2]))));
+            Node brother = (Node)nodes.get(temp[0]);
+            Node sister = (Node)nodes.get(temp[1]);
+            edges.add(new Edge(brother, sister, float(parseInt(temp[2]))));
           }
           
       }
