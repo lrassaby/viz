@@ -359,7 +359,7 @@ public void submitQuery() {
     }
 
     where_clause = where_clause.substring(0, where_clause.length() - 4);
-    where_clause += ") and";
+    where_clause += ") and (";
 
     for (int i = 0; i < 7; i++) {
         if (checkboxDay.getState(i)) {

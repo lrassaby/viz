@@ -10,7 +10,7 @@ public class Edge {
 
 	}
 	
-	public float hookes_law() {
-		
+	public float hookeEnergy() {
+		return 0;
 	}
 }
