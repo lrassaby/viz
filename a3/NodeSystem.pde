@@ -1,5 +1,5 @@
 public class NodeSystem {
-  public HashMap nodes; 
+  public ArrayList<Node> nodes;
   public ArrayList<Edge> edges;
 
   public NodeSystem(String filename) {
@@ -12,6 +12,7 @@ public class NodeSystem {
   }  
   
   private void readInput(String filename) {
+    HashMap nodes_map = new HashMap();
     String lines[] = loadStrings(filename);
     int total_mass = 0;
     int num_nodes = parseInt(lines[0]);
@@ -28,7 +29,8 @@ public class NodeSystem {
       String[] temp = split(lines[i], ',');
       // temp[0] is the name of the node
       // temp[1] is its mass
-      nodes.put(temp[0], new Node(temp[0], parseInt(temp[1]), total_mass));
+      nodes_map.put(temp[0], new Node(temp[0], parseInt(temp[1]), total_mass));
+      nodes.add(new Node(temp[0], parseInt(temp[1]), total_mass));
     }
 
     /* add edges to arraylist */
@@ -36,10 +38,10 @@ public class NodeSystem {
       String[] temp = split(lines[i], ',');
       // temp[0], temp[1] are the names of the nodes
       // temp[2] is the optimal length of the spring
-      Node brother = (Node)nodes.get(temp[0]);
-      Node sister = (Node)nodes.get(temp[1]);
+      Node brother = (Node)nodes_map.get(temp[0]);
+      Node sister = (Node)nodes_map.get(temp[1]);
       edges.add(new Edge(brother, sister, float(parseInt(temp[2]))));
     }
+  }
     
-}
 }
