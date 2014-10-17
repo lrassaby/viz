@@ -11,10 +11,11 @@ public class Edge {
 	}
 
 	public void draw() {
+	    strokeWeight(1);
 		line(a.x, a.y, b.x, b.y);
 	}
 	
 	public float hookesForce() {
-		return  SPRING_MULTIPLE * (a.distance(b) - optimal_length);
+		return SPRING_MULTIPLE * (a.distance(b) - optimal_length);
 	}
 }

@@ -9,13 +9,12 @@ public class NodeSystem {
   }
 
   public void draw() {
-    for (Node n : nodes) {
-      n.draw();
-    }
     for (Edge e : edges) {
       e.draw();
     }
-    update();
+    for (Node n : nodes) {
+      n.draw();
+    }
   }  
 
   public void update() {
@@ -42,8 +41,9 @@ public class NodeSystem {
       String[] temp = split(lines[i], ',');
       // temp[0] is the name of the node
       // temp[1] is its mass
-      nodes_map.put(temp[0], new Node(temp[0], parseInt(temp[1]), total_mass));
-      nodes.add(new Node(temp[0], parseInt(temp[1]), total_mass));
+      Node n = new Node(temp[0], parseInt(temp[1]), total_mass);
+      nodes_map.put(temp[0], n);
+      nodes.add(n);
     }
 
     /* add edges to arraylist */
@@ -53,8 +53,14 @@ public class NodeSystem {
       // temp[2] is the optimal length of the spring
       Node brother = (Node)nodes_map.get(temp[0]);
       Node sister = (Node)nodes_map.get(temp[1]);
-      edges.add(new Edge(brother, sister, float(parseInt(temp[2]))));
+      Edge e = new Edge(brother, sister, float(parseInt(temp[2])));
+      brother.addEdge(e);
+      sister.addEdge(e);
+      edges.add(e);
+    }
+    /* add all nodes to each node */
+    for (Node n : nodes) {
+      n.nodes = nodes;
     }
   }
-    
 }

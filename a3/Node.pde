@@ -7,7 +7,7 @@ public class Node {
 	public float x_acceleration, y_acceleration;
 	public float radius;
 	public boolean hover;
-	public final float AREA_MULTIPLE = 10000;
+	public final float AREA_MULTIPLE = 150;
 	public final float UPDATE_MULTIPLE = 1;
     public final float COULOMB_MULTIPLE = 1;
 
@@ -21,8 +21,7 @@ public class Node {
 		x_acceleration = 0;
 		y_acceleration = 0;
 		edges = new ArrayList<Edge>();
-		nodes = new ArrayList<Node>();
-		radius = sqrt((mass / system_mass) * AREA_MULTIPLE);
+		radius = sqrt(mass / system_mass) * AREA_MULTIPLE;
 		x = random(radius, width - radius);
 		y = random(radius, height - radius);
 	}
@@ -31,8 +30,16 @@ public class Node {
 		ellipse(x, y, radius, radius);
 	}
 
+    public void addEdge(Edge e) {
+        edges.add(e);
+    }
+
+    public void setNodes(ArrayList<Node> nodes) {
+        this.nodes = nodes;
+    }
+
 	public float coulombForce(Node node) {
-        return (COULOMB_MULTIPLE * node.mass * this.mass) / pow(distance(node), 2);
+        return (COULOMB_MULTIPLE * (node.mass * this.mass) / system_mass) / pow(distance(node), 2);
 	}
 
     public float distance(Node node) {
@@ -44,13 +51,17 @@ public class Node {
 	}
 
 	public void update() {
+        // cooloommmmbbb
         for (Node n : nodes) {
             if (n.id != this.id) {
                 float force = coulombForce(n);
                 x_acceleration = (force / mass) * (n.x - this.x);
                 y_acceleration = (force / mass) * (n.y - this.y);
+                println("x_accel" + x_acceleration);
+                println("y_accel" + y_acceleration);
             }
         }
+        // hooookes
         for (Edge e : edges) {
             float force = e.hookesForce();
             float x_component = e.a.id == this.id ? (e.a.x - e.b.x) : (e.b.x - e.a.x);

@@ -19,11 +19,13 @@ NodeSystem diagram;
 public void setup() {
     frame.setResizable(true);
     size(1000, 800);
+    background(255);
     diagram = new NodeSystem("data.csv");
 }
 
 public void draw() {
     diagram.draw();
+    // diagram.update();
 }
 public class Edge {
 	public Node a; 
@@ -38,11 +40,12 @@ public class Edge {
 	}
 
 	public void draw() {
+	    strokeWeight(1);
 		line(a.x, a.y, b.x, b.y);
 	}
 	
 	public float hookesForce() {
-		return  SPRING_MULTIPLE * (a.distance(b) - optimal_length);
+		return SPRING_MULTIPLE * (a.distance(b) - optimal_length);
 	}
 }
 public class Node {
@@ -54,7 +57,7 @@ public class Node {
 	public float x_acceleration, y_acceleration;
 	public float radius;
 	public boolean hover;
-	public final float AREA_MULTIPLE = 10000;
+	public final float AREA_MULTIPLE = 150;
 	public final float UPDATE_MULTIPLE = 1;
     public final float COULOMB_MULTIPLE = 1;
 
@@ -68,8 +71,7 @@ public class Node {
 		x_acceleration = 0;
 		y_acceleration = 0;
 		edges = new ArrayList<Edge>();
-		nodes = new ArrayList<Node>();
-		radius = sqrt((mass / system_mass) * AREA_MULTIPLE);
+		radius = sqrt(mass / system_mass) * AREA_MULTIPLE;
 		x = random(radius, width - radius);
 		y = random(radius, height - radius);
 	}
@@ -78,8 +80,16 @@ public class Node {
 		ellipse(x, y, radius, radius);
 	}
 
+    public void addEdge(Edge e) {
+        edges.add(e);
+    }
+
+    public void setNodes(ArrayList<Node> nodes) {
+        this.nodes = nodes;
+    }
+
 	public float coulombForce(Node node) {
-        return (COULOMB_MULTIPLE * node.mass * this.mass) / pow(distance(node), 2);
+        return (COULOMB_MULTIPLE * (node.mass * this.mass) / system_mass) / pow(distance(node), 2);
 	}
 
     public float distance(Node node) {
@@ -91,13 +101,17 @@ public class Node {
 	}
 
 	public void update() {
+        // cooloommmmbbb
         for (Node n : nodes) {
             if (n.id != this.id) {
                 float force = coulombForce(n);
                 x_acceleration = (force / mass) * (n.x - this.x);
                 y_acceleration = (force / mass) * (n.y - this.y);
+                println("x_accel" + x_acceleration);
+                println("y_accel" + y_acceleration);
             }
         }
+        // hooookes
         for (Edge e : edges) {
             float force = e.hookesForce();
             float x_component = e.a.id == this.id ? (e.a.x - e.b.x) : (e.b.x - e.a.x);
@@ -124,13 +138,12 @@ public class NodeSystem {
   }
 
   public void draw() {
-    for (Node n : nodes) {
-      n.draw();
-    }
     for (Edge e : edges) {
       e.draw();
     }
-    update();
+    for (Node n : nodes) {
+      n.draw();
+    }
   }  
 
   public void update() {
@@ -157,8 +170,9 @@ public class NodeSystem {
       String[] temp = split(lines[i], ',');
       // temp[0] is the name of the node
       // temp[1] is its mass
-      nodes_map.put(temp[0], new Node(temp[0], parseInt(temp[1]), total_mass));
-      nodes.add(new Node(temp[0], parseInt(temp[1]), total_mass));
+      Node n = new Node(temp[0], parseInt(temp[1]), total_mass);
+      nodes_map.put(temp[0], n);
+      nodes.add(n);
     }
 
     /* add edges to arraylist */
@@ -168,10 +182,16 @@ public class NodeSystem {
       // temp[2] is the optimal length of the spring
       Node brother = (Node)nodes_map.get(temp[0]);
       Node sister = (Node)nodes_map.get(temp[1]);
-      edges.add(new Edge(brother, sister, PApplet.parseFloat(parseInt(temp[2]))));
+      Edge e = new Edge(brother, sister, PApplet.parseFloat(parseInt(temp[2])));
+      brother.addEdge(e);
+      sister.addEdge(e);
+      edges.add(e);
+    }
+    /* add all nodes to each node */
+    for (Node n : nodes) {
+      n.nodes = nodes;
     }
   }
-    
 }
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "a3" };
