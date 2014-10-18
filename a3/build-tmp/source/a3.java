@@ -47,7 +47,7 @@ public class Edge {
 	}
 	
 	public float hookesForce() {
-		return SPRING_MULTIPLE * abs(a.distance(b) - optimal_length);
+		return SPRING_MULTIPLE * (a.distance(b) - optimal_length);
 	}
 }
 public class Node {
@@ -116,16 +116,16 @@ public class Node {
         float sum_force_y = 0;
 
         // coulomb's law 
-        // for (Node n : nodes) {
-        //     if (n.id != this.id) {
-        //         float force = coulombForce(n) * UPDATE_MULTIPLE;
-        //         float dist = distance(n);
-        //         float dir_force_x = (this.x - n.x)/dist;
-        //         float dir_force_y = (this.y - n.y)/dist;
-        //         sum_force_x += dir_force_x * force;
-        //         sum_force_y += dir_force_y * force;
-        //     }
-        // }
+        for (Node n : nodes) {
+            if (n.id != this.id) {
+                float force = coulombForce(n) * UPDATE_MULTIPLE;
+                float dist = distance(n);
+                float dir_force_x = (this.x - n.x)/dist;
+                float dir_force_y = (this.y - n.y)/dist;
+                sum_force_x += dir_force_x * force;
+                sum_force_y += dir_force_y * force;
+            }
+        }
 
         // hooke's law
         for (Edge e : edges) {

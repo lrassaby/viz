@@ -17,6 +17,6 @@ public class Edge {
 	}
 	
 	public float hookesForce() {
-		return SPRING_MULTIPLE * abs(a.distance(b) - optimal_length);
+		return SPRING_MULTIPLE * (a.distance(b) - optimal_length);
 	}
 }
