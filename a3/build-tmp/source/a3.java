@@ -19,19 +19,20 @@ NodeSystem diagram;
 public void setup() {
     frame.setResizable(true);
     size(1000, 800);
-    background(255);
+    frameRate(60);
     diagram = new NodeSystem("data.csv");
 }
 
 public void draw() {
+    background(255, 255, 255);
     diagram.draw();
-    // diagram.update();
+    diagram.update();
 }
 public class Edge {
 	public Node a; 
 	public Node b;
 	public float optimal_length;
-	public final float SPRING_MULTIPLE = 400;
+	public final float SPRING_MULTIPLE = 1e-8f;
 
 	public Edge(Node a, Node b, float optimal_length) {
 		this.a = a;
@@ -40,7 +41,8 @@ public class Edge {
 	}
 
 	public void draw() {
-	    strokeWeight(1);
+	    strokeWeight(2);
+	    stroke(40, 58, 127);
 		line(a.x, a.y, b.x, b.y);
 	}
 	
@@ -58,8 +60,8 @@ public class Node {
 	public float radius;
 	public boolean hover;
 	public final float AREA_MULTIPLE = 150;
-	public final float UPDATE_MULTIPLE = 1;
-    public final float COULOMB_MULTIPLE = 1;
+	public final float UPDATE_MULTIPLE = 1e-5f;
+    public final float COULOMB_MULTIPLE = 1e6f;
 
 	public Node(String id, float mass, float system_mass) {
 		this.id = id;
@@ -77,6 +79,8 @@ public class Node {
 	}
 
 	public void draw() {
+        fill(154, 175, 255);
+        stroke(40, 58, 127);
 		ellipse(x, y, radius, radius);
 	}
 
@@ -89,7 +93,11 @@ public class Node {
     }
 
 	public float coulombForce(Node node) {
-        return (COULOMB_MULTIPLE * (node.mass * this.mass) / system_mass) / pow(distance(node), 2);
+        float force = (node.mass * this.mass) / pow(distance(node), 2);
+        if (force != force) { // NaN
+            force = 0;
+        }
+        return force * COULOMB_MULTIPLE;
 	}
 
     public float distance(Node node) {
@@ -101,29 +109,30 @@ public class Node {
 	}
 
 	public void update() {
-        // cooloommmmbbb
+        // coulomb's law 
         for (Node n : nodes) {
             if (n.id != this.id) {
                 float force = coulombForce(n);
-                x_acceleration = (force / mass) * (n.x - this.x);
-                y_acceleration = (force / mass) * (n.y - this.y);
-                println("x_accel" + x_acceleration);
-                println("y_accel" + y_acceleration);
+                float dist = distance(n);
+                x_acceleration += (force / mass) * (this.x - n.x) / dist * UPDATE_MULTIPLE;
+                y_acceleration += (force / mass) * (this.y - n.y) / dist * UPDATE_MULTIPLE;
             }
         }
-        // hooookes
+        // hooke's law
         for (Edge e : edges) {
             float force = e.hookesForce();
-            float x_component = e.a.id == this.id ? (e.a.x - e.b.x) : (e.b.x - e.a.x);
-            float y_component = e.a.id == this.id ? (e.a.y - e.b.y) : (e.b.y - e.a.y);
-            x_acceleration = (force / mass) * x_component;
-            y_acceleration = (force / mass) * y_component;   
+            float x_component = e.a.id != this.id ? (e.a.x - e.b.x) : (e.b.x - e.a.x);
+            float y_component = e.a.id != this.id ? (e.a.y - e.b.y) : (e.b.y - e.a.y);
+            x_acceleration += (force / mass) * x_component;
+            y_acceleration += (force / mass) * y_component;  
+            println("x_acceleration: "+x_acceleration); 
+            println("y_acceleration: "+y_acceleration);
         }
 
         x_velocity += (x_acceleration * (1 / frameRate));
         y_velocity += (y_acceleration * (1 / frameRate));
-		x += (x_velocity * (1 / frameRate)) * UPDATE_MULTIPLE;
-		y += (y_velocity * (1 / frameRate)) * UPDATE_MULTIPLE;
+		x += x_velocity;
+		y += y_velocity ;
 	}
 }
 

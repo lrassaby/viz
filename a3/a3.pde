@@ -3,11 +3,12 @@ NodeSystem diagram;
 void setup() {
     frame.setResizable(true);
     size(1000, 800);
-    background(255);
+    frameRate(60);
     diagram = new NodeSystem("data.csv");
 }
 
 void draw() {
+    background(255, 255, 255);
     diagram.draw();
-    // diagram.update();
+    diagram.update();
 }

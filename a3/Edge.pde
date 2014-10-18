@@ -2,7 +2,7 @@ public class Edge {
 	public Node a; 
 	public Node b;
 	public float optimal_length;
-	public final float SPRING_MULTIPLE = 400;
+	public final float SPRING_MULTIPLE = 1e-8;
 
 	public Edge(Node a, Node b, float optimal_length) {
 		this.a = a;
@@ -11,7 +11,8 @@ public class Edge {
 	}
 
 	public void draw() {
-	    strokeWeight(1);
+	    strokeWeight(2);
+	    stroke(40, 58, 127);
 		line(a.x, a.y, b.x, b.y);
 	}
 	
