@@ -9,8 +9,9 @@ public class Node {
 	public boolean hover;
     public float energy;
 	public final float AREA_MULTIPLE = 150;
-	public final float UPDATE_MULTIPLE = 4;
-    public final float COULOMB_MULTIPLE = 1e-3;
+	public final float UPDATE_MULTIPLE = 20;
+    public final float COULOMB_MULTIPLE = 1e2;
+    public final float DAMPING = 0.95;
 
 	public Node(String id, float mass, float system_mass) {
 		this.id = id;
@@ -66,32 +67,36 @@ public class Node {
         for (Node n : nodes) {
             if (n.id != this.id) {
                 float force = coulombForce(n) * UPDATE_MULTIPLE;
-                float dir_force_x = (n.x - this.x);
-                float dir_force_y = (n.y - this.y);
-                sum_force_x += (dir_force_x / (dir_force_x + dir_force_y)) * force;
-                sum_force_y += (dir_force_y / (dir_force_x + dir_force_y)) * force;
+                float dist = distance(n);
+                float dir_force_x = (this.x - n.x)/dist;
+                float dir_force_y = (this.y - n.y)/dist;
+                sum_force_x += dir_force_x * force;
+                sum_force_y += dir_force_y * force;
             }
         }
-        // hooke's law
-        // for (Edge e : edges) {
-        //     sum_of_forces += e.hookesForce() * UPDATE_MULTIPLE;
-        //     float dist_a = distance(e.a);
-        //     float dist_b = distance(e.b);
-        //     float dist = e.a.distance(e.b);
 
-        //     sum_force_x += dist_a > dist_b ? (e.a.x - e.b.x) / dist : (e.b.x - e.a.x) / dist;
-        //     sum_force_y += dist_a > dist_b ? (e.a.y - e.b.y) / dist : (e.b.y - e.a.y) / dist;
-        // }
+        // hooke's law
+        for (Edge e : edges) {
+            float force = e.hookesForce() * UPDATE_MULTIPLE;
+            float dist_a = distance(e.a);
+            float dist_b = distance(e.b);
+            float dist = e.a.distance(e.b);
+
+            float dir_force_x = dist_a > dist_b ? (e.a.x - e.b.x) / dist : (e.b.x - e.a.x) / dist;
+            float dir_force_y = dist_a > dist_b ? (e.a.y - e.b.y) / dist : (e.b.y - e.a.y) / dist; 
+
+            sum_force_x += dir_force_x * force;
+            sum_force_y += dir_force_y * force;
+        }
 
         x_acceleration = (sum_force_x / mass);
         y_acceleration = (sum_force_y / mass);
-        x_velocity += x_acceleration;
-        y_velocity += y_acceleration;
+        x_velocity += x_acceleration - (1 - DAMPING) * x_velocity;
+        y_velocity += y_acceleration - (1 - DAMPING) * y_velocity;
 		x += x_velocity * (1 / frameRate);
 		y += y_velocity * (1 / frameRate);
 
-        energy += (x_velocity * x_velocity + y_velocity * y_velocity) * mass;
-        println("energy: "+energy);
+        energy = (x_velocity * x_velocity + y_velocity * y_velocity) * mass;
 	}
 }
 
