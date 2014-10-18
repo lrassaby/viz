@@ -28,6 +28,14 @@ public void draw() {
     diagram.draw();
     diagram.update();
 }
+
+public void mousePressed() {
+    diagram.mousePressed();
+}
+
+public void mouseReleased() {
+    diagram.mouseReleased();
+}
 public class Edge {
 	public Node a; 
 	public Node b;
@@ -55,6 +63,8 @@ public class Node {
 	public ArrayList<Node> nodes;
 	public String id;
 	public float x, y, mass, system_mass;
+    public float dx, dy;
+    public boolean selected;
     public float x_velocity, y_velocity; 
 	public float x_acceleration, y_acceleration;
 	public float radius;
@@ -62,7 +72,7 @@ public class Node {
     public float energy;
 	public final float AREA_MULTIPLE = 150;
 	public final float UPDATE_MULTIPLE = 20;
-    public final float COULOMB_MULTIPLE = 1e2f;
+    public final float COULOMB_MULTIPLE = 1.5e2f;
     public final float DAMPING = 0.95f;
 
 	public Node(String id, float mass, float system_mass) {
@@ -80,6 +90,14 @@ public class Node {
 		x = random(radius, width - radius);
 		y = random(radius, height - radius);
 	}
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+        if (selected) {
+            this.dx = x - mouseX;
+            this.dy = y - mouseY;
+        }
+    }
 
 	public void draw() {
         fill(154, 175, 255);
@@ -108,7 +126,7 @@ public class Node {
     }
 
 	public boolean intersect() {
-        return sqrt(pow((mouseX - this.x), 2) + pow((mouseY - this.y), 2)) < radius;
+        return (sqrt(pow((mouseX - this.x), 2) + pow((mouseY - this.y), 2)) < radius);
 	}
 
 	public void update() {
@@ -148,6 +166,11 @@ public class Node {
 		x += x_velocity * (1 / frameRate);
 		y += y_velocity * (1 / frameRate);
 
+        if (selected) {
+            x = mouseX + dx;
+            y = mouseY + dy;
+        }
+
         energy = (x_velocity * x_velocity + y_velocity * y_velocity) * mass;
 	}
 }
@@ -176,7 +199,29 @@ public class NodeSystem {
       n.update();
     }
   }
+
+  public void mousePressed() {
+    for (Node n : nodes) {
+      if (mousePressed) {
+        if(n.intersect()) {
+          n.setSelected(true);
+        } else {
+          n.setSelected(false);
+        }
+      } else {
+        n.setSelected(false);
+      }
+    }
+  }
+
+  public void mouseReleased() {
+    for (Node n : nodes) {
+      n.setSelected(false);
+    }
+  }
   
+
+
   private void readInput(String filename) {
     HashMap nodes_map = new HashMap();
     String lines[] = loadStrings(filename);

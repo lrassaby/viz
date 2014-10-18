@@ -22,7 +22,29 @@ public class NodeSystem {
       n.update();
     }
   }
+
+  public void mousePressed() {
+    for (Node n : nodes) {
+      if (mousePressed) {
+        if(n.intersect()) {
+          n.setSelected(true);
+        } else {
+          n.setSelected(false);
+        }
+      } else {
+        n.setSelected(false);
+      }
+    }
+  }
+
+  public void mouseReleased() {
+    for (Node n : nodes) {
+      n.setSelected(false);
+    }
+  }
   
+
+
   private void readInput(String filename) {
     HashMap nodes_map = new HashMap();
     String lines[] = loadStrings(filename);

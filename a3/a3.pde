@@ -12,3 +12,11 @@ void draw() {
     diagram.draw();
     diagram.update();
 }
+
+void mousePressed() {
+    diagram.mousePressed();
+}
+
+void mouseReleased() {
+    diagram.mouseReleased();
+}
