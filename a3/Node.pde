@@ -10,9 +10,10 @@ public class Node {
 	public float radius;
 	public boolean hover;
     public float energy;
-	public final float AREA_MULTIPLE = 150;
-	public final float UPDATE_MULTIPLE = 20;
+	public final float AREA_MULTIPLE = 60;
+	public final float UPDATE_MULTIPLE = 10;
     public final float COULOMB_MULTIPLE = 1.5e2;
+    public final float CENTER_COERSION_MULTIPLE = 0;
     public final float DAMPING = 0.95;
 
 	public Node(String id, float mass, float system_mass) {
@@ -40,9 +41,20 @@ public class Node {
     }
 
 	public void draw() {
-        fill(154, 175, 255);
-        stroke(40, 58, 127);
-		ellipse(x, y, radius, radius);
+        if (hover) {
+            fill(180, 180, 180, 128);
+            strokeWeight(0);
+            rect(x - 20, y - radius - 60, 90, 50, 15);
+            strokeWeight(2);
+            fill(200, 60, 60);
+            stroke(100, 30, 30);
+            text("id: " + id, x - 10, y - radius - 50, 80, 50); 
+            text("mass: " + mass, x - 10, y - radius - 40, 80, 50); 
+        } else {
+            fill(154, 175, 255);
+            stroke(40, 58, 127);
+        }
+		ellipse(x, y, radius * 2, radius * 2);
 	}
 
     public void addEdge(Edge e) {
@@ -61,8 +73,10 @@ public class Node {
         return force * COULOMB_MULTIPLE;
 	}
 
+
+
     public float distance(Node node) {
-        return sqrt(pow((this.x - node.x), 2) + pow((this.y - node.y), 2));
+        return max(sqrt(pow((this.x - node.x), 2) + pow((this.y - node.y), 2)), 1);
     }
 
 	public boolean intersect() {
@@ -99,6 +113,11 @@ public class Node {
             sum_force_y += dir_force_y * force;
         }
 
+        /* coerce the system towards the center */
+        float dist = sqrt(pow((width/2 - this.x), 2) + pow((height/2 - this.x), 2));
+        sum_force_x += ((this.x - width/2)/dist) * CENTER_COERSION_MULTIPLE;
+        sum_force_y += ((this.x - height/2)/dist) * CENTER_COERSION_MULTIPLE;
+
         x_acceleration = (sum_force_x / mass);
         y_acceleration = (sum_force_y / mass);
         x_velocity += x_acceleration - (1 - DAMPING) * x_velocity;
@@ -109,6 +128,18 @@ public class Node {
         if (selected) {
             x = mouseX + dx;
             y = mouseY + dy;
+        }
+        hover = intersect();
+
+        if (x > width - radius - 1) {
+            x = width - radius;
+        } else if (x < radius) {
+            x = radius;
+        }
+        if (y > height - radius - 1) {
+            y = height - radius;
+        } else if (y < radius) {
+            y = radius;
         }
 
         energy = (x_velocity * x_velocity + y_velocity * y_velocity) * mass;

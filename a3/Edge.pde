@@ -2,7 +2,7 @@ public class Edge {
 	public Node a; 
 	public Node b;
 	public float optimal_length;
-	public final float SPRING_MULTIPLE = 1e-1;
+	public final float SPRING_MULTIPLE = 0.5e-1;
 
 	public Edge(Node a, Node b, float optimal_length) {
 		this.a = a;

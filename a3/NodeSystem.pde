@@ -1,20 +1,27 @@
 public class NodeSystem {
   public ArrayList<Node> nodes;
   public ArrayList<Edge> edges;
+  public float total_energy;
 
   public NodeSystem(String filename) {
     nodes = new ArrayList<Node>();
     edges = new ArrayList<Edge>();
     readInput(filename);
+    total_energy = 0;
   }
 
   public void draw() {
     for (Edge e : edges) {
       e.draw();
     }
+    float energy = 0;
     for (Node n : nodes) {
       n.draw();
+      energy += n.energy;
     }
+    total_energy = energy;
+    fill(40, 58, 127);
+    text("Total energy: " + total_energy, 10, 15); 
   }  
 
   public void update() {
