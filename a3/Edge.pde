@@ -2,7 +2,7 @@ public class Edge {
 	public Node a; 
 	public Node b;
 	public float optimal_length;
-	public final float SPRING_MULTIPLE = 1e-8;
+	public final float SPRING_MULTIPLE = 1e-3;
 
 	public Edge(Node a, Node b, float optimal_length) {
 		this.a = a;
@@ -17,6 +17,6 @@ public class Edge {
 	}
 	
 	public float hookesForce() {
-		return SPRING_MULTIPLE * (a.distance(b) - optimal_length);
+		return SPRING_MULTIPLE * abs(a.distance(b) - optimal_length);
 	}
 }

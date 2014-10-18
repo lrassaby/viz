@@ -35,7 +35,6 @@ public class NodeSystem {
       String[] temp = split(lines[i], ',');
       total_mass += parseInt(temp[1]);
     }
-    
     /* add nodes to arraylist */
     for (int i = 1; i <= num_nodes; i++) {
       String[] temp = split(lines[i], ',');
