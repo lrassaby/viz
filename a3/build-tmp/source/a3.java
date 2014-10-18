@@ -3,6 +3,8 @@ import processing.data.*;
 import processing.event.*; 
 import processing.opengl.*; 
 
+import javax.swing.*; 
+
 import java.util.HashMap; 
 import java.util.ArrayList; 
 import java.io.File; 
@@ -14,13 +16,32 @@ import java.io.IOException;
 
 public class a3 extends PApplet {
 
+
 NodeSystem diagram;
 
 public void setup() {
     frame.setResizable(true);
     size(1000, 800);
     frameRate(60);
-    diagram = new NodeSystem("data.csv");
+
+    String filename = null;
+    try { 
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    } catch (Exception e) { 
+    e.printStackTrace();
+    } 
+
+    try {
+      filename = JOptionPane.showInputDialog(frame, "Input file", "data.csv");
+    } catch (Exception e) {
+      println("Process cancelled.");
+      exit();
+    }
+    if (filename == null) {
+      println("Process cancelled.");
+      exit();
+    }
+    diagram = new NodeSystem(filename);
 }
 
 public void draw() {
