@@ -13,7 +13,7 @@ public class Node {
 	public final float AREA_MULTIPLE = 60;
 	public final float UPDATE_MULTIPLE = 10;
     public final float COULOMB_MULTIPLE = 1.5e2;
-    public final float CENTER_COERSION_MULTIPLE = 0;
+    public final float CENTER_COERSION_MULTIPLE = 1e-2;
     public final float DAMPING = 0.95;
 
 	public Node(String id, float mass, float system_mass) {
@@ -114,9 +114,8 @@ public class Node {
         }
 
         /* coerce the system towards the center */
-        float dist = sqrt(pow((width/2 - this.x), 2) + pow((height/2 - this.x), 2));
-        sum_force_x += ((this.x - width/2)/dist) * CENTER_COERSION_MULTIPLE;
-        sum_force_y += ((this.x - height/2)/dist) * CENTER_COERSION_MULTIPLE;
+        sum_force_x += (width/2 - this.x) * CENTER_COERSION_MULTIPLE;
+        sum_force_y += (height/2 - this.y) * CENTER_COERSION_MULTIPLE;
 
         x_acceleration = (sum_force_x / mass);
         y_acceleration = (sum_force_y / mass);
