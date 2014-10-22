@@ -1,7 +1,7 @@
 public class NodeSystem {
-  public ArrayList<Node> nodes;
-  public ArrayList<Edge> edges;
-  public float total_energy;
+  private ArrayList<Node> nodes;
+  private ArrayList<Edge> edges;
+  private float total_energy;
 
   public NodeSystem(String filename) {
     nodes = new ArrayList<Node>();
@@ -15,10 +15,27 @@ public class NodeSystem {
       e.draw();
     }
     float energy = 0;
+    Node hovernode = null;
+    Node selectednode = null;
     for (Node n : nodes) {
-      n.draw();
+      boolean hover = n.intersect(), selected = n.isSelected();
+      if (hover) {
+        hovernode = n;
+        n.draw(hover);
+      } else if (selected) {
+        selectednode = n;
+        n.draw(selected);
+      } else {
+        n.draw(false);
+      }
       energy += n.energy;
     }
+    if (selectednode != null) {
+      selectednode.drawHoverBox();
+    } else if (hovernode != null) {
+      hovernode.drawHoverBox();
+    }
+
     total_energy = energy;
     fill(40, 58, 127);
     text("Total energy: " + total_energy, 10, 15); 

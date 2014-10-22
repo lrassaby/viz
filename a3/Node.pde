@@ -1,27 +1,24 @@
 public class Node {
-	public ArrayList<Edge> edges;
-	public ArrayList<Node> nodes;
-	public String id;
-	public float x, y, mass, system_mass;
-    public float dx, dy;
-    public boolean selected;
-    public float x_velocity, y_velocity; 
-	public float x_acceleration, y_acceleration;
-	public float radius;
-	public boolean hover;
-    public float energy;
-	public final float AREA_MULTIPLE = 60;
-	public final float UPDATE_MULTIPLE = 10;
-    // public final float COULOMB_MULTIPLE = 1.5e2;
-    public final float COULOMB_MULTIPLE = 5e3;
-    public final float CENTER_COERSION_MULTIPLE = 1e-2;
-    public final float DAMPING = 0.95;
+	private ArrayList<Edge> edges;
+	private ArrayList<Node> nodes;
+	private String id;
+	private float x, y, mass, system_mass;
+    private float dx, dy;
+    private boolean selected;
+    private float x_velocity, y_velocity; 
+	private float x_acceleration, y_acceleration;
+	private float radius;
+    private float energy;
+	private final float AREA_MULTIPLE = 60;
+	private final float UPDATE_MULTIPLE = 10;
+    private final float COULOMB_MULTIPLE = 2e3;
+    private final float CENTER_COERSION_MULTIPLE = 1e-2;
+    private final float DAMPING = 0.95;
 
 	public Node(String id, float mass, float system_mass) {
 		this.id = id;
 		this.mass = mass;
 		this.system_mass = system_mass;
-		hover = false;
 		x_velocity = 0;
 		y_velocity = 0;
 		x_acceleration = 0;
@@ -41,22 +38,30 @@ public class Node {
         }
     }
 
-	public void draw() {
-        if (hover) {
-            fill(180, 180, 180, 128);
-            strokeWeight(0);
-            rect(x - 20, y - radius - 60, 90, 50, 15);
-            strokeWeight(2);
+    public boolean isSelected() {
+        return selected;
+    }
+
+	public void draw(boolean colored) {
+        strokeWeight(2);
+        if (colored) {
             fill(200, 60, 60);
             stroke(100, 30, 30);
-            text("id: " + id, x - 10, y - radius - 50, 80, 50); 
-            text("mass: " + mass, x - 10, y - radius - 40, 80, 50); 
         } else {
             fill(154, 175, 255);
             stroke(40, 58, 127);
         }
 		ellipse(x, y, radius * 2, radius * 2);
 	}
+
+    public void drawHoverBox() {
+        fill(180, 180, 180, 128);
+        strokeWeight(0);
+        rect(x - 20, y - radius - 60, 90, 50, 15);
+        fill(200, 60, 60);
+        text("id: " + id, x - 10, y - radius - 50, 80, 50); 
+        text("mass: " + mass, x - 10, y - radius - 40, 80, 50); 
+    }
 
     public void addEdge(Edge e) {
         edges.add(e);
@@ -67,15 +72,12 @@ public class Node {
     }
 
 	public float coulombForce(Node node) {
-        // float force = (node.mass * this.mass) / pow(distance(node), 2);
         float force = (COULOMB_MULTIPLE + (node.mass * this.mass))/2 / pow(distance(node), 2);
         if (force != force) { // NaN
             force = 0;
         }
         return force;
 	}
-
-
 
     public float distance(Node node) {
         return max(sqrt(pow((this.x - node.x), 2) + pow((this.y - node.y), 2)), 1);
@@ -130,7 +132,6 @@ public class Node {
             x = mouseX + dx;
             y = mouseY + dy;
         }
-        hover = intersect();
 
         if (x > width - radius - 1) {
             x = width - radius;
