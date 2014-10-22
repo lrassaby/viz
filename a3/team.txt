@@ -1,5 +1,5 @@
 Louis Rassaby, Jim Bonish, Suzie Church
-10/6/2014
+10/22/2014
 ---------------------------------------
 Work was divided relatively evenly with Jim focusing on parsing, Suzie
 focusing on edges, and Louis focusing on Nodes and debugging.
