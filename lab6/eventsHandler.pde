@@ -49,40 +49,26 @@ void submitQuery() {
      **
      ** checkboxDay (Mon-Sun) is similar with checkboxMon
      **/
-
-    String where_clause = "where (";
-    boolean selectedMon = false;
-    boolean selectedDay = false;
-    for (int i = 0; i < 12; i++) {
-        if (checkboxMon.getState(i)) {
-            selectedMon = true;
-            where_clause += "month = '" + checkboxMon.getItem(i).getName() + "' or ";
+    String where = "Where ";
+    for (int i = 0; i < checkboxMon.getItems().size(); i++) {
+      String name = checkboxMon.getItem(i).getName();
+      if(!checkboxMon.getState(i)) {
+        if (where != "Where "){
+          where += "AND ";
         }
+        where += "month != '" + name + "' ";
+      }
     }
-
-    where_clause = where_clause.substring(0, where_clause.length() - 4);
-    where_clause += ") and (";
-
-    for (int i = 0; i < 7; i++) {
-        if (checkboxDay.getState(i)) {
-            selectedDay = true;
-            where_clause += "day = '" + checkboxDay.getItem(i).getName() + "' or ";
+    
+    for (int i = 0; i < checkboxDay.getItems().size(); i++) {
+      String name = checkboxDay.getItem(i).getName();
+      if(!checkboxDay.getState(i)) {
+        if (where != "Where "){
+          where += "AND ";
         }
+        where += "day != '" + name + "' ";
+      }
     }
-
-    where_clause = where_clause.substring(0, where_clause.length() - 4);
-    where_clause += ");";
-
-    String sql = "select * from forestfire\n";
-    if (selectedMon && selectedDay) {
-        sql += where_clause;
-    }  
-    else 
-        sql = null; 
-
-    println(sql + "\n");
-
-    println("the " + checkboxMon.getItem(0).getName() + " is " + checkboxMon.getState(0));
 
 
     /** use getHighValue() to get the upper value of the current selected interval
@@ -92,17 +78,43 @@ void submitQuery() {
      **/
     float maxTemp = rangeTemp.getHighValue();
     float minTemp = rangeTemp.getLowValue();
+    if (where == "Where "){
+      where += "temp > " + minTemp + " AND temp < " + maxTemp + " ";
+    } else {
+      where += "AND temp > " + minTemp + " AND temp < " + maxTemp + " ";
+    }
+    
+    float maxHumidity = rangeHumidity.getHighValue();
+    float minHumidity = rangeHumidity.getLowValue();
+    where += "AND humidity > " + minHumidity + " AND humidity < " + maxHumidity + " ";
+    
+    float maxWind = rangeWind.getHighValue();
+    float minWind = rangeWind.getLowValue();
+    where += "AND wind > " + minWind + " AND wind < " + maxWind + " ";
 
     /** Finish this
      **
      ** finish the sql
      ** do read information from the ResultSet
      **/
+    String sql = "Select x, y from forestfire";
+    
+    if (where != "Where "){
+      sql += " " + where;
+    }
+    
     ResultSet rs = null;
-
+    dataSet = new ArrayList<float[]>();
+    
     try {
-        // submit the sql query and get a ResultSet from the database
+        // submit the sql query and get a ResultSet from the dataSetbase
        rs  = (ResultSet) DBHandler.exeQuery(sql);
+       while (rs.next()) {
+         float xval = rs.getFloat("x");
+         float yval = rs.getFloat("y");
+         float[] dataSetpt = {xval, yval};
+         dataSet.add(dataSetpt);
+       }
 
     } catch (Exception e) {
         // should be a java.lang.NullPointerException here when rs is empty

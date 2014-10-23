@@ -284,17 +284,21 @@ public void stop() {
     closeAll();
 }
 int canvasWidth = MIN_INT; // this would be initialized in setup
+ArrayList<float[]> dataSet = new ArrayList<float[]>();
 
 public void draw() {
   clearCanvas();
+  float margin = canvasWidth * .2f;
+  strokeWeight(1);
+  stroke(0, 0, 0);
+  line(margin, canvasWidth - margin, canvasWidth - margin, canvasWidth - margin);
+  line(margin, margin, margin, canvasWidth - margin);
 
-  /**
-   ** Finish this:
-   **
-   ** you should draw your scatterplot here, on rect(0, 0, canvasWidth,canvasWidth) (CORNER)
-   ** axes and labels on axes are required
-   ** the hovering is optional
-   **/
+  for (int i = 0; i < dataSet.size(); i++) {
+  	   float[] newPoint = dataSet.get(i);
+  	   fill(150);
+  	   ellipse((canvasWidth - margin - (newPoint[0]/maxPoint[0]) * (canvasWidth - 2 * margin)), (canvasWidth - margin - (newPoint[1]/maxPoint[1]) * (canvasWidth - 2 * margin)), 7, 7);
+  }
 }
 
 
@@ -347,40 +351,26 @@ public void submitQuery() {
      **
      ** checkboxDay (Mon-Sun) is similar with checkboxMon
      **/
-
-    String where_clause = "where (";
-    boolean selectedMon = false;
-    boolean selectedDay = false;
-    for (int i = 0; i < 12; i++) {
-        if (checkboxMon.getState(i)) {
-            selectedMon = true;
-            where_clause += "month = '" + checkboxMon.getItem(i).getName() + "' or ";
+    String where = "Where ";
+    for (int i = 0; i < checkboxMon.getItems().size(); i++) {
+      String name = checkboxMon.getItem(i).getName();
+      if(!checkboxMon.getState(i)) {
+        if (where != "Where "){
+          where += "AND ";
         }
+        where += "month != '" + name + "' ";
+      }
     }
-
-    where_clause = where_clause.substring(0, where_clause.length() - 4);
-    where_clause += ") and (";
-
-    for (int i = 0; i < 7; i++) {
-        if (checkboxDay.getState(i)) {
-            selectedDay = true;
-            where_clause += "day = '" + checkboxDay.getItem(i).getName() + "' or ";
+    
+    for (int i = 0; i < checkboxDay.getItems().size(); i++) {
+      String name = checkboxDay.getItem(i).getName();
+      if(!checkboxDay.getState(i)) {
+        if (where != "Where "){
+          where += "AND ";
         }
+        where += "day != '" + name + "' ";
+      }
     }
-
-    where_clause = where_clause.substring(0, where_clause.length() - 4);
-    where_clause += ");";
-
-    String sql = "select * from forestfire\n";
-    if (selectedMon && selectedDay) {
-        sql += where_clause;
-    }  
-    else 
-        sql = null; 
-
-    println(sql + "\n");
-
-    println("the " + checkboxMon.getItem(0).getName() + " is " + checkboxMon.getState(0));
 
 
     /** use getHighValue() to get the upper value of the current selected interval
@@ -390,17 +380,43 @@ public void submitQuery() {
      **/
     float maxTemp = rangeTemp.getHighValue();
     float minTemp = rangeTemp.getLowValue();
+    if (where == "Where "){
+      where += "temp > " + minTemp + " AND temp < " + maxTemp + " ";
+    } else {
+      where += "AND temp > " + minTemp + " AND temp < " + maxTemp + " ";
+    }
+    
+    float maxHumidity = rangeHumidity.getHighValue();
+    float minHumidity = rangeHumidity.getLowValue();
+    where += "AND humidity > " + minHumidity + " AND humidity < " + maxHumidity + " ";
+    
+    float maxWind = rangeWind.getHighValue();
+    float minWind = rangeWind.getLowValue();
+    where += "AND wind > " + minWind + " AND wind < " + maxWind + " ";
 
     /** Finish this
      **
      ** finish the sql
      ** do read information from the ResultSet
      **/
+    String sql = "Select x, y from forestfire";
+    
+    if (where != "Where "){
+      sql += " " + where;
+    }
+    
     ResultSet rs = null;
-
+    dataSet = new ArrayList<float[]>();
+    
     try {
-        // submit the sql query and get a ResultSet from the database
+        // submit the sql query and get a ResultSet from the dataSetbase
        rs  = (ResultSet) DBHandler.exeQuery(sql);
+       while (rs.next()) {
+         float xval = rs.getFloat("x");
+         float yval = rs.getFloat("y");
+         float[] dataSetpt = {xval, yval};
+         dataSet.add(dataSetpt);
+       }
 
     } catch (Exception e) {
         // should be a java.lang.NullPointerException here when rs is empty
@@ -433,24 +449,38 @@ public void closeAll() {
 float[] rangeTempValue = {0, 1};  // slider of temp 
 float[] rangeHumidityValue = {0, 1}; // slider of humidity 
 float[] rangeWindValue = {0, 1}; // slider of wind 
+float[] maxPoint = {0, 1}; //range of points
 
 /**
  * this function is called before initializing the interface
  */
 public void initSetting() {
-    /** Finish this
-     **
-     ** initialize those three arrays
-     ** initialize the first element of each array to the min value of the column
-     ** initialize the second element of each array to the max value of the column
-     **/
 
-    String sql = null;
     ResultSet rs = null;
      
     try {
         // submit the sql query and get a ResultSet from the database
-        rs = (ResultSet) DBHandler.exeQuery(sql);
+    String sql = "select max(x), max(y), max(temp), max(wind), max(humidity), min(temp), min(wind), min(humidity) from forestfire";
+    rs = (ResultSet) DBHandler.exeQuery(sql);
+    while(rs.next()) {
+        float minTemp = rs.getFloat("min(temp)");
+        float maxTemp = rs.getFloat("max(temp)");
+        float minHumidity = rs.getFloat("min(humidity)");
+        float maxHumidity = rs.getFloat("max(humidity)");
+        float maxX = rs.getFloat("max(x)");
+        float maxY = rs.getFloat("max(y)");
+        float minWind = rs.getFloat("min(wind)");
+        float maxWind =  rs.getFloat("max(wind)");
+
+        rangeTempValue[0] = minTemp;
+        rangeTempValue[1] = maxTemp;
+        rangeHumidityValue[0] = minHumidity;
+        rangeHumidityValue[1] = maxHumidity;
+        maxPoint[0] = maxX;
+        maxPoint[1] = maxY;
+        rangeWindValue[0] = minWind;
+        rangeWindValue[1] = maxWind;
+    }
 
     } catch (Exception e) {
         // should be a java.lang.NullPointerException here when rs is empty
