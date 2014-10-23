@@ -10,4 +10,4 @@ class Rectangle { // model dragging area
         p1 = new PVector(x1, y1);
         p2 = new PVector(x2, y2);
     }
-}
+};

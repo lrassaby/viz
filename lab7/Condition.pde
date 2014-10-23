@@ -23,7 +23,7 @@ class Condition {
         value == cond.value && 
         col.equals(cond.col);
     }
-}
+};
 
 
 boolean checkConditions(Condition[] conds, TableRow row) {

@@ -195,7 +195,7 @@ class Condition {
         value == cond.value && 
         col.equals(cond.col);
     }
-}
+};
 
 
 public boolean checkConditions(Condition[] conds, TableRow row) {
@@ -449,7 +449,7 @@ class Message {
         }
         return str + "\n\n";
     }
-}
+};
 class Rectangle { // model dragging area
     PVector p1 = null;
     PVector p2 = null;
@@ -462,7 +462,7 @@ class Rectangle { // model dragging area
         p1 = new PVector(x1, y1);
         p2 = new PVector(x2, y2);
     }
-}
+};
 class ScatterplotView extends AbstractView {
     float[] xArray = null;
     float[] yArray = null;
@@ -496,13 +496,18 @@ class ScatterplotView extends AbstractView {
         conds[1] = cond2;
         conds[2] = cond3;
         conds[3] = cond4;
-         
+        
         // Finish this:
         // Send a message to the Controller to provide the current conditions for highlighting
         // 1. create a new message instance (see Message.pde)
         // 2. set the source of this message (see Message.pde)
         // 3. set the conditions of this message (see Message.pde)
         // 4. send the message (see AbstractView.pde)
+        
+        Message msg = new Message();
+        msg.setSource(name)
+           .setConditions(conds);
+        sendMsg(msg);
     }
 
     // handle sending messages to the Controller when a rectangle is selected
@@ -511,7 +516,6 @@ class ScatterplotView extends AbstractView {
         Rectangle rectSub = getIntersectRegion(rect);
 
         if (rectSub != null) {
-            Condition[] conds = null;
 
             // Finish this:
             // Create the conditions for what points to highlight to send
@@ -520,6 +524,16 @@ class ScatterplotView extends AbstractView {
             // The getIntersectRegion() call above gets you the selection rectangle
             // in the current view.
             
+            Condition cond1 = new Condition(xTitle, "<=", inverseToXReal(rectSub.p2.x));
+            Condition cond2 = new Condition(xTitle, ">=", inverseToXReal(rectSub.p1.x));
+            Condition cond3 = new Condition(yTitle, ">=", inverseToYReal(rectSub.p2.y));
+            Condition cond4 = new Condition(yTitle, "<=", inverseToYReal(rectSub.p1.y));
+            Condition[] conds = new Condition[4];
+            conds[0] = cond1;
+            conds[1] = cond2;
+            conds[2] = cond3;
+            conds[3] = cond4;
+
             // send out the message
             Message msg = new Message();
             msg.setSource(name)
