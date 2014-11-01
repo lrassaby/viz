@@ -24,7 +24,7 @@ public class Edge {
     public void draw() {
         strokeWeight(weight/30);
         if (selected) {
-            stroke(3, 70, 127, 150);
+            stroke(5, 185, 119, 150);
         } else {
             stroke(83, 176, 255, 150);
         }

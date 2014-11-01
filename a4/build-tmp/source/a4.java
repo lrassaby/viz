@@ -116,6 +116,7 @@ public class Controller {
     this.network = network;
     this.temporal = temporal;
     processTable();
+    unselect();
   }
 
   public void draw() {
@@ -123,9 +124,18 @@ public class Controller {
     temporal.draw();
     line(0, height - 200, width, height - 200);
     line(width - 300, 0, width - 300, height - 200);
+    unselect();
   }
 
-
+  public void unselect() {
+    for (Edge e : edges) {
+      e.selected = false; 
+    }
+    for (Object key: nodes.keySet()) {
+      Node n = (Node)(nodes.get(key));
+      n.selected = false;
+    } 
+  }
   
   private void processTable() {
     ArrayList<String> ips = new ArrayList();
@@ -235,7 +245,7 @@ public class Edge {
     public void draw() {
         strokeWeight(weight/30);
         if (selected) {
-            stroke(3, 70, 127, 150);
+            stroke(5, 185, 119, 150);
         } else {
             stroke(83, 176, 255, 150);
         }
@@ -270,7 +280,7 @@ public class Edge {
 }
 public class Network {
   public ArrayList<Edge> edges;
-  private HashMap nodes;
+  public HashMap nodes;
   private final float margin_r = 300;
   private final float margin_b = 200;
   private final float margin = 20;
@@ -335,16 +345,22 @@ public class Node {
 	public float x, y;
     private float radius;
     public ArrayList<Edge> edges;
+    public Boolean selected; 
 
 	public Node(String id) {
         this.id = id;
         radius = 10;
         edges = new ArrayList();
+        selected = false;
     }
 
 	public void draw() {
         strokeWeight(1);
-        fill(5, 112, 204, 255);
+        if (selected) {
+            fill(13, 134, 90, 255);
+        } else {
+            fill(5, 112, 204, 255);
+        }
         stroke(0);
 		ellipse(x, y, radius * 2, radius * 2);
 	}
@@ -394,8 +410,8 @@ class Selection {
     public void draw() {
         if (selection_mode) {
             strokeWeight(1);
-            stroke(0, 120, 180, 180);
-            fill(0, 120, 180, 80);
+            stroke(1, 57, 37, 180);
+            fill(96, 185, 153, 50);
             rect(x_start, y_start, x_end - x_start, y_end - y_start);
         }
     }
@@ -407,10 +423,23 @@ class Selection {
         fixed = false;
     }
     public void modifyViews() {
-        
+        if (selection_mode) {
+            for (Object key : network.nodes.keySet()) {
+                Node n = (Node)(network.nodes.get(key));
+                n.selected = pointSelected(n.x, n.y);
+                for (Edge e : n.edges) {
+                    e.selected = e.selected || n.selected;
+                }
+            } 
+        }
     }
-    private Boolean checkIntersection() {
-        return true;
+    private Boolean pointSelected(float x, float y) {
+        float topleft_x = min(x_start, x_end);
+        float topleft_y = min(y_start, y_end);
+        float bottomright_x = max(x_start, x_end);
+        float bottomright_y = max(y_start, y_end);
+        return x > topleft_x && x < bottomright_x 
+            && y > topleft_y && y < bottomright_y;
     }
 };
 public class Temporal {

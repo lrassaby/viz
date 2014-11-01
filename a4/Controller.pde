@@ -14,6 +14,7 @@ public class Controller {
     this.network = network;
     this.temporal = temporal;
     processTable();
+    unselect();
   }
 
   public void draw() {
@@ -21,9 +22,18 @@ public class Controller {
     temporal.draw();
     line(0, height - 200, width, height - 200);
     line(width - 300, 0, width - 300, height - 200);
+    unselect();
   }
 
-
+  public void unselect() {
+    for (Edge e : edges) {
+      e.selected = false; 
+    }
+    for (Object key: nodes.keySet()) {
+      Node n = (Node)(nodes.get(key));
+      n.selected = false;
+    } 
+  }
   
   private void processTable() {
     ArrayList<String> ips = new ArrayList();

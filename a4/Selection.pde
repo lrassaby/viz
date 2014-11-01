@@ -35,8 +35,8 @@ class Selection {
     public void draw() {
         if (selection_mode) {
             strokeWeight(1);
-            stroke(0, 120, 180, 180);
-            fill(0, 120, 180, 80);
+            stroke(1, 57, 37, 180);
+            fill(96, 185, 153, 50);
             rect(x_start, y_start, x_end - x_start, y_end - y_start);
         }
     }
@@ -48,9 +48,22 @@ class Selection {
         fixed = false;
     }
     public void modifyViews() {
-        
+        if (selection_mode) {
+            for (Object key : network.nodes.keySet()) {
+                Node n = (Node)(network.nodes.get(key));
+                n.selected = pointSelected(n.x, n.y);
+                for (Edge e : n.edges) {
+                    e.selected = e.selected || n.selected;
+                }
+            } 
+        }
     }
-    private Boolean checkIntersection() {
-        return true;
+    private Boolean pointSelected(float x, float y) {
+        float topleft_x = min(x_start, x_end);
+        float topleft_y = min(y_start, y_end);
+        float bottomright_x = max(x_start, x_end);
+        float bottomright_y = max(y_start, y_end);
+        return x > topleft_x && x < bottomright_x 
+            && y > topleft_y && y < bottomright_y;
     }
 };
