@@ -120,13 +120,18 @@ public class Controller {
       String IP = table.getString(i, "Source IP");
       String IP2 = table.getString(i, "Destination IP");
       if (!edges_map.containsKey(IP+IP2)) {
-        edges_map.put(IP+IP2, new Edge(table.getRow(i)));
+        Edge ed = new Edge(table.getRow(i));
+        edges_map.put(IP+IP2, ed);
         if (!nodes.containsKey(IP)) {
           nodes.put(IP, new Node(IP));
         }
         if (!nodes.containsKey(IP2)) {
           nodes.put(IP2, new Node(IP2));
         }
+        Node n = (Node)(nodes.get(IP));
+        n.add_edge(ed);
+        n = (Node)(nodes.get(IP2));
+        n.add_edge(ed);
       }
       else {
         Edge e = (Edge)(edges_map.get(IP+IP2));
@@ -304,10 +309,12 @@ public class Node {
 	private String id;
 	public float x, y;
     private float radius;
+    public ArrayList<Edge> edges;
 
 	public Node(String id) {
         this.id = id;
         radius = 4;
+        edges = new ArrayList();
     }
 
 	public void draw() {
@@ -315,6 +322,10 @@ public class Node {
         fill(200, 60, 60);
         stroke(100, 30, 30);
 		ellipse(x, y, radius * 2, radius * 2);
+	}
+
+	public void add_edge(Edge edge) {
+		edges.add(edge);
 	}
 
 	public boolean intersect() {
