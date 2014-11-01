@@ -8,10 +8,10 @@ public class Network {
   }
 
   public void draw() {
-  	for (Edge e : edges) {
-  		e.draw();
-  	}
     resize();
+    for (Edge e : edges) {
+      e.draw();
+    }
     for (Object key: nodes.keySet()) {
       Node n = (Node)(nodes.get(key));
       n.draw();
