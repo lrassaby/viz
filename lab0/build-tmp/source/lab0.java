@@ -140,8 +140,7 @@ class Button {
   public int getColor() {return c;}
   public float getRoundness() {return roundness;}
   public String getText() {return text;}
-}
-
+};
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "lab0" };
     if (passedArgs != null) {

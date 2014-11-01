@@ -26,9 +26,9 @@ public void setup() {
 
     String filename = null;
     try { 
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     } catch (Exception e) { 
-    e.printStackTrace();
+        e.printStackTrace();
     } 
 
     try {
@@ -153,7 +153,7 @@ public class Node {
     }
 
 	public float coulombForce(Node node) {
-        float force = (COULOMB_MULTIPLE + (node.mass * this.mass))/2 / pow(distance(node), 2);
+        float force = COULOMB_MULTIPLE / pow(distance(node), 2);
         if (force != force) { // NaN
             force = 0;
         }

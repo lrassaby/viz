@@ -8,9 +8,9 @@ void setup() {
 
     String filename = null;
     try { 
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     } catch (Exception e) { 
-    e.printStackTrace();
+        e.printStackTrace();
     } 
 
     try {
