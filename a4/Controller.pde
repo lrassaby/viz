@@ -2,11 +2,26 @@ public class Controller {
   private Table table;
   private ArrayList<Edge> edges;
   private ArrayList<Box> boxes;
+  private HashMap nodes;
+  private Network network;
+  private Temporal temporal;
 
-  public Controller(String filename) {
+  public Controller(String filename, Network network, Temporal temporal) {
     table = loadTable(filename, "header");
+    nodes = new HashMap();
+    edges = new ArrayList();
+    boxes = new ArrayList();
+    this.network = network;
+    this.temporal = temporal;
     processTable();
   }
+
+  public void draw() {
+    network.draw();
+    temporal.draw();
+  }
+
+
   
   private void processTable() {
     ArrayList<String> ips = new ArrayList();
@@ -19,6 +34,12 @@ public class Controller {
       String IP2 = table.getString(i, "Destination IP");
       if (!edges_map.containsKey(IP+IP2)) {
         edges_map.put(IP+IP2, new Edge(table.getRow(i)));
+        if (!nodes.containsKey(IP)) {
+          nodes.put(IP, new Node(IP));
+        }
+        if (!nodes.containsKey(IP2)) {
+          nodes.put(IP2, new Node(IP2));
+        }
       }
       else {
         Edge e = (Edge)(edges_map.get(IP+IP2));
@@ -40,7 +61,25 @@ public class Controller {
       b.map_edges(edges_map);
     }
 
-    println("EDGES: ");
+    for (Object key: edges_map.keySet()) {
+            Edge e = (Edge)edges_map.get(key);
+            edges.add(e);
+    } 
+    for (Object key: boxes_map.keySet()) {
+            Box b = (Box)boxes_map.get(key);
+            boxes.add(b);
+    } 
+    network.add_nodes(nodes);
+    network.add_edges(edges);
+  }
+}
+
+
+
+
+
+
+/*println("EDGES: ");
     for (Object key: edges_map.keySet()) {
             Edge e = (Edge)edges_map.get(key);
             println(e.source + ": " + e.dest + ", weight: " + e.weight);
@@ -60,6 +99,4 @@ public class Controller {
               println(e.source + ": " + e.dest);
             }
             println();
-    }
-  }
-}
+    }*/
