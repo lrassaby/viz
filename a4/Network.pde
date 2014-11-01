@@ -11,7 +11,7 @@ public class Network {
   	for (Edge e : edges) {
   		e.draw();
   	}
-    size_nodes();
+    resize();
     for (Object key: nodes.keySet()) {
       Node n = (Node)(nodes.get(key));
       n.draw();
@@ -20,22 +20,13 @@ public class Network {
 
   public void add_edges (ArrayList<Edge> edges) {
   	this.edges = edges;
-  	for (Edge e : edges) {
-  		Node s = (Node)(nodes.get(e.source));
-  		Node d = (Node)(nodes.get(e.dest));
-  		e.x1 = s.x;
-  		e.y1 = s.y;
-  		e.x2 = d.x;
-  		e.y2 = d.y;
-  	}
   }
 
   public void add_nodes (HashMap nodes) {
     this.nodes = nodes;
-    size_nodes();
   }
 
-  private void size_nodes () {
+  private void resize () {
     float center_x = width/2;
     float center_y = height/2;
     float margin = 20;
@@ -57,6 +48,14 @@ public class Network {
         serverangle += (2 * PI) / servercount;
       }
       count += 1;
+    }
+    for (Edge e : edges) {
+      Node s = (Node)(nodes.get(e.source));
+      Node d = (Node)(nodes.get(e.dest));
+      e.x1 = s.x;
+      e.y1 = s.y;
+      e.x2 = d.x;
+      e.y2 = d.y;
     }
   }
 }
