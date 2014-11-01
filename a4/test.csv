@@ -1,0 +1,1 @@
+Time,Source IP,Source port,Destination IP,Destination port,Syslog priority,Operation,Protocol1,1,4000-5000,2,2,Info,Built,TCP1,1,4000-5000,3,2,Info,Built,TCP2,3,4000-5000,2,3,Info,Built,TCP2,1,4000-5000,2,5,Info,Teardown,TCP3,2,4000-5000,3,4,Info,Built,TCP3,1,4000-5000,2,5,Info,Built,TCP
