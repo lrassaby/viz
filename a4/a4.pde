@@ -2,10 +2,11 @@ import javax.swing.*;
 Controller controller;
 Network network;
 Temporal temporal;
+Selection selection;
 
 void setup() {
     frame.setResizable(true);
-    size(800, 800);
+    size(900, 800);
     frameRate(60);
     String filename = null;
     try { 
@@ -27,9 +28,25 @@ void setup() {
     network = new Network();
     temporal = new Temporal();
     controller = new Controller(filename, network, temporal);
+    selection = new Selection(network, temporal);
 }
 
 void draw() {
   background(255, 255, 255);
+  if (mousePressed) {
+    selection.update();
+  }
+  selection.modifyViews();
   controller.draw();
+  selection.draw();
+}
+
+void mouseClicked() {
+  if (selection.active()) {
+    selection.disable();
+  }
+}
+
+void mouseReleased() {
+  selection.setFixed();
 }

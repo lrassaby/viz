@@ -5,6 +5,7 @@ public class Edge {
     public ArrayList<Box> boxes;
     public float weight;
     private float x1, y1, x2, y2;
+    public Boolean selected;
 
     public Edge(TableRow row) {
         weight = 0;
@@ -17,10 +18,16 @@ public class Edge {
         times = new HashMap();
         boxes = new ArrayList();
         times.put(t, t_map);
+        selected = false;
     }
 
     public void draw() {
-        //strokeWeight(weight);
+        strokeWeight(weight/30);
+        if (selected) {
+            stroke(150, 30, 150, 150);
+        } else {
+            stroke(0, 150, 150, 150);
+        }
         line(x1, y1, x2, y2);
     }
 
@@ -48,4 +55,5 @@ public class Edge {
         }
     }
 
+    // intersect function
 }

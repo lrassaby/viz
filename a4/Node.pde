@@ -5,13 +5,13 @@ public class Node {
 
 	public Node(String id) {
         this.id = id;
-        radius = 4;
+        radius = 10;
     }
 
 	public void draw() {
-        strokeWeight(2);
-        fill(200, 60, 60);
-        stroke(100, 30, 30);
+        strokeWeight(1);
+        fill(0, 150, 200);
+        stroke(0);
 		ellipse(x, y, radius * 2, radius * 2);
 	}
 

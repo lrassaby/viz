@@ -20,10 +20,11 @@ public class a4 extends PApplet {
 Controller controller;
 Network network;
 Temporal temporal;
+Selection selection;
 
 public void setup() {
     frame.setResizable(true);
-    size(800, 800);
+    size(900, 800);
     frameRate(60);
     String filename = null;
     try { 
@@ -45,11 +46,27 @@ public void setup() {
     network = new Network();
     temporal = new Temporal();
     controller = new Controller(filename, network, temporal);
+    selection = new Selection(network, temporal);
 }
 
 public void draw() {
   background(255, 255, 255);
+  if (mousePressed) {
+    selection.update();
+  }
+  selection.modifyViews();
   controller.draw();
+  selection.draw();
+}
+
+public void mouseClicked() {
+  if (selection.active()) {
+    selection.disable();
+  }
+}
+
+public void mouseReleased() {
+  selection.setFixed();
 }
 public class Box {
     public String time; 
@@ -105,7 +122,7 @@ public class Controller {
     network.draw();
     temporal.draw();
     line(0, height - 200, width, height - 200);
-    line(width - 200, 0, width - 200, height - 200);
+    line(width - 300, 0, width - 300, height - 200);
   }
 
 
@@ -194,6 +211,7 @@ public class Edge {
     public ArrayList<Box> boxes;
     public float weight;
     private float x1, y1, x2, y2;
+    public Boolean selected;
 
     public Edge(TableRow row) {
         weight = 0;
@@ -206,10 +224,16 @@ public class Edge {
         times = new HashMap();
         boxes = new ArrayList();
         times.put(t, t_map);
+        selected = false;
     }
 
     public void draw() {
-        //strokeWeight(weight);
+        strokeWeight(weight/30);
+        if (selected) {
+            stroke(150, 30, 150, 150);
+        } else {
+            stroke(0, 150, 150, 150);
+        }
         line(x1, y1, x2, y2);
     }
 
@@ -237,11 +261,12 @@ public class Edge {
         }
     }
 
+    // intersect function
 }
 public class Network {
-  private ArrayList<Edge> edges;
+  public ArrayList<Edge> edges;
   private HashMap nodes;
-  private final float margin_r = 200;
+  private final float margin_r = 300;
   private final float margin_b = 200;
   private final float margin = 20;
 
@@ -307,13 +332,13 @@ public class Node {
 
 	public Node(String id) {
         this.id = id;
-        radius = 4;
+        radius = 10;
     }
 
 	public void draw() {
-        strokeWeight(2);
-        fill(200, 60, 60);
-        stroke(100, 30, 30);
+        strokeWeight(1);
+        fill(0, 150, 200);
+        stroke(0);
 		ellipse(x, y, radius * 2, radius * 2);
 	}
 
@@ -321,6 +346,65 @@ public class Node {
         return (sqrt(pow((mouseX - this.x), 2) + pow((mouseY - this.y), 2)) < radius);
 	}
 }
+class Selection {
+    private Boolean selection_mode;
+    private Boolean fixed;
+    private Network network;
+    private Temporal temporal;
+    public float x_start, y_start, x_end, y_end;
+
+    Selection(Network network, Temporal temporal) {
+        x_start = y_start = x_end = y_end = 0;
+        this.network = network;
+        this.temporal = temporal;
+        disable();
+        fixed = true;
+    }
+    public void setFixed() {
+        fixed = true;
+    }
+    public void setMutable() {
+        fixed = false;
+    }
+    public Boolean active() {
+        return selection_mode;
+    }
+    public void update() {
+        if (!selection_mode) {
+            enable();
+            x_start = mouseX;
+            y_start = mouseY;
+        }
+        if (!fixed) {
+            x_end = mouseX;
+            y_end = mouseY;
+        }
+    }
+    public void draw() {
+        if (selection_mode) {
+            strokeWeight(1);
+            stroke(0, 120, 180, 180);
+            fill(0, 120, 180, 80);
+            rect(x_start, y_start, x_end - x_start, y_end - y_start);
+        }
+    }
+    public void disable() {
+        selection_mode = false;
+    }
+    public void enable() {
+        selection_mode = true;
+        fixed = false;
+    }
+    public void modifyViews() {
+        ArrayList<Edge> edges = network.edges;
+        for (Edge e : edges) {
+
+        }
+    }
+    private Boolean checkIntersection() {
+        return true;
+    }
+};
 public class Temporal {
   private ArrayList<Box> boxes;
 

@@ -1,7 +1,7 @@
 public class Network {
-  private ArrayList<Edge> edges;
+  public ArrayList<Edge> edges;
   private HashMap nodes;
-  private final float margin_r = 200;
+  private final float margin_r = 300;
   private final float margin_b = 200;
   private final float margin = 20;
 

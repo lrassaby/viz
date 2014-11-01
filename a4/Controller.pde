@@ -20,7 +20,7 @@ public class Controller {
     network.draw();
     temporal.draw();
     line(0, height - 200, width, height - 200);
-    line(width - 200, 0, width - 200, height - 200);
+    line(width - 300, 0, width - 300, height - 200);
   }
 
 
