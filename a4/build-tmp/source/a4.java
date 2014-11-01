@@ -23,15 +23,13 @@ Temporal temporal;
 
 public void setup() {
     frame.setResizable(true);
-    size(1000, 800);
+    size(800, 800);
     frameRate(60);
-    float [] net_canvas = {0, 0, 800, 600};
-    float [] temp_canvas = {0, 700, 800, 200};
     String filename = null;
     try { 
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     } catch (Exception e) { 
-    e.printStackTrace();
+      e.printStackTrace();
     } 
 
     try {
@@ -44,12 +42,13 @@ public void setup() {
       println("Process cancelled.");
       exit();
     }
-    network = new Network(net_canvas);
-    temporal = new Temporal(temp_canvas);
+    network = new Network();
+    temporal = new Temporal();
     controller = new Controller(filename, network, temporal);
 }
 
 public void draw() {
+  background(255, 255, 255);
   controller.draw();
 }
 public class Box {
@@ -105,6 +104,8 @@ public class Controller {
   public void draw() {
     network.draw();
     temporal.draw();
+    line(0, height - 200, width, height - 200);
+    line(width - 200, 0, width - 200, height - 200);
   }
 
 
@@ -240,10 +241,11 @@ public class Edge {
 public class Network {
   private ArrayList<Edge> edges;
   private HashMap nodes;
-  private float[] canvas;
+  private final float margin_r = 200;
+  private final float margin_b = 200;
+  private final float margin = 20;
 
-  public Network (float[] canvas) {
-  	this.canvas = canvas;
+  public Network () {
   }
 
   public void draw() {
@@ -266,10 +268,10 @@ public class Network {
   }
 
   private void resize () {
-    float center_x = width/2;
-    float center_y = height/2;
-    float margin = 20;
-    float radius = min(width, height)/2 - margin;
+    float center_x = (width - margin_r)/2;
+    float center_y = (height - margin_b)/2;
+    float radius_x = (width - margin_r)/2 - margin;
+    float radius_y = (height - margin_b)/2 - margin;
 
     float nodeangle = 0, serverangle = 0;
     int servercount = 2;
@@ -278,12 +280,12 @@ public class Network {
     for (Object key : nodes.keySet()) {
       Node n = (Node)(nodes.get(key));
       if (count != 9 && count != 17) {
-        n.x = center_x + cos(nodeangle) * radius;
-        n.y = center_y + sin(nodeangle) * radius;
+        n.x = center_x + cos(nodeangle) * radius_x;
+        n.y = center_y + sin(nodeangle) * radius_y;
         nodeangle += (2 * PI) / nodecount;
       } else {
-        n.x = center_x + cos(nodeangle) * radius/2;
-        n.y = center_y + sin(nodeangle) * radius/2;
+        n.x = center_x + cos(nodeangle) * min(radius_x, radius_y)/2;
+        n.y = center_y + sin(nodeangle) * min(radius_x, radius_y)/2;
         serverangle += (2 * PI) / servercount;
       }
       count += 1;
@@ -321,10 +323,8 @@ public class Node {
 }
 public class Temporal {
   private ArrayList<Box> boxes;
-  private float[] canvas;
 
-  public Temporal (float[] canvas) {
-  	this.canvas = canvas;
+  public Temporal () {
   }
   public void draw() {
 

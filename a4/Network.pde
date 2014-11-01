@@ -1,10 +1,11 @@
 public class Network {
   private ArrayList<Edge> edges;
   private HashMap nodes;
-  private float[] canvas;
+  private final float margin_r = 200;
+  private final float margin_b = 200;
+  private final float margin = 20;
 
-  public Network (float[] canvas) {
-  	this.canvas = canvas;
+  public Network () {
   }
 
   public void draw() {
@@ -27,10 +28,10 @@ public class Network {
   }
 
   private void resize () {
-    float center_x = width/2;
-    float center_y = height/2;
-    float margin = 20;
-    float radius = min(width, height)/2 - margin;
+    float center_x = (width - margin_r)/2;
+    float center_y = (height - margin_b)/2;
+    float radius_x = (width - margin_r)/2 - margin;
+    float radius_y = (height - margin_b)/2 - margin;
 
     float nodeangle = 0, serverangle = 0;
     int servercount = 2;
@@ -39,12 +40,12 @@ public class Network {
     for (Object key : nodes.keySet()) {
       Node n = (Node)(nodes.get(key));
       if (count != 9 && count != 17) {
-        n.x = center_x + cos(nodeangle) * radius;
-        n.y = center_y + sin(nodeangle) * radius;
+        n.x = center_x + cos(nodeangle) * radius_x;
+        n.y = center_y + sin(nodeangle) * radius_y;
         nodeangle += (2 * PI) / nodecount;
       } else {
-        n.x = center_x + cos(nodeangle) * radius/2;
-        n.y = center_y + sin(nodeangle) * radius/2;
+        n.x = center_x + cos(nodeangle) * min(radius_x, radius_y)/2;
+        n.y = center_y + sin(nodeangle) * min(radius_x, radius_y)/2;
         serverangle += (2 * PI) / servercount;
       }
       count += 1;

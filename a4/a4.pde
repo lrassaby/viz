@@ -5,15 +5,13 @@ Temporal temporal;
 
 void setup() {
     frame.setResizable(true);
-    size(1000, 800);
+    size(800, 800);
     frameRate(60);
-    float [] net_canvas = {0, 0, 800, 600};
-    float [] temp_canvas = {0, 700, 800, 200};
     String filename = null;
     try { 
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     } catch (Exception e) { 
-    e.printStackTrace();
+      e.printStackTrace();
     } 
 
     try {
@@ -26,11 +24,12 @@ void setup() {
       println("Process cancelled.");
       exit();
     }
-    network = new Network(net_canvas);
-    temporal = new Temporal(temp_canvas);
+    network = new Network();
+    temporal = new Temporal();
     controller = new Controller(filename, network, temporal);
 }
 
 void draw() {
+  background(255, 255, 255);
   controller.draw();
 }
