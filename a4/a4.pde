@@ -29,7 +29,6 @@ void setup() {
     network = new Network(net_canvas);
     temporal = new Temporal(temp_canvas);
     controller = new Controller(filename, network, temporal);
-
 }
 
 void draw() {
