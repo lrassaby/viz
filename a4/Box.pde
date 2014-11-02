@@ -4,7 +4,7 @@ public class Box {
     private ArrayList<Edge> edges;
     private float weight;
     public int index;
-    public final int margin_l = 50, margin_b = 10;
+    public final int margin_l = 50, margin_b = 20;
     public Boolean selected;
 
     public void draw() {
@@ -15,6 +15,7 @@ public class Box {
         h = (200 - margin_b)/8;
         x = col * w + margin_l;
         y = row * h + (height - 200);
+        stroke(150);
         if (weight > 0) {
             if (selected) {
                 fill(13, 134, 90, 60 + weight);
@@ -22,7 +23,7 @@ public class Box {
                 fill(5, 112, 204, 60 + weight);
             }
         } else {
-            fill(0);
+            fill(255);
         }
         rect(x, y, w, h);
     }
@@ -33,6 +34,12 @@ public class Box {
         this.time = row.getString("Time");
         this.port = row.getString("Destination port");
         edges = new ArrayList();
+    }
+
+    public Box(String time, String port) {
+        weight = 0;
+        this.time = time;
+        this.port = port;
     }
 
     public void add_weight() {

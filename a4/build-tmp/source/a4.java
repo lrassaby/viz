@@ -76,7 +76,7 @@ public class Box {
     private ArrayList<Edge> edges;
     private float weight;
     public int index;
-    public final int margin_l = 50, margin_b = 10;
+    public final int margin_l = 50, margin_b = 20;
     public Boolean selected;
 
     public void draw() {
@@ -87,6 +87,7 @@ public class Box {
         h = (200 - margin_b)/8;
         x = col * w + margin_l;
         y = row * h + (height - 200);
+        stroke(150);
         if (weight > 0) {
             if (selected) {
                 fill(13, 134, 90, 60 + weight);
@@ -94,7 +95,7 @@ public class Box {
                 fill(5, 112, 204, 60 + weight);
             }
         } else {
-            fill(0);
+            fill(255);
         }
         rect(x, y, w, h);
     }
@@ -105,6 +106,12 @@ public class Box {
         this.time = row.getString("Time");
         this.port = row.getString("Destination port");
         edges = new ArrayList();
+    }
+
+    public Box(String time, String port) {
+        weight = 0;
+        this.time = time;
+        this.port = port;
     }
 
     public void add_weight() {
@@ -183,6 +190,8 @@ public class Controller {
     ArrayList<String> ips = new ArrayList();
     HashMap edges_map = new HashMap();
     HashMap boxes_map = new HashMap();
+    ArrayList<String> ts = new ArrayList();
+    ArrayList<String> ps = new ArrayList();
     int i;
     //create edges list
     for (i = 0; i < table.getRowCount(); i++) {
@@ -217,10 +226,24 @@ public class Controller {
       if (!boxes_map.containsKey(t+port)) {
         boxes_map.put(t+port, new Box(table.getRow(i)));
       }
+      if (!ts.contains(t)) {
+        ts.add(t);
+      }
+      if (!ps.contains(port)) {
+        ps.add(port);
+      }
       Box b = (Box)(boxes_map.get(t+port));
       b.add_weight();  
       b.map_edges(edges_map);
     }
+
+    for (String t: ts) {
+        for (String p: ps) {
+          if (!boxes_map.containsKey(t+p)) {
+            boxes_map.put(t+p, new Box(t, p));
+          }
+        }
+    } 
 
     for (Object key: edges_map.keySet()) {
             Edge e = (Edge)edges_map.get(key);
@@ -232,10 +255,10 @@ public class Controller {
     } 
 
 
+
     Collections.sort(boxes, new BoxComparator());
     int index = 0;
     for (Box b : boxes) {
-      println("b.time: "+b.time);
       b.index = index++;
     }
     network.set_nodes(nodes);
