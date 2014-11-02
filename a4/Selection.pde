@@ -59,6 +59,12 @@ class Selection {
                     }
                 }
             } 
+            for (Box b : temporal.boxes) {
+                b.selected = pointSelected(b.x + b.w/2, b.y + b.h/2);
+                for (Edge e : b.edges) {
+                    e.selected = e.selected || b.selected;
+                }
+            }
         }
     }
     private Boolean pointSelected(float x, float y) {

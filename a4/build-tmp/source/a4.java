@@ -78,11 +78,10 @@ public class Box {
     public int index;
     public final int margin_l = 50, margin_b = 20;
     public Boolean selected;
+    public float x, y, w, h;
 
     public void draw() {
-
         int row = index % 8, col = index / 8;
-        float x, y, w, h;
         w = (width - margin_l)/31;
         h = (200 - margin_b)/8;
         x = col * w + margin_l;
@@ -112,6 +111,7 @@ public class Box {
         weight = 0;
         this.time = time;
         this.port = port;
+        edges = new ArrayList();
     }
 
     public void add_weight() {
@@ -184,6 +184,9 @@ public class Controller {
       Node n = (Node)(nodes.get(key));
       n.selected = false;
     } 
+    for (Box b : boxes) {
+      b.selected = false;
+    }
   }
   
   private void processTable() {
@@ -508,6 +511,12 @@ class Selection {
                     }
                 }
             } 
+            for (Box b : temporal.boxes) {
+                b.selected = pointSelected(b.x + b.w/2, b.y + b.h/2);
+                for (Edge e : b.edges) {
+                    e.selected = e.selected || b.selected;
+                }
+            }
         }
     }
     private Boolean pointSelected(float x, float y) {

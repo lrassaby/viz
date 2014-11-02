@@ -49,6 +49,9 @@ public class Controller {
       Node n = (Node)(nodes.get(key));
       n.selected = false;
     } 
+    for (Box b : boxes) {
+      b.selected = false;
+    }
   }
   
   private void processTable() {
