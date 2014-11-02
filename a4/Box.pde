@@ -3,6 +3,18 @@ public class Box {
     public String port;
     private ArrayList<Edge> edges;
     private float weight;
+    public int index;
+    public final int margin_l = 20, margin_b = 10;
+
+    public void draw() {
+        int row = index % 8, col = index / 8;
+        float x, y, w, h;
+        w = (width - margin_l)/31;
+        h = (200 - margin_b)/8;
+        x = col * w + margin_l;
+        y = row * h + (height - 200);
+        rect(x, y, w, h);
+    }
 
     public Box(TableRow row) {
         weight = 0;

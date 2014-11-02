@@ -7,7 +7,7 @@ public class Node {
 
 	public Node(String id) {
         this.id = id;
-        radius = 10;
+        radius = 15;
         edges = new ArrayList();
         selected = false;
     }

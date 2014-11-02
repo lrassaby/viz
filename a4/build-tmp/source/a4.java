@@ -4,6 +4,8 @@ import processing.event.*;
 import processing.opengl.*; 
 
 import javax.swing.*; 
+import java.util.Comparator; 
+import java.util.Collections; 
 
 import java.util.HashMap; 
 import java.util.ArrayList; 
@@ -73,6 +75,18 @@ public class Box {
     public String port;
     private ArrayList<Edge> edges;
     private float weight;
+    public int index;
+    public final int margin_l = 20, margin_b = 10;
+
+    public void draw() {
+        int row = index % 8, col = index / 8;
+        float x, y, w, h;
+        w = (width - margin_l)/31;
+        h = (200 - margin_b)/8;
+        x = col * w + margin_l;
+        y = row * h + (height - 200);
+        rect(x, y, w, h);
+    }
 
     public Box(TableRow row) {
         weight = 0;
@@ -100,6 +114,22 @@ public class Box {
         }
     }
 }
+
+
+
+public class BoxComparator implements Comparator<Box> {
+    @Override
+    public int compare(Box a, Box b) {
+        int time_comparator = a.time.compareTo(b.time);
+        if (time_comparator != 0) {
+          return time_comparator;
+        } else {
+          return a.port.compareTo(b.port);
+        }
+    }
+}
+
+
 public class Controller {
   private Table table;
   private ArrayList<Edge> edges;
@@ -188,8 +218,17 @@ public class Controller {
             Box b = (Box)boxes_map.get(key);
             boxes.add(b);
     } 
-    network.add_nodes(nodes);
-    network.add_edges(edges);
+
+
+    Collections.sort(boxes, new BoxComparator());
+    int index = 0;
+    for (Box b : boxes) {
+      println("b.time: "+b.time);
+      b.index = index++;
+    }
+    network.set_nodes(nodes);
+    network.set_edges(edges);
+    temporal.set_boxes(boxes);
   }
 }
 
@@ -243,7 +282,7 @@ public class Edge {
     }
 
     public void draw() {
-        strokeWeight(weight/30);
+        strokeWeight(weight/20);
         if (selected) {
             stroke(5, 185, 119, 150);
         } else {
@@ -299,11 +338,11 @@ public class Network {
     } 
   }
 
-  public void add_edges (ArrayList<Edge> edges) {
+  public void set_edges (ArrayList<Edge> edges) {
   	this.edges = edges;
   }
 
-  public void add_nodes (HashMap nodes) {
+  public void set_nodes (HashMap nodes) {
     this.nodes = nodes;
   }
 
@@ -349,7 +388,7 @@ public class Node {
 
 	public Node(String id) {
         this.id = id;
-        radius = 10;
+        radius = 15;
         edges = new ArrayList();
         selected = false;
     }
@@ -448,7 +487,14 @@ public class Temporal {
   public Temporal () {
   }
   public void draw() {
+    // labels
+    for (Box b : boxes) {
+        b.draw();
+    }
+  }
 
+  public void set_boxes(ArrayList<Box> boxes) {
+    this.boxes = boxes;
   }
 }
   static public void main(String[] passedArgs) {

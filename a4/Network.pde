@@ -19,11 +19,11 @@ public class Network {
     } 
   }
 
-  public void add_edges (ArrayList<Edge> edges) {
+  public void set_edges (ArrayList<Edge> edges) {
   	this.edges = edges;
   }
 
-  public void add_nodes (HashMap nodes) {
+  public void set_nodes (HashMap nodes) {
     this.nodes = nodes;
   }
 

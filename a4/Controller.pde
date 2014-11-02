@@ -1,3 +1,19 @@
+import java.util.Comparator;
+import java.util.Collections;
+
+public class BoxComparator implements Comparator<Box> {
+    @Override
+    public int compare(Box a, Box b) {
+        int time_comparator = a.time.compareTo(b.time);
+        if (time_comparator != 0) {
+          return time_comparator;
+        } else {
+          return a.port.compareTo(b.port);
+        }
+    }
+}
+
+
 public class Controller {
   private Table table;
   private ArrayList<Edge> edges;
@@ -86,8 +102,17 @@ public class Controller {
             Box b = (Box)boxes_map.get(key);
             boxes.add(b);
     } 
-    network.add_nodes(nodes);
-    network.add_edges(edges);
+
+
+    Collections.sort(boxes, new BoxComparator());
+    int index = 0;
+    for (Box b : boxes) {
+      println("b.time: "+b.time);
+      b.index = index++;
+    }
+    network.set_nodes(nodes);
+    network.set_edges(edges);
+    temporal.set_boxes(boxes);
   }
 }
 
