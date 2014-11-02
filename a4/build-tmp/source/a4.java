@@ -76,19 +76,31 @@ public class Box {
     private ArrayList<Edge> edges;
     private float weight;
     public int index;
-    public final int margin_l = 20, margin_b = 10;
+    public final int margin_l = 50, margin_b = 10;
+    public Boolean selected;
 
     public void draw() {
+
         int row = index % 8, col = index / 8;
         float x, y, w, h;
         w = (width - margin_l)/31;
         h = (200 - margin_b)/8;
         x = col * w + margin_l;
         y = row * h + (height - 200);
+        if (weight > 0) {
+            if (selected) {
+                fill(13, 134, 90, 60 + weight);
+            } else {
+                fill(5, 112, 204, 60 + weight);
+            }
+        } else {
+            fill(0);
+        }
         rect(x, y, w, h);
     }
 
     public Box(TableRow row) {
+        selected = false;
         weight = 0;
         this.time = row.getString("Time");
         this.port = row.getString("Destination port");

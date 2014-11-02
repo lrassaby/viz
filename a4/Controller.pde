@@ -107,7 +107,6 @@ public class Controller {
     Collections.sort(boxes, new BoxComparator());
     int index = 0;
     for (Box b : boxes) {
-      println("b.time: "+b.time);
       b.index = index++;
     }
     network.set_nodes(nodes);
