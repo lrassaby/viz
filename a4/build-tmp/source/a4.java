@@ -503,6 +503,9 @@ class Selection {
                 n.selected = pointSelected(n.x, n.y);
                 for (Edge e : n.edges) {
                     e.selected = e.selected || n.selected;
+                    for (Box b : e.boxes) {
+                        b.selected = e.selected;
+                    }
                 }
             } 
         }
