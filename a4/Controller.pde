@@ -55,6 +55,8 @@ public class Controller {
     ArrayList<String> ips = new ArrayList();
     HashMap edges_map = new HashMap();
     HashMap boxes_map = new HashMap();
+    ArrayList<String> ts = new ArrayList();
+    ArrayList<String> ps = new ArrayList();
     int i;
     //create edges list
     for (i = 0; i < table.getRowCount(); i++) {
@@ -89,10 +91,24 @@ public class Controller {
       if (!boxes_map.containsKey(t+port)) {
         boxes_map.put(t+port, new Box(table.getRow(i)));
       }
+      if (!ts.contains(t)) {
+        ts.add(t);
+      }
+      if (!ps.contains(port)) {
+        ps.add(port);
+      }
       Box b = (Box)(boxes_map.get(t+port));
       b.add_weight();  
       b.map_edges(edges_map);
     }
+
+    for (String t: ts) {
+        for (String p: ps) {
+          if (!boxes_map.containsKey(t+p)) {
+            boxes_map.put(t+p, new Box(t, p));
+          }
+        }
+    } 
 
     for (Object key: edges_map.keySet()) {
             Edge e = (Edge)edges_map.get(key);
@@ -102,6 +118,7 @@ public class Controller {
             Box b = (Box)boxes_map.get(key);
             boxes.add(b);
     } 
+
 
 
     Collections.sort(boxes, new BoxComparator());

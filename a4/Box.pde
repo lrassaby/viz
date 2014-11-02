@@ -23,6 +23,12 @@ public class Box {
         edges = new ArrayList();
     }
 
+    public Box(String time, String port) {
+        weight = 0;
+        this.time = time;
+        this.port = port;
+    }
+
     public void add_weight() {
         weight++;
     }
