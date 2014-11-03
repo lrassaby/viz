@@ -78,7 +78,7 @@ public class AxisChart {
     protected String[] categories;
     protected float maxY; // for single columned 
     protected float superMaxY; // for multi columned
-    protected int[] margins = {100, 150, 220, 100};
+    public int[] margins = {100, 150, 220, 100};
     protected Point origin, topyaxis, rightxaxis;
     public float[] intersections = {100000, 100000, 100000, 100000};
 
@@ -318,6 +318,9 @@ public class Categorical {
   }
 
   public void draw() {
+    op.margins[0] = width - 200;
+    protocol.margins[0] = width - 200;
+    info.margins[0] = width - 200;
     int selected[] = {0, 0};
     if (built_selected) {selected[0] = 1;}
     if (tear_selected) {selected[1] = 1;}
@@ -341,7 +344,7 @@ public class Categorical {
     newRow.setInt("TCP", tcp);
     newRow.setInt("UDP", udp);
     String cat[] = {"TCP", "UDP"};
-    int[] margins = {700, 50, 100, 650};
+    int[] margins = {width - 200, 50, 100, 650};
     protocol = new Barchart(table,cat, margins);
 
     Table table2 = new Table();
@@ -351,7 +354,7 @@ public class Categorical {
     newRow.setInt("Built", built);
     newRow.setInt("Teardown", tear);
     String cat2[] = {"Built", "Teardown"};
-    int[] margins2 = {700, 200, 100, 500};
+    int[] margins2 = {width - 200, 200, 100, 500};
     op = new Barchart(table2,cat2, margins2);
 
     Table table3 = new Table();
@@ -359,7 +362,7 @@ public class Categorical {
     newRow = table3.addRow();
     newRow.setInt("Info", 1);
     String cat3[] = {"Info"};
-    int[] margins3 = {700, 400, 100, 300};
+    int[] margins3 = {width - 200, 400, 100, 300};
     info = new Barchart(table3, cat3, margins3);
   }
 
