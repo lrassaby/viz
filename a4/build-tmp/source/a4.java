@@ -22,7 +22,9 @@ public class a4 extends PApplet {
 Controller controller;
 Network network;
 Temporal temporal;
+Categorical categorical;
 Selection selection;
+
 
 public void setup() {
     frame.setResizable(true);
@@ -47,8 +49,9 @@ public void setup() {
     }
     network = new Network();
     temporal = new Temporal();
-    controller = new Controller(filename, network, temporal);
-    selection = new Selection(network, temporal);
+    categorical = new Categorical();
+    controller = new Controller(filename, network, temporal, categorical);
+    selection = new Selection(network, temporal, categorical);
 }
 
 public void draw() {
@@ -70,9 +73,163 @@ public void mouseClicked() {
 public void mouseReleased() {
   selection.setFixed();
 }
+public class AxisChart {
+    protected Table data;
+    protected String[] categories;
+    protected float maxY; // for single columned 
+    protected float superMaxY; // for multi columned
+    protected int[] margins = {100, 150, 220, 100};
+    protected Point origin, topyaxis, rightxaxis;
+    public float[] intersections = {100000, 100000, 100000, 100000};
+
+    AxisChart (Table data, String[] categories, int[] margins) {
+        this.data = data;
+        this.categories = categories;
+        maxY = 0;
+        superMaxY = 0;
+        for (int i = 0; i < categories.length; i ++) {
+            int elemweight = data.getRow(0).getInt(categories[i]);
+            if (elemweight > maxY) {
+                maxY = elemweight;
+            }
+            /*int rowweight = 0;
+            for (int i = 1; i < categories.length; i++) {
+                rowweight += row.getInt(categories[i]);
+            }
+            if (rowweight > superMaxY) {
+                superMaxY = rowweight;
+            }*/
+        }
+        this.margins = margins;
+        origin = new Point(margins[0], height - margins[3]);
+        topyaxis = new Point(margins[0], margins[1]); 
+        rightxaxis = new Point(width - margins[2], height - margins[3]);
+    }
+
+ 
+    public void drawAxes(int c) {
+        strokeWeight(2);
+        stroke(c);
+        fill(c);
+        line(origin.x, origin.y, topyaxis.x, topyaxis.y - 15);
+        line(origin.x, origin.y, rightxaxis.x, rightxaxis.y);
+    }
+
+    protected void drawLabels(int c, float ratio) {
+        stroke(c);
+        fill(c);
+        textSize(16); 
+        textAlign(RIGHT, CENTER);
+        /* X labels */
+        // X-axis label
+        //makeText(categories[0], rightxaxis.x, rightxaxis.y + 70, 0);
+        // X value labels
+        textSize(12); 
+        int sectionWidth = abs(((rightxaxis.x - origin.x) / categories.length));
+        strokeWeight(sectionWidth * 0.8f);
+        strokeCap(SQUARE);
+        for (int i = 0; i < categories.length; i++) {
+            int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+            int y = origin.y + 10;
+            makeText(categories[i], x, y, -HALF_PI / 2);
+        }
+        /* Y labels */
+        // Y-axis label
+        /*textSize(16); 
+        makeText(categories[1], topyaxis.x - 60, topyaxis.y + 50, -HALF_PI);
+
+        // Y value labels
+        if (ratio < 100) {
+            textSize(12);
+        
+            int increment;
+            try {
+                increment = int(25/ratio);
+            } catch (Exception e) {
+                increment = 30;
+            }
+            if (increment < 1) {
+                increment = 1;
+            }
+
+            float max = float(origin.y - topyaxis.y) / ratio;
+            for (int i = 0; i <= max * 1.03; i+= increment) {
+                makeText(Integer.toString(i), origin.x - 10, int(-i * ratio + origin.y), 0);
+            }
+        }*/
+    }
+};
+public class Barchart extends AxisChart {
+    Barchart(Table data, String[] categories, int[] margins) {
+        super(data, categories, margins);
+    }
+
+    public void draw (float transition_completeness, int transition, int[] selected) {
+        origin.setXY(margins[0], height - margins[3]);
+        topyaxis.setXY(margins[0], margins[1]);
+        rightxaxis.setXY(width - margins[2], height - margins[3]);
+        float c = 0;
+        /*switch(transition) {
+            case 0:
+            case LINETOBAR:
+            case BARTOLINE:
+                c = 0;
+                break;
+            case BARTOPIE:
+            case PIETOBAR:
+                c = serp(255, 0, transition_completeness);
+                break;
+        }*/
+        int col = color(c, c, c);
+        drawAxes(col);
+        drawLabels(col, PApplet.parseFloat(origin.y - topyaxis.y) / maxY);
+        drawData(transition_completeness, transition, selected);
+    }
+
+
+    public void drawData (float transition_completeness, int transition, int[] selected) {
+        float ratio = PApplet.parseFloat(origin.y - topyaxis.y) / maxY;
+        int sectionWidth = abs(((rightxaxis.x - origin.x) / categories.length));
+        strokeWeight(serp(5, sectionWidth * 0.7f, transition_completeness));
+        stroke(5, 112, 204, 255);
+        strokeCap(SQUARE);
+
+        switch(transition) {
+            case 0:
+                for (int i = 0; i < categories.length; i++) {
+                    if (selected[i] == 1) {stroke(13, 134, 90, 255);}
+                    else {stroke(5, 112, 204, 255);}
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
+                    int y = origin.y - PApplet.parseInt(data.getRow(0).getInt(categories[i]) * ratio);
+                    line(x, origin.y, x, y);
+                    intersections[2*i] = x;
+                    intersections[2*i + 1] = y;
+                }
+                break;
+            /*case LINETOBAR:
+            case BARTOLINE:
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                    int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
+                    line(x, serp(y, origin.y, transition_completeness), x, y);
+                }
+                break;
+            case BARTOPIE:
+            case PIETOBAR:
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
+                    int y = origin.y - int(data.getRow(i).getInt(categories[1]) * ratio);
+                    line(x, origin.y, x, y);
+                }
+                break;*/
+        }
+        
+    }   
+};
 public class Box {
     public String time; 
     public String port;
+    public String op, protocol;
     private ArrayList<Edge> edges;
     private float weight;
     public int index;
@@ -104,6 +261,8 @@ public class Box {
         weight = 0;
         this.time = row.getString("Time");
         this.port = row.getString("Destination port");
+        this.op = row.getString("Operation");
+        this.protocol = row.getString("Protocol");
         edges = new ArrayList();
     }
 
@@ -111,6 +270,8 @@ public class Box {
         weight = 0;
         this.time = time;
         this.port = port;
+        this.op = "";
+        this.protocol = "";
         edges = new ArrayList();
     }
 
@@ -133,6 +294,107 @@ public class Box {
         }
     }
 }
+public class Categorical {
+  private int tear, built, udp, tcp;
+  private Barchart info, op, protocol;
+  private ArrayList<Edge> built_edges, tear_edges, tcp_edges, udp_edges;
+  private ArrayList<Box> built_boxes, tear_boxes, tcp_boxes, udp_boxes;
+  public Boolean built_selected, tear_selected, tcp_selected, udp_selected, info_selected;
+
+  public Categorical() {
+    built_edges = new ArrayList<Edge>();
+    tear_edges = new ArrayList<Edge>();
+    tcp_edges = new ArrayList<Edge>();
+    udp_edges = new ArrayList<Edge>();
+    built_boxes = new ArrayList<Box>();
+    tear_boxes = new ArrayList<Box>();
+    tcp_boxes = new ArrayList<Box>();
+    udp_boxes = new ArrayList<Box>();
+    built_selected = false;
+    tear_selected = false;
+    tcp_selected = false;
+    udp_selected = false;
+    info_selected = false;
+  }
+
+  public void draw() {
+    int selected[] = {0, 0};
+    if (built_selected) {selected[0] = 1;}
+    if (tear_selected) {selected[1] = 1;}
+    op.draw(1, 0, selected);
+    if (tcp_selected) {selected[0] = 1;} else {selected[0] = 0;}
+    if (udp_selected) {selected[1] = 1;} else {selected[1] = 0;}
+    protocol.draw(1, 0, selected);
+    if (info_selected) {selected[0] = 1;} else {selected[0] = 0;}
+    info.draw(1, 0, selected);
+  }
+
+  public void set_data(int tear, int built, int tcp, int udp) {
+    this.tear = tear;
+    this.built = built;
+    this.udp = udp;
+    this.tcp = tcp;
+    Table table = new Table();
+    table.addColumn("TCP");
+    table.addColumn("UDP");
+    TableRow newRow = table.addRow();
+    newRow.setInt("TCP", tcp);
+    newRow.setInt("UDP", udp);
+    String cat[] = {"TCP", "UDP"};
+    int[] margins = {700, 50, 100, 650};
+    protocol = new Barchart(table,cat, margins);
+
+    Table table2 = new Table();
+    table2.addColumn("Built");
+    table2.addColumn("Teardown");
+    newRow = table2.addRow();
+    newRow.setInt("Built", built);
+    newRow.setInt("Teardown", tear);
+    String cat2[] = {"Built", "Teardown"};
+    int[] margins2 = {700, 200, 100, 500};
+    op = new Barchart(table2,cat2, margins2);
+
+    Table table3 = new Table();
+    table3.addColumn("Info");
+    newRow = table3.addRow();
+    newRow.setInt("Info", 1);
+    String cat3[] = {"Info"};
+    int[] margins3 = {700, 400, 100, 300};
+    info = new Barchart(table3, cat3, margins3);
+  }
+
+  public void set_edges(HashMap edges) {
+    for (Object key: edges.keySet()) {
+        Edge e = (Edge)edges.get(key);
+        if(e.op.equals("Built")) {
+            built_edges.add(e);
+        } else {
+            tear_edges.add(e);
+        }
+        if (e.protocol.equals("TCP")) {
+            tcp_edges.add(e);
+        } else {
+            udp_edges.add(e);
+        }
+    }
+  }
+
+  public void set_boxes(HashMap boxes) {
+    for (Object key: boxes.keySet()) {
+        Box b = (Box)boxes.get(key);
+        if(b.op.equals("Built")) {
+            built_boxes.add(b);
+        } else {
+            tear_boxes.add(b);
+        }
+        if (b.protocol.equals("TCP")) {
+            tcp_boxes.add(b);
+        } else {
+            udp_boxes.add(b);
+        }
+    }
+  }
+}
 
 
 
@@ -153,17 +415,20 @@ public class Controller {
   private Table table;
   private ArrayList<Edge> edges;
   private ArrayList<Box> boxes;
+  private int built, tear, tcp, udp = 0;
   private HashMap nodes;
   private Network network;
   private Temporal temporal;
+  private Categorical categorical;
 
-  public Controller(String filename, Network network, Temporal temporal) {
+  public Controller(String filename, Network network, Temporal temporal, Categorical categorical) {
     table = loadTable(filename, "header");
     nodes = new HashMap();
     edges = new ArrayList();
     boxes = new ArrayList();
     this.network = network;
     this.temporal = temporal;
+    this.categorical = categorical;
     processTable();
     unselect();
   }
@@ -171,6 +436,8 @@ public class Controller {
   public void draw() {
     network.draw();
     temporal.draw();
+    categorical.draw();
+    strokeWeight(1);
     line(0, height - 200, width, height - 200);
     line(width - 300, 0, width - 300, height - 200);
     unselect();
@@ -200,7 +467,7 @@ public class Controller {
     for (i = 0; i < table.getRowCount(); i++) {
       String IP = table.getString(i, "Source IP");
       String IP2 = table.getString(i, "Destination IP");
-      if (!edges_map.containsKey(IP+IP2)) {
+      if (!(edges_map.containsKey(IP+IP2) || edges_map.containsKey(IP2+IP))) {
         Edge ed = new Edge(table.getRow(i));
         edges_map.put(IP+IP2, ed);
         if (!nodes.containsKey(IP)) {
@@ -215,10 +482,20 @@ public class Controller {
         n.add_edge(ed);
       }
       else {
-        Edge e = (Edge)(edges_map.get(IP+IP2));
+        Edge e = null;
+        if (edges_map.containsKey(IP+IP2)) {
+          e = (Edge)(edges_map.get(IP+IP2));
+        } else {
+          e = (Edge)(edges_map.get(IP2+IP));
+        }
         e.update(table.getRow(i));
       }
-      Edge e = (Edge)(edges_map.get(IP+IP2));
+      Edge e = null;
+      if (edges_map.containsKey(IP+IP2)) {
+          e = (Edge)(edges_map.get(IP+IP2));
+        } else {
+          e = (Edge)(edges_map.get(IP2+IP));
+      }
       e.add_weight();
     }
 
@@ -239,6 +516,26 @@ public class Controller {
       b.add_weight();  
       b.map_edges(edges_map);
     }
+
+    //count categorical stuff
+    for (i = 0; i < table.getRowCount(); i++) {
+      String op = table.getString(i, "Operation");
+      String protocol = table.getString(i, "Protocol");
+      if (op.equals("Built")) {
+        built ++;
+      } else {
+        tear ++;
+      }
+      if (protocol.equals("TCP")) {
+        tcp ++;
+      } else {
+        udp ++;
+      }
+    }
+
+    categorical.set_data(tear, built, tcp, udp);
+    categorical.set_edges(edges_map);
+    categorical.set_boxes(boxes_map);
 
     for (String t: ts) {
         for (String p: ps) {
@@ -296,11 +593,118 @@ public class Controller {
             }
             println();
     }*/
+
+
+public class Point {
+    int x, y;
+    String disp;
+    Point() {
+        this.x = 0;
+        this.y = 0;
+    }
+    Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    public void setXY(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    public void setDisp(String disp) {
+        this.disp = disp;
+    }
+};
+
+public class Dimensions {
+    int w, h;
+    Dimensions(int w, int h) {
+        this.w = w;
+        this.h = h;
+    }
+    public void setWH(int w, int h) {
+        this.w = w;
+        this.h = h;
+    }
+};
+
+public class Line {
+    Point start, end;
+    String disp;
+    Line(Point start, Point end) {
+        this.start = start;
+        this.end = end;
+    }
+    public void draw() {
+        
+    }
+    public void setPoints(Point start, Point end) {
+        this.start = start;
+        this.end = end;
+    }
+};
+
+public class Color {
+    int r, g, b;
+    Color(int r, int g, int b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+    public void setRGB(int r, int g, int b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+};
+
+public class Rect {
+    float d_short, d_long;
+    String name;
+
+    Rect(float d_short, float d_long, String name) {
+        this.d_short = d_short;
+        this.d_long = d_long;
+        this.name = name;
+    }
+    // value between 0 and 1, where closer to 1 is more square
+    public float getAspectRatio() {
+        float aspect_ratio = d_short / d_long;
+        if (aspect_ratio > 1) {
+            aspect_ratio = 1 / aspect_ratio;
+        }
+        return aspect_ratio;
+    }
+
+    public float size() {
+        return d_short * d_long;
+    }
+
+};
+
+public class Canvas {
+  float x, y, w, h;
+  Canvas(float x, float y, float w, float h) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+  }
+  public float size() {
+    return w * h;
+  }
+  public float getShortSide() {
+    return w <= h ? w : h;
+  }
+  public float getLongSide() {
+    return w <= h ? h : w;
+  }
+};
 public class Edge {
     public String source; 
     public String dest;    //dest ip
     public HashMap times;
     public ArrayList<Box> boxes;
+    public String op, protocol;
     public float weight;
     private float x1, y1, x2, y2;
     public Boolean selected;
@@ -309,6 +713,8 @@ public class Edge {
         weight = 0;
         this.source = row.getString("Source IP");
         this.dest = row.getString("Destination IP");
+        this.op = row.getString("Operation");
+        this.protocol = row.getString("Protocol");
         String t = row.getString("Time");
         String p = row.getString("Destination port");
         HashMap t_map = new HashMap();
@@ -455,12 +861,14 @@ class Selection {
     private Boolean fixed;
     private Network network;
     private Temporal temporal;
+    private Categorical categorical;
     public float x_start, y_start, x_end, y_end;
 
-    Selection(Network network, Temporal temporal) {
+    Selection(Network network, Temporal temporal, Categorical categorical) {
         x_start = y_start = x_end = y_end = 0;
         this.network = network;
         this.temporal = temporal;
+        this.categorical = categorical;
         disable();
         fixed = true;
     }
@@ -501,22 +909,127 @@ class Selection {
     }
     public void modifyViews() {
         if (selection_mode) {
+            categorical.built_selected = pointSelected(categorical.op.intersections[0],categorical.op.intersections[1]);
+            if (pointSelected(categorical.op.intersections[0],categorical.op.intersections[1])) {
+                for (Edge e : network.edges) {
+                        if (e.op.equals("Built")) {
+                            e.selected = categorical.built_selected;
+                        }
+                }
+                for (Box b : temporal.boxes) {
+                        if (b.op.equals("Built")) {
+                            b.selected = categorical.built_selected;
+                        }
+                }
+            }
+
+            categorical.tear_selected = pointSelected(categorical.op.intersections[2],categorical.op.intersections[3]);
+            if (pointSelected(categorical.op.intersections[2],categorical.op.intersections[3])) {
+                for (Edge e : network.edges) {
+                        if (e.op.equals("Teardown")) {
+                            e.selected = categorical.tear_selected;
+                        }
+                }
+                for (Box b : temporal.boxes) {
+                        if (b.op.equals("Teardown")) {
+                            b.selected = categorical.tear_selected;
+                        }
+                }
+            }
+
+            categorical.tcp_selected = pointSelected(categorical.protocol.intersections[0],categorical.protocol.intersections[1]);
+            if (pointSelected(categorical.protocol.intersections[0],categorical.protocol.intersections[1])) {
+                for (Edge e : network.edges) {
+                        if (e.protocol.equals("TCP")) {
+                            e.selected = categorical.tcp_selected;
+                        }
+                }
+                for (Box b : temporal.boxes) {
+                        if (b.protocol.equals("TCP")) {
+                            b.selected = categorical.tcp_selected;
+                        }
+                }
+            }
+
+            categorical.udp_selected = pointSelected(categorical.protocol.intersections[2],categorical.protocol.intersections[3]);
+            if (pointSelected(categorical.protocol.intersections[2],categorical.protocol.intersections[3])) {
+                for (Edge e : network.edges) {
+                        if (e.protocol.equals("UDP")) {
+                            e.selected = categorical.udp_selected;
+                        }
+                }
+                for (Box b : temporal.boxes) {
+                        if (b.protocol.equals("UDP")) {
+                            b.selected = categorical.udp_selected;
+                        }
+                }
+            }
+            categorical.info_selected = pointSelected(categorical.info.intersections[0],categorical.info.intersections[1]);
+            if (pointSelected(categorical.info.intersections[0],categorical.info.intersections[1])) {
+                for (Edge e : network.edges) {
+                        e.selected = true;
+                }
+                for (Box b : temporal.boxes) {
+                        b.selected = true;
+                }
+            }
+
             for (Object key : network.nodes.keySet()) {
                 Node n = (Node)(network.nodes.get(key));
                 n.selected = pointSelected(n.x, n.y);
-                for (Edge e : n.edges) {
-                    e.selected = e.selected || n.selected;
-                    for (Box b : e.boxes) {
-                        b.selected = e.selected;
+                
+                if (pointSelected(n.x, n.y)) {
+                    for (Edge e : n.edges) {
+                        e.selected = e.selected || n.selected;
+                        for (Box b : e.boxes) {
+                            b.selected = e.selected;
+                        }
                     }
-                }
+                    for (Edge e : n.edges) {
+                        if (e.op.equals("Built")) {
+                            categorical.built_selected = e.selected;
+                        } else {
+                            categorical.tear_selected = e.selected;
+                        }
+                        if (e.protocol.equals("TCP")) {
+                            categorical.tcp_selected = e.selected;
+                        } else {
+                            categorical.udp_selected = e.selected;
+                        }
+                        categorical.info_selected = e.selected;
+                    }
+                } /*else {
+                    
+                }*/
             } 
             for (Box b : temporal.boxes) {
-                b.selected = pointSelected(b.x + b.w/2, b.y + b.h/2);
-                for (Edge e : b.edges) {
-                    e.selected = e.selected || b.selected;
+                b.selected = b.selected || pointSelected(b.x + b.w/2, b.y + b.h/2);
+
+                
+                if (pointSelected(b.x + b.w/2, b.y + b.h/2)) {
+                    for (Edge e : b.edges) {
+                        e.selected = e.selected || b.selected;
+                    }
+                    if (!b.op.equals("")) {
+                        if (b.op.equals("Built")) {
+                                categorical.built_selected = b.selected || categorical.built_selected;
+                        } else {
+                                categorical.tear_selected = b.selected || categorical.tear_selected;
+                        } 
+                        if (b.protocol.equals("TCP")) {
+                                categorical.tcp_selected = b.selected || categorical.tcp_selected;
+                        } else {
+                                categorical.udp_selected = b.selected || categorical.udp_selected;
+                        }
+                        categorical.info_selected = b.selected ||categorical.info_selected;
+                    }
                 }
             }
+            /*categorical.built_selected = pointSelected(categorical.op.intersections[0],categorical.op.intersections[1]) || categorical.built_selected;
+            categorical.tear_selected = pointSelected(categorical.op.intersections[2],categorical.op.intersections[3]) || categorical.tear_selected ;
+            categorical.tcp_selected = pointSelected(categorical.protocol.intersections[0],categorical.protocol.intersections[1]) || categorical.tcp_selected ;
+            categorical.udp_selected = pointSelected(categorical.protocol.intersections[2],categorical.protocol.intersections[3]) || categorical.udp_selected ;
+            categorical.info_selected = pointSelected(categorical.info.intersections[0],categorical.info.intersections[1]) || categorical.info_selected ;*/
         }
     }
     private Boolean pointSelected(float x, float y) {
@@ -544,6 +1057,60 @@ public class Temporal {
     this.boxes = boxes;
   }
 }
+public void makeText(String str, int x, int y, float rotation) {      
+    if (rotation != 0) {
+        pushMatrix();
+        translate(x, y);
+        rotate(rotation);
+        translate(-x, -y);
+        text(str, x, y);
+        popMatrix();
+    } else {
+        text(str, x, y);
+    }
+}
+
+public void drawCircle(int x, int y, float diameter) {
+    ellipse(x, y, diameter, diameter);
+}
+
+public final float serp(float x, float y, float completeness) {
+    float sinvalue = sin(completeness * HALF_PI);
+    return y * sinvalue + x * (1-sinvalue);
+}
+
+// see http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
+public class ColorGenerator {
+    private float golden_ratio_conjugate = 0.618033988749895f;
+    private float h = 0.5f;
+    public int generate() {
+        h += golden_ratio_conjugate;
+        h %= 1;
+        return hsvToRGB(h, 0.60f, 0.90f);
+    }
+    public int hsvToRGB (float h, float s, float v) {
+        float h_i = PApplet.parseInt(h*6);
+        float f = h*6 - h_i;
+        float p = v * (1 - s);
+        float q = v * (1 - f*s);
+        float t = v * (1 - (1 - f) * s);
+        int c = color(0, 0, 0);
+        if (h_i == 0) {
+            c = color(PApplet.parseInt(v * 256), PApplet.parseInt(t * 256), PApplet.parseInt(p * 256));
+        } else if (h_i == 1) {
+            c = color(PApplet.parseInt(q * 256), PApplet.parseInt(v * 256), PApplet.parseInt(p * 256));
+        } else if (h_i == 2) {
+            c = color(PApplet.parseInt(p * 256), PApplet.parseInt(v * 256), PApplet.parseInt(t * 256));
+        } else if (h_i == 3) {
+            c = color(PApplet.parseInt(p * 256), PApplet.parseInt(q * 256), PApplet.parseInt(v * 256));
+        } else if (h_i == 4) {
+            c = color(PApplet.parseInt(t * 256), PApplet.parseInt(p * 256), PApplet.parseInt(v * 256));
+        } else if (h_i == 5) {
+            c = color(PApplet.parseInt(v * 256), PApplet.parseInt(p * 256), PApplet.parseInt(q * 256));
+        }
+        return c;
+    }
+};
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "a4" };
     if (passedArgs != null) {

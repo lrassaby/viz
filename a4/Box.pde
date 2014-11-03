@@ -1,6 +1,7 @@
 public class Box {
     public String time; 
     public String port;
+    public String op, protocol;
     private ArrayList<Edge> edges;
     private float weight;
     public int index;
@@ -32,6 +33,8 @@ public class Box {
         weight = 0;
         this.time = row.getString("Time");
         this.port = row.getString("Destination port");
+        this.op = row.getString("Operation");
+        this.protocol = row.getString("Protocol");
         edges = new ArrayList();
     }
 
@@ -39,6 +42,8 @@ public class Box {
         weight = 0;
         this.time = time;
         this.port = port;
+        this.op = "";
+        this.protocol = "";
         edges = new ArrayList();
     }
 

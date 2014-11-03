@@ -2,7 +2,9 @@ import javax.swing.*;
 Controller controller;
 Network network;
 Temporal temporal;
+Categorical categorical;
 Selection selection;
+
 
 void setup() {
     frame.setResizable(true);
@@ -27,8 +29,9 @@ void setup() {
     }
     network = new Network();
     temporal = new Temporal();
-    controller = new Controller(filename, network, temporal);
-    selection = new Selection(network, temporal);
+    categorical = new Categorical();
+    controller = new Controller(filename, network, temporal, categorical);
+    selection = new Selection(network, temporal, categorical);
 }
 
 void draw() {

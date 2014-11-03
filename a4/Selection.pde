@@ -3,12 +3,14 @@ class Selection {
     private Boolean fixed;
     private Network network;
     private Temporal temporal;
+    private Categorical categorical;
     public float x_start, y_start, x_end, y_end;
 
-    Selection(Network network, Temporal temporal) {
+    Selection(Network network, Temporal temporal, Categorical categorical) {
         x_start = y_start = x_end = y_end = 0;
         this.network = network;
         this.temporal = temporal;
+        this.categorical = categorical;
         disable();
         fixed = true;
     }
@@ -49,22 +51,127 @@ class Selection {
     }
     public void modifyViews() {
         if (selection_mode) {
+            categorical.built_selected = pointSelected(categorical.op.intersections[0],categorical.op.intersections[1]);
+            if (pointSelected(categorical.op.intersections[0],categorical.op.intersections[1])) {
+                for (Edge e : network.edges) {
+                        if (e.op.equals("Built")) {
+                            e.selected = categorical.built_selected;
+                        }
+                }
+                for (Box b : temporal.boxes) {
+                        if (b.op.equals("Built")) {
+                            b.selected = categorical.built_selected;
+                        }
+                }
+            }
+
+            categorical.tear_selected = pointSelected(categorical.op.intersections[2],categorical.op.intersections[3]);
+            if (pointSelected(categorical.op.intersections[2],categorical.op.intersections[3])) {
+                for (Edge e : network.edges) {
+                        if (e.op.equals("Teardown")) {
+                            e.selected = categorical.tear_selected;
+                        }
+                }
+                for (Box b : temporal.boxes) {
+                        if (b.op.equals("Teardown")) {
+                            b.selected = categorical.tear_selected;
+                        }
+                }
+            }
+
+            categorical.tcp_selected = pointSelected(categorical.protocol.intersections[0],categorical.protocol.intersections[1]);
+            if (pointSelected(categorical.protocol.intersections[0],categorical.protocol.intersections[1])) {
+                for (Edge e : network.edges) {
+                        if (e.protocol.equals("TCP")) {
+                            e.selected = categorical.tcp_selected;
+                        }
+                }
+                for (Box b : temporal.boxes) {
+                        if (b.protocol.equals("TCP")) {
+                            b.selected = categorical.tcp_selected;
+                        }
+                }
+            }
+
+            categorical.udp_selected = pointSelected(categorical.protocol.intersections[2],categorical.protocol.intersections[3]);
+            if (pointSelected(categorical.protocol.intersections[2],categorical.protocol.intersections[3])) {
+                for (Edge e : network.edges) {
+                        if (e.protocol.equals("UDP")) {
+                            e.selected = categorical.udp_selected;
+                        }
+                }
+                for (Box b : temporal.boxes) {
+                        if (b.protocol.equals("UDP")) {
+                            b.selected = categorical.udp_selected;
+                        }
+                }
+            }
+            categorical.info_selected = pointSelected(categorical.info.intersections[0],categorical.info.intersections[1]);
+            if (pointSelected(categorical.info.intersections[0],categorical.info.intersections[1])) {
+                for (Edge e : network.edges) {
+                        e.selected = true;
+                }
+                for (Box b : temporal.boxes) {
+                        b.selected = true;
+                }
+            }
+
             for (Object key : network.nodes.keySet()) {
                 Node n = (Node)(network.nodes.get(key));
                 n.selected = pointSelected(n.x, n.y);
-                for (Edge e : n.edges) {
-                    e.selected = e.selected || n.selected;
-                    for (Box b : e.boxes) {
-                        b.selected = e.selected;
+                
+                if (pointSelected(n.x, n.y)) {
+                    for (Edge e : n.edges) {
+                        e.selected = e.selected || n.selected;
+                        for (Box b : e.boxes) {
+                            b.selected = e.selected;
+                        }
                     }
-                }
+                    for (Edge e : n.edges) {
+                        if (e.op.equals("Built")) {
+                            categorical.built_selected = e.selected;
+                        } else {
+                            categorical.tear_selected = e.selected;
+                        }
+                        if (e.protocol.equals("TCP")) {
+                            categorical.tcp_selected = e.selected;
+                        } else {
+                            categorical.udp_selected = e.selected;
+                        }
+                        categorical.info_selected = e.selected;
+                    }
+                } /*else {
+                    
+                }*/
             } 
             for (Box b : temporal.boxes) {
-                b.selected = pointSelected(b.x + b.w/2, b.y + b.h/2);
-                for (Edge e : b.edges) {
-                    e.selected = e.selected || b.selected;
+                b.selected = b.selected || pointSelected(b.x + b.w/2, b.y + b.h/2);
+
+                
+                if (pointSelected(b.x + b.w/2, b.y + b.h/2)) {
+                    for (Edge e : b.edges) {
+                        e.selected = e.selected || b.selected;
+                    }
+                    if (!b.op.equals("")) {
+                        if (b.op.equals("Built")) {
+                                categorical.built_selected = b.selected || categorical.built_selected;
+                        } else {
+                                categorical.tear_selected = b.selected || categorical.tear_selected;
+                        } 
+                        if (b.protocol.equals("TCP")) {
+                                categorical.tcp_selected = b.selected || categorical.tcp_selected;
+                        } else {
+                                categorical.udp_selected = b.selected || categorical.udp_selected;
+                        }
+                        categorical.info_selected = b.selected ||categorical.info_selected;
+                    }
                 }
             }
+            /*categorical.built_selected = pointSelected(categorical.op.intersections[0],categorical.op.intersections[1]) || categorical.built_selected;
+            categorical.tear_selected = pointSelected(categorical.op.intersections[2],categorical.op.intersections[3]) || categorical.tear_selected ;
+            categorical.tcp_selected = pointSelected(categorical.protocol.intersections[0],categorical.protocol.intersections[1]) || categorical.tcp_selected ;
+            categorical.udp_selected = pointSelected(categorical.protocol.intersections[2],categorical.protocol.intersections[3]) || categorical.udp_selected ;
+            categorical.info_selected = pointSelected(categorical.info.intersections[0],categorical.info.intersections[1]) || categorical.info_selected ;*/
         }
     }
     private Boolean pointSelected(float x, float y) {

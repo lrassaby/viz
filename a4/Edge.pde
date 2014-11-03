@@ -3,6 +3,7 @@ public class Edge {
     public String dest;    //dest ip
     public HashMap times;
     public ArrayList<Box> boxes;
+    public String op, protocol;
     public float weight;
     private float x1, y1, x2, y2;
     public Boolean selected;
@@ -11,6 +12,8 @@ public class Edge {
         weight = 0;
         this.source = row.getString("Source IP");
         this.dest = row.getString("Destination IP");
+        this.op = row.getString("Operation");
+        this.protocol = row.getString("Protocol");
         String t = row.getString("Time");
         String p = row.getString("Destination port");
         HashMap t_map = new HashMap();
