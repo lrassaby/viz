@@ -4,7 +4,7 @@ public class AxisChart {
     protected float maxY; // for single columned 
     protected float superMaxY; // for multi columned
     public int[] margins = {100, 150, 220, 100};
-    protected Point origin, topyaxis, rightxaxis;
+    public Point origin, topyaxis, rightxaxis;
     public float[] intersections = {100000, 100000, 100000, 100000};
 
     AxisChart (Table data, String[] categories, int[] margins) {
