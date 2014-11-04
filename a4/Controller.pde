@@ -41,8 +41,9 @@ public class Controller {
     temporal.draw();
     categorical.draw();
     strokeWeight(1);
+    stroke(100);
     line(0, height - 200, width, height - 200);
-    line(width - 300, 0, width - 300, height - 200);
+    line(width - 140, 0, width - 140, height - 200);
     unselect();
   }
 

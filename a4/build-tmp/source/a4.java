@@ -233,7 +233,7 @@ public class Box {
     private ArrayList<Edge> edges;
     private float weight;
     public int index;
-    public final int margin_l = 50, margin_b = 20;
+    public final float margin_l = 50, margin_b = 20;
     public Boolean selected;
     public float x, y, w, h;
 
@@ -318,9 +318,9 @@ public class Categorical {
   }
 
   public void draw() {
-    op.margins[0] = width - 200;
-    protocol.margins[0] = width - 200;
-    info.margins[0] = width - 200;
+    op.margins[0] = width - 120;
+    protocol.margins[0] = width - 120;
+    info.margins[0] = width - 120;
     int selected[] = {0, 0};
     if (built_selected) {selected[0] = 1;}
     if (tear_selected) {selected[1] = 1;}
@@ -344,7 +344,7 @@ public class Categorical {
     newRow.setInt("TCP", tcp);
     newRow.setInt("UDP", udp);
     String cat[] = {"TCP", "UDP"};
-    int[] margins = {width - 200, 50, 100, 650};
+    int[] margins = {width - 120, 50, 20, 650};
     protocol = new Barchart(table,cat, margins);
 
     Table table2 = new Table();
@@ -354,7 +354,7 @@ public class Categorical {
     newRow.setInt("Built", built);
     newRow.setInt("Teardown", tear);
     String cat2[] = {"Built", "Teardown"};
-    int[] margins2 = {width - 200, 200, 100, 500};
+    int[] margins2 = {width - 120, 250, 20, 450};
     op = new Barchart(table2,cat2, margins2);
 
     Table table3 = new Table();
@@ -362,7 +362,7 @@ public class Categorical {
     newRow = table3.addRow();
     newRow.setInt("Info", 1);
     String cat3[] = {"Info"};
-    int[] margins3 = {width - 200, 400, 100, 300};
+    int[] margins3 = {width - 120, 450, 20, 250};
     info = new Barchart(table3, cat3, margins3);
   }
 
@@ -441,8 +441,9 @@ public class Controller {
     temporal.draw();
     categorical.draw();
     strokeWeight(1);
+    stroke(100);
     line(0, height - 200, width, height - 200);
-    line(width - 300, 0, width - 300, height - 200);
+    line(width - 140, 0, width - 140, height - 200);
     unselect();
   }
 
@@ -767,7 +768,7 @@ public class Edge {
 public class Network {
   public ArrayList<Edge> edges;
   public HashMap nodes;
-  private final float margin_r = 300;
+  private final float margin_r = 140;
   private final float margin_b = 200;
   private final float margin = 20;
 
