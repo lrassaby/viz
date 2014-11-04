@@ -92,13 +92,6 @@ public class AxisChart {
             if (elemweight > maxY) {
                 maxY = elemweight;
             }
-            /*int rowweight = 0;
-            for (int i = 1; i < categories.length; i++) {
-                rowweight += row.getInt(categories[i]);
-            }
-            if (rowweight > superMaxY) {
-                superMaxY = rowweight;
-            }*/
         }
         this.margins = margins;
         origin = new Point(margins[0], height - margins[3]);
@@ -108,7 +101,7 @@ public class AxisChart {
 
  
     public void drawAxes(int c) {
-        strokeWeight(2);
+        strokeWeight(1);
         stroke(c);
         fill(c);
         line(origin.x, origin.y, topyaxis.x, topyaxis.y - 15);
@@ -168,10 +161,8 @@ public class Barchart extends AxisChart {
         origin.setXY(margins[0], height - margins[3]);
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
-        float c = 0;
-        int col = color(c, c, c);
-        drawAxes(col);
-        drawLabels(col, PApplet.parseFloat(origin.y - topyaxis.y) / maxY);
+        drawAxes(color(100, 100, 100));
+        drawLabels(color(0, 0, 0), PApplet.parseFloat(origin.y - topyaxis.y) / maxY);
         drawData(transition_completeness, transition, selected);
     }
 

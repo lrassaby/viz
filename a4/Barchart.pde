@@ -7,10 +7,8 @@ public class Barchart extends AxisChart {
         origin.setXY(margins[0], height - margins[3]);
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
-        float c = 0;
-        color col = color(c, c, c);
-        drawAxes(col);
-        drawLabels(col, float(origin.y - topyaxis.y) / maxY);
+        drawAxes(color(100, 100, 100));
+        drawLabels(color(0, 0, 0), float(origin.y - topyaxis.y) / maxY);
         drawData(transition_completeness, transition, selected);
     }
 
