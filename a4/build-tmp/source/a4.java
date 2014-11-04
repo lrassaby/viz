@@ -904,6 +904,9 @@ class Selection {
             Node n = (Node)(network.nodes.get(key));
             if (n.intersect()) {hover_mode = true;}
         }
+        for (Box b : temporal.boxes) {
+            if (b.intersect()) {hover_mode = true;}
+        }
         if (selection_mode || hover_mode) {
             categorical.built_selected = pointSelected(categorical.op.intersections[0],categorical.op.intersections[1]);
             if (pointSelected(categorical.op.intersections[0],categorical.op.intersections[1])) {
@@ -972,9 +975,9 @@ class Selection {
 
             for (Object key : network.nodes.keySet()) {
                 Node n = (Node)(network.nodes.get(key));
-                n.selected = pointSelected(n.x, n.y) || n.intersect();
+                n.selected =(selection_mode && pointSelected(n.x, n.y)) || n.intersect();
                 
-                if (pointSelected(n.x, n.y) || n.intersect()) {
+                if ((selection_mode && pointSelected(n.x, n.y)) || n.intersect()) {
                     for (Edge e : n.edges) {
                         e.selected = e.selected || n.selected;
                         for (Box b : e.boxes) {
@@ -999,10 +1002,9 @@ class Selection {
                 }*/
             } 
             for (Box b : temporal.boxes) {
-                b.selected = b.selected || pointSelected(b.x + b.w/2, b.y + b.h/2);
+                b.selected = b.selected || (selection_mode && pointSelected(b.x + b.w/2, b.y + b.h/2)) || b.intersect();
 
-                
-                if (pointSelected(b.x + b.w/2, b.y + b.h/2)) {
+                if ((selection_mode && pointSelected(b.x + b.w/2, b.y + b.h/2)) || b.intersect()) {
                     for (Edge e : b.edges) {
                         e.selected = e.selected || b.selected;
                     }
