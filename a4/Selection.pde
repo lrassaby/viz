@@ -53,6 +53,47 @@ class Selection {
         fixed = false;
     }
     public void modifyViews() {
+        Boolean b_s = false;
+        Boolean te_s = false;
+        Boolean tc_s = false;
+        Boolean u_s = false;
+        Boolean i_s = false;
+
+        Barchart op = categorical.op;
+        int sectionWidth = abs(((op.rightxaxis.x - op.origin.x) / op.categories.length));
+        float ratio = float(op.origin.y - op.topyaxis.y) / op.maxY;
+        int x = op.origin.x + sectionWidth * 0 + sectionWidth / 2 + int(sectionWidth * 0.1);
+        int y = op.origin.y - int(op.data.getRow(0).getInt(op.categories[0]) * ratio);
+        if (mouseX >= x - sectionWidth/2 && mouseX <= x + sectionWidth/2 && mouseY >= y && mouseY <= categorical.op.origin.y) {hover_mode = true; b_s = true;}
+        else { b_s = false;}
+        x = op.origin.x + sectionWidth * 1 + sectionWidth / 2 + int(sectionWidth * 0.1);
+        y = op.origin.y - int(op.data.getRow(0).getInt(op.categories[1]) * ratio);
+        if (mouseX >= x - sectionWidth/2 && mouseX <= x + sectionWidth/2 && mouseY >= y && mouseY <= categorical.op.origin.y) {hover_mode = true; te_s = true;}
+        else { te_s = false;}
+
+        Barchart pro = categorical.protocol;
+        sectionWidth = abs(((pro.rightxaxis.x - pro.origin.x) / pro.categories.length));
+        ratio = float(pro.origin.y - pro.topyaxis.y) / pro.maxY;
+        x = pro.origin.x + sectionWidth * 0 + sectionWidth / 2 + int(sectionWidth * 0.1);
+        y = pro.origin.y - int(pro.data.getRow(0).getInt(pro.categories[0]) * ratio);
+        if (mouseX >= x - sectionWidth/2 && mouseX <= x + sectionWidth/2 && mouseY >= y && mouseY <= pro.origin.y) {hover_mode = true; tc_s = true;}
+        else { tc_s = false;}
+        x = pro.origin.x + sectionWidth * 1 + sectionWidth / 2 + int(sectionWidth * 0.1);
+        y = pro.origin.y - int(pro.data.getRow(0).getInt(pro.categories[1]) * ratio);
+        if (mouseX >= x - sectionWidth/2 && mouseX <= x + sectionWidth/2 && mouseY >= y && mouseY <= pro.origin.y) {hover_mode = true; u_s = true;}
+        else { u_s = false;}
+
+        Barchart info = categorical.info;
+        sectionWidth = abs(((info.rightxaxis.x - info.origin.x) / info.categories.length));
+        ratio = float(info.origin.y - info.topyaxis.y) / info.maxY;
+        x = info.origin.x + sectionWidth * 0 + sectionWidth / 2 + int(sectionWidth * 0.1);
+        y = info.origin.y - int(info.data.getRow(0).getInt(info.categories[0]) * ratio);
+        if (mouseX >= x - sectionWidth/2 && mouseX <= x + sectionWidth/2 && mouseY >= y && mouseY <= info.origin.y) {hover_mode = true; i_s = true;}
+        else { i_s = false;}
+
+
+
+
         for (Object key : network.nodes.keySet()) {
             Node n = (Node)(network.nodes.get(key));
             if (n.intersect()) {hover_mode = true;}
@@ -61,8 +102,9 @@ class Selection {
             if (b.intersect()) {hover_mode = true;}
         }
         if (selection_mode || hover_mode) {
-            categorical.built_selected = pointSelected(categorical.op.intersections[0],categorical.op.intersections[1]);
-            if (pointSelected(categorical.op.intersections[0],categorical.op.intersections[1])) {
+
+            categorical.built_selected = pointSelected(categorical.op.intersections[0],categorical.op.intersections[1]) || b_s;
+            if (pointSelected(categorical.op.intersections[0],categorical.op.intersections[1]) || b_s) {
                 for (Edge e : network.edges) {
                         if (e.op.equals("Built")) {
                             e.selected = categorical.built_selected;
@@ -75,8 +117,8 @@ class Selection {
                 }
             }
 
-            categorical.tear_selected = pointSelected(categorical.op.intersections[2],categorical.op.intersections[3]);
-            if (pointSelected(categorical.op.intersections[2],categorical.op.intersections[3])) {
+            categorical.tear_selected = pointSelected(categorical.op.intersections[2],categorical.op.intersections[3]) || te_s;
+            if (pointSelected(categorical.op.intersections[2],categorical.op.intersections[3]) || te_s) {
                 for (Edge e : network.edges) {
                         if (e.op.equals("Teardown")) {
                             e.selected = categorical.tear_selected;
@@ -89,8 +131,8 @@ class Selection {
                 }
             }
 
-            categorical.tcp_selected = pointSelected(categorical.protocol.intersections[0],categorical.protocol.intersections[1]);
-            if (pointSelected(categorical.protocol.intersections[0],categorical.protocol.intersections[1])) {
+            categorical.tcp_selected = pointSelected(categorical.protocol.intersections[0],categorical.protocol.intersections[1]) || tc_s;
+            if (pointSelected(categorical.protocol.intersections[0],categorical.protocol.intersections[1]) || tc_s) {
                 for (Edge e : network.edges) {
                         if (e.protocol.equals("TCP")) {
                             e.selected = categorical.tcp_selected;
@@ -103,8 +145,8 @@ class Selection {
                 }
             }
 
-            categorical.udp_selected = pointSelected(categorical.protocol.intersections[2],categorical.protocol.intersections[3]);
-            if (pointSelected(categorical.protocol.intersections[2],categorical.protocol.intersections[3])) {
+            categorical.udp_selected = pointSelected(categorical.protocol.intersections[2],categorical.protocol.intersections[3]) || u_s;
+            if (pointSelected(categorical.protocol.intersections[2],categorical.protocol.intersections[3]) || u_s) {
                 for (Edge e : network.edges) {
                         if (e.protocol.equals("UDP")) {
                             e.selected = categorical.udp_selected;
@@ -116,8 +158,8 @@ class Selection {
                         }
                 }
             }
-            categorical.info_selected = pointSelected(categorical.info.intersections[0],categorical.info.intersections[1]);
-            if (pointSelected(categorical.info.intersections[0],categorical.info.intersections[1])) {
+            categorical.info_selected = pointSelected(categorical.info.intersections[0],categorical.info.intersections[1]) || i_s;
+            if (pointSelected(categorical.info.intersections[0],categorical.info.intersections[1]) || i_s) {
                 for (Edge e : network.edges) {
                         e.selected = true;
                 }
