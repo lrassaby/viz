@@ -17,13 +17,6 @@ public class AxisChart {
             if (elemweight > maxY) {
                 maxY = elemweight;
             }
-            /*int rowweight = 0;
-            for (int i = 1; i < categories.length; i++) {
-                rowweight += row.getInt(categories[i]);
-            }
-            if (rowweight > superMaxY) {
-                superMaxY = rowweight;
-            }*/
         }
         this.margins = margins;
         origin = new Point(margins[0], height - margins[3]);
@@ -33,7 +26,7 @@ public class AxisChart {
 
  
     void drawAxes(color c) {
-        strokeWeight(2);
+        strokeWeight(1);
         stroke(c);
         fill(c);
         line(origin.x, origin.y, topyaxis.x, topyaxis.y - 15);

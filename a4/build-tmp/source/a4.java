@@ -92,13 +92,6 @@ public class AxisChart {
             if (elemweight > maxY) {
                 maxY = elemweight;
             }
-            /*int rowweight = 0;
-            for (int i = 1; i < categories.length; i++) {
-                rowweight += row.getInt(categories[i]);
-            }
-            if (rowweight > superMaxY) {
-                superMaxY = rowweight;
-            }*/
         }
         this.margins = margins;
         origin = new Point(margins[0], height - margins[3]);
@@ -108,7 +101,7 @@ public class AxisChart {
 
  
     public void drawAxes(int c) {
-        strokeWeight(2);
+        strokeWeight(1);
         stroke(c);
         fill(c);
         line(origin.x, origin.y, topyaxis.x, topyaxis.y - 15);
@@ -168,10 +161,8 @@ public class Barchart extends AxisChart {
         origin.setXY(margins[0], height - margins[3]);
         topyaxis.setXY(margins[0], margins[1]);
         rightxaxis.setXY(width - margins[2], height - margins[3]);
-        float c = 0;
-        int col = color(c, c, c);
-        drawAxes(col);
-        drawLabels(col, PApplet.parseFloat(origin.y - topyaxis.y) / maxY);
+        drawAxes(color(100, 100, 100));
+        drawLabels(color(0, 0, 0), PApplet.parseFloat(origin.y - topyaxis.y) / maxY);
         drawData(transition_completeness, transition, selected);
     }
 
@@ -207,7 +198,7 @@ public class Box {
     private ArrayList<Edge> edges;
     private float weight;
     public int index;
-    public final float margin_l = 90, margin_b = 20;
+    public final float margin_l = 90, margin_b = 40;
     public Boolean selected;
     public float x, y, w, h;
 
@@ -1084,7 +1075,7 @@ class Selection {
 };
 public class Temporal {
   private ArrayList<Box> boxes;
-  public final float margin_l = 90, margin_b = 20;
+  public final float margin_l = 90, margin_b = 40;
   public Temporal () {
   }
   public void draw() {
@@ -1096,10 +1087,16 @@ public class Temporal {
     fill(0);
     textAlign(LEFT);
     float h = (200 - margin_b)/8;
+    float w = (width - margin_l)/31;
     for (int i = 0; i < 8; i++) {
       text(boxes.get(i).port, 5, i * h + (height - 200) + 15);
       line(0, (i + 1) * h + (height - 200), margin_l, (i + 1) * h + (height - 200));
     }
+    for (int i = 0; i < 31; i++) {
+      makeText(boxes.get(i * 8).time, PApplet.parseInt(w * i + margin_l) - 15, height-5, -HALF_PI/2);
+      line(PApplet.parseInt(w * i + margin_l) - 40, height, PApplet.parseInt(w * i + margin_l), height - margin_b);
+    }
+    line(PApplet.parseInt(w * 31 + margin_l) - 40, height, PApplet.parseInt(w * 31 + margin_l), height - margin_b);
   }
 
   public void set_boxes(ArrayList<Box> boxes) {
