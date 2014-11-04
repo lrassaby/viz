@@ -5,7 +5,7 @@ public class Box {
     private ArrayList<Edge> edges;
     private float weight;
     public int index;
-    public final float margin_l = 50, margin_b = 20;
+    public final float margin_l = 90, margin_b = 20;
     public Boolean selected;
     public float x, y, w, h;
 
@@ -64,5 +64,9 @@ public class Box {
                 }
             }
         }
+    }
+
+    public boolean intersect() {
+        return ((mouseX > x) && (mouseX < x + w) && (mouseY > y) && (mouseY < y + h));
     }
 }

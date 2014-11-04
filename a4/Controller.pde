@@ -58,6 +58,11 @@ public class Controller {
     for (Box b : boxes) {
       b.selected = false;
     }
+    categorical.built_selected = false;
+    categorical.tear_selected = false;
+    categorical.tcp_selected = false;
+    categorical.udp_selected = false;
+    categorical.info_selected = false;
   }
   
   private void processTable() {

@@ -14,11 +14,13 @@ public class Node {
 
 	public void draw() {
         strokeWeight(1);
+
         if (selected) {
             fill(13, 134, 90, 255);
         } else {
             fill(5, 112, 204, 255);
         }
+        
         stroke(0);
 		ellipse(x, y, radius * 2, radius * 2);
 	}

@@ -1,5 +1,6 @@
 class Selection {
     private Boolean selection_mode;
+    private Boolean hover_mode;
     private Boolean fixed;
     private Network network;
     private Temporal temporal;
@@ -13,6 +14,7 @@ class Selection {
         this.categorical = categorical;
         disable();
         fixed = true;
+        hover_mode = false;
     }
     public void setFixed() {
         fixed = true;
@@ -44,13 +46,18 @@ class Selection {
     }
     public void disable() {
         selection_mode = false;
+        hover_mode = false;
     }
     public void enable() {
         selection_mode = true;
         fixed = false;
     }
     public void modifyViews() {
-        if (selection_mode) {
+        for (Object key : network.nodes.keySet()) {
+            Node n = (Node)(network.nodes.get(key));
+            if (n.intersect()) {hover_mode = true;}
+        }
+        if (selection_mode || hover_mode) {
             categorical.built_selected = pointSelected(categorical.op.intersections[0],categorical.op.intersections[1]);
             if (pointSelected(categorical.op.intersections[0],categorical.op.intersections[1])) {
                 for (Edge e : network.edges) {
@@ -118,9 +125,9 @@ class Selection {
 
             for (Object key : network.nodes.keySet()) {
                 Node n = (Node)(network.nodes.get(key));
-                n.selected = pointSelected(n.x, n.y);
+                n.selected = pointSelected(n.x, n.y) || n.intersect();
                 
-                if (pointSelected(n.x, n.y)) {
+                if (pointSelected(n.x, n.y) || n.intersect()) {
                     for (Edge e : n.edges) {
                         e.selected = e.selected || n.selected;
                         for (Box b : e.boxes) {
@@ -172,7 +179,8 @@ class Selection {
             categorical.tcp_selected = pointSelected(categorical.protocol.intersections[0],categorical.protocol.intersections[1]) || categorical.tcp_selected ;
             categorical.udp_selected = pointSelected(categorical.protocol.intersections[2],categorical.protocol.intersections[3]) || categorical.udp_selected ;
             categorical.info_selected = pointSelected(categorical.info.intersections[0],categorical.info.intersections[1]) || categorical.info_selected ;*/
-        }
+        } 
+        hover_mode = false;
     }
     private Boolean pointSelected(float x, float y) {
         float topleft_x = min(x_start, x_end);
