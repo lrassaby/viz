@@ -65,4 +65,8 @@ public class Box {
             }
         }
     }
+
+    public boolean intersect() {
+        return ((mouseX > x) && (mouseX < x + w) && (mouseY > y) && (mouseY < y + h));
+    }
 }
