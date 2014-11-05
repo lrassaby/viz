@@ -248,7 +248,7 @@ public class ParallelCoordinatesGraph {
 	ColorGenerator generator;
 	int[] colors;
 	/* parallel lines on the graph*/
-	ArrayList<Line> lines;
+	ArrayList<ArrayList<Line>> lineMap;
 	Point origin, rightxaxis;
 	String[] categories;
 	Table data;
@@ -291,8 +291,10 @@ public class ParallelCoordinatesGraph {
 		}
 		/* draws lines */
 		createLines();
-		for (Line l : lines) {
-			l.draw(colors[l.classification - 1], isHovered(l));
+		for (int i = 0; i < lineMap.size(); i++) {
+			for (int j = 0; j < lineMap.get(i).size(); j++) {
+				lineMap.get(i).get(j).draw(colors[lineMap.get(i).get(j).classification - 1], isHovered(lineMap.get(i).get(j)), lineMap.get(i));
+			}
 		}
 
 		if (mousePressed) {
@@ -330,7 +332,7 @@ public class ParallelCoordinatesGraph {
 
 	public void createLines() {
 		getAllCoordinates();
-		lines = new ArrayList<Line>();
+		lineMap = new ArrayList<ArrayList<Line>>();
 		for (int i = 0; i < coordinates.size() - 1; i++) {
 			for (int j = 0; j < coordinates.get(i).size(); j++) {
 				/* two points on line */
@@ -339,7 +341,10 @@ public class ParallelCoordinatesGraph {
 				/* classification of line*/
 				int classification = coordinates.get(i).get(j).classification;
 				Line l = new Line(a, b, classification);
-				lines.add(l);
+				if (i == 0) {
+					lineMap.add(new ArrayList<Line>());
+				}
+				lineMap.get(j).add(l);
 			}
 		}
 	}
@@ -364,10 +369,13 @@ public class Line {
 		this.classification = classification;
 	} 
 
-	public void draw(int c, boolean hovered) {
+	public void draw(int c, boolean hovered, ArrayList<Line> lines) {
 			strokeWeight(1);
 			if (hovered) {
 				stroke(255, 0, 0);
+				for (Line l : lines) {
+					line(l.a.x, l.a.y, l.b.x, l.b.y);
+				}
 			}
 			else {
 				stroke(c, 120);
