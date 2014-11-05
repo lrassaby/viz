@@ -15,6 +15,8 @@ import java.io.IOException;
 public class lab8 extends PApplet {
 
 ParallelCoordinatesGraph graph;
+int initHoverBox_x, initHoverBox_y;
+boolean mousePressed = false;
 
 public void setup() {
 	frame.setResizable(true);
@@ -30,6 +32,16 @@ public void setup() {
 public void draw() {
 	background(255, 255, 255);
 	graph.draw();
+}
+
+public void mousePressed() {
+	mousePressed = true;
+	initHoverBox_x = mouseX;
+	initHoverBox_y = mouseY;
+}
+
+public void mouseReleased() {
+	mousePressed = false;
 }
 /* represents a single axis/category */
 public class Axis {
@@ -152,6 +164,13 @@ public class ParallelCoordinatesGraph {
 		for (Line l : lines) {
 			l.draw(colors[l.classification - 1], isHovered(l));
 		}
+
+
+		if (mousePressed) {
+			stroke(160);
+			fill(200, 100);
+			rect(initHoverBox_x, initHoverBox_y, mouseX - initHoverBox_x, mouseY - initHoverBox_y);
+		}
 	}
 
 	public boolean isHovered(Line l) {
@@ -159,9 +178,16 @@ public class ParallelCoordinatesGraph {
 		if ((distance(l.a, mouse) + distance(l.b, mouse)) - distance(l.a, l.b) < 0.05f) {
 			return true;
 		}
+		else if (mousePressed && isBoxHovered(l)) {
+			return true;
+		}
 		else {
 			return false;
 		}
+	}
+
+	public boolean isBoxHovered(Line l) {
+		return false;
 	}
 
 	public float distance(Point a, Point b) {
@@ -192,6 +218,13 @@ public class ParallelCoordinatesGraph {
 	}
 
 };
+public class Interaction {
+	public void mousePressed() {
+		int init_x = mouseX;
+		int init_y = mouseY;
+		println("hello!");
+	}
+}
 /* holds two endpoints of the line and its class */
 public class Line {
 	Point a;

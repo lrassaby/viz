@@ -51,6 +51,13 @@ public class ParallelCoordinatesGraph {
 		for (Line l : lines) {
 			l.draw(colors[l.classification - 1], isHovered(l));
 		}
+
+
+		if (mousePressed) {
+			stroke(160);
+			fill(200, 100);
+			rect(initHoverBox_x, initHoverBox_y, mouseX - initHoverBox_x, mouseY - initHoverBox_y);
+		}
 	}
 
 	public boolean isHovered(Line l) {
@@ -58,9 +65,16 @@ public class ParallelCoordinatesGraph {
 		if ((distance(l.a, mouse) + distance(l.b, mouse)) - distance(l.a, l.b) < 0.05) {
 			return true;
 		}
+		else if (mousePressed && isBoxHovered(l)) {
+			return true;
+		}
 		else {
 			return false;
 		}
+	}
+
+	public boolean isBoxHovered(Line l) {
+		return false;
 	}
 
 	public float distance(Point a, Point b) {
