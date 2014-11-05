@@ -151,7 +151,6 @@ public class Axis {
 		flip.intersect(mouseClickX, mouseClickY);
 		if (flip.isect) {
 			newClick = false;
-			println("hello!");
 			flipped = !flipped;
 		}
 		else if (lastAxis) {
@@ -317,7 +316,12 @@ public class ParallelCoordinatesGraph {
 	}
 
 	public boolean isBoxHovered(Line l) {
-		return false;
+		float x = min(mouseClickX, mouseX);
+		float y = min(mouseClickY, mouseY);
+		float w = abs(mouseX - mouseClickX);
+		float h = abs(mouseY - mouseClickY);
+		return lineRectangleIntersect(l.a.x, l.a.y, l.b.x, l.b.y, 
+									  x, y, w, h);
 	}
 
 	public float distance(Point a, Point b) {
@@ -403,6 +407,52 @@ public class ColorGenerator {
         return c;
     }
 };
+
+
+// http://sebleedelisle.com/2009/05/super-fast-trianglerectangle-intersection-test/
+public boolean lineRectangleIntersect(float x1, float y1, float x2, float y2,
+                               float rx, float ry, float rw, float rh) {
+                                  
+  float topIntersection;
+  float bottomIntersection;
+  float topPoint;
+  float bottomPoint;
+ 
+  // Calculate m and c for the equation for the line (y = mx+c)
+  float m = (y2-y1) / (x2-x1);
+  float c = y1 -(m*x1);
+ 
+  // If the line is going up from right to left then the top intersect point is on the left
+  if(m > 0) {
+    topIntersection = (m*rx  + c);
+    bottomIntersection = (m*(rx+rw)  + c);
+  }
+  // Otherwise it's on the right
+  else {
+    topIntersection = (m*(rx+rw)  + c);
+    bottomIntersection = (m*rx  + c);
+  }
+ 
+  // Work out the top and bottom extents for the triangle
+  if(y1 < y2) {
+    topPoint = y1;
+    bottomPoint = y2;
+  } else {
+    topPoint = y2;
+    bottomPoint = y1;
+  }
+ 
+  float topOverlap;
+  float botOverlap;
+ 
+  // Calculate the overlap between those two bounds
+  topOverlap = topIntersection > topPoint ? topIntersection : topPoint;
+  botOverlap = bottomIntersection < bottomPoint ? bottomIntersection : bottomPoint;
+ 
+  return (topOverlap<botOverlap) && (!((botOverlap<ry) || (topOverlap>ry+rh)));
+ 
+}
+
 
 /* Point class */
 public class Point {

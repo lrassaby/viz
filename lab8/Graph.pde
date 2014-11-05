@@ -77,7 +77,12 @@ public class ParallelCoordinatesGraph {
 	}
 
 	public boolean isBoxHovered(Line l) {
-		return false;
+		float x = min(mouseClickX, mouseX);
+		float y = min(mouseClickY, mouseY);
+		float w = abs(mouseX - mouseClickX);
+		float h = abs(mouseY - mouseClickY);
+		return lineRectangleIntersect(l.a.x, l.a.y, l.b.x, l.b.y, 
+									  x, y, w, h);
 	}
 
 	public float distance(Point a, Point b) {
