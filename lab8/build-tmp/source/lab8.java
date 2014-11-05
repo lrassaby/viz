@@ -86,6 +86,8 @@ public class Axis {
 			Point p1 = new Point(a.x, a.y - (((a.y - b.y)/(NUM_MARKS - 1))*i));
 			Point p2 = new Point(a.x - 20, a.y - (((a.y - b.y)/(NUM_MARKS - 1))*i));
 			line(p1.x, p1.y, p2.x, p2.y);
+			stroke(0);
+			fill(0);
 			text(data_min + ((data_max - data_min)/(NUM_MARKS - 1))*i, p1.x - 2, p2.y - 7);
 		}
 
@@ -93,6 +95,7 @@ public class Axis {
 		fill(0);
 		textAlign(RIGHT);
 		textSize(11);
+		stroke(0);
 		text(category, a.x + 20, a.y + 20); 
 	}
 
@@ -165,7 +168,6 @@ public class ParallelCoordinatesGraph {
 			l.draw(colors[l.classification - 1], isHovered(l));
 		}
 
-
 		if (mousePressed) {
 			stroke(160);
 			fill(200, 100);
@@ -218,13 +220,6 @@ public class ParallelCoordinatesGraph {
 	}
 
 };
-public class Interaction {
-	public void mousePressed() {
-		int init_x = mouseX;
-		int init_y = mouseY;
-		println("hello!");
-	}
-}
 /* holds two endpoints of the line and its class */
 public class Line {
 	Point a;

@@ -52,7 +52,6 @@ public class ParallelCoordinatesGraph {
 			l.draw(colors[l.classification - 1], isHovered(l));
 		}
 
-
 		if (mousePressed) {
 			stroke(160);
 			fill(200, 100);
