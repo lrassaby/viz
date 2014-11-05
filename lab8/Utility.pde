@@ -68,3 +68,15 @@ public class Coordinate {
         ellipse(p.x, p.y, 4, 4);
     }
 };
+
+public class Dimensions {
+    int w, h;
+    Dimensions(int w, int h) {
+        this.w = w;
+        this.h = h;
+    }
+    void setWH(int w, int h) {
+        this.w = w;
+        this.h = h;
+    }
+};

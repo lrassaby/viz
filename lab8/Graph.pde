@@ -26,9 +26,13 @@ public class ParallelCoordinatesGraph {
 		for (int i = 0; i < NUM_CLASSES; i++) {
 			colors[i] = generator.generate();
 		}
+		boolean lastAxis = false;
 		for (int i = 0; i < categories.length - 1; i++) {
 	   		categories[i] = categories[i].trim();
-	   		Axis a = new Axis(categories[i], data);
+	   		if (i == categories.length - 2) {
+	   			lastAxis = true;
+	   		}
+	   		Axis a = new Axis(categories[i], data, lastAxis);
 	   		axes.add(a);
 		}
 	}
@@ -55,7 +59,7 @@ public class ParallelCoordinatesGraph {
 		if (mousePressed) {
 			stroke(160);
 			fill(200, 100);
-			rect(initHoverBox_x, initHoverBox_y, mouseX - initHoverBox_x, mouseY - initHoverBox_y);
+			rect(mouseClickX, mouseClickY, mouseX - mouseClickX, mouseY - mouseClickY);
 		}
 	}
 

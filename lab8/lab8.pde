@@ -1,6 +1,7 @@
 ParallelCoordinatesGraph graph;
-int initHoverBox_x, initHoverBox_y;
+int mouseClickX, mouseClickY;
 boolean mousePressed = false;
+boolean newClick = false;
 
 void setup() {
 	frame.setResizable(true);
@@ -20,10 +21,11 @@ void draw() {
 
 void mousePressed() {
 	mousePressed = true;
-	initHoverBox_x = mouseX;
-	initHoverBox_y = mouseY;
+	mouseClickX = mouseX;
+	mouseClickY = mouseY;
 }
 
 void mouseReleased() {
 	mousePressed = false;
+	newClick = true;
 }

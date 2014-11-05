@@ -15,8 +15,9 @@ import java.io.IOException;
 public class lab8 extends PApplet {
 
 ParallelCoordinatesGraph graph;
-int initHoverBox_x, initHoverBox_y;
+int mouseClickX, mouseClickY;
 boolean mousePressed = false;
+boolean newClick = false;
 
 public void setup() {
 	frame.setResizable(true);
@@ -36,26 +37,31 @@ public void draw() {
 
 public void mousePressed() {
 	mousePressed = true;
-	initHoverBox_x = mouseX;
-	initHoverBox_y = mouseY;
+	mouseClickX = mouseX;
+	mouseClickY = mouseY;
 }
 
 public void mouseReleased() {
 	mousePressed = false;
+	newClick = true;
 }
 /* represents a single axis/category */
 public class Axis {
 	Point a, b; // a is bottom, b is top
 	float data_max, data_min;
+	boolean flipped = false;
+	boolean lastAxis;
+	Button flip;
 	static final int NUM_MARKS = 10;
 	String category;
     Table data;
 
-	Axis(String category, Table data) {
+	Axis(String category, Table data, boolean lastAxis) {
 		this.category = category;
 		this.data = data;
 		data_max = data.getRow(0).getFloat(category);
 		data_min = data_max;
+		this.lastAxis = lastAxis;
 		a = new Point();
 		b = new Point();
 		/* find data max and min */
@@ -81,6 +87,7 @@ public class Axis {
 		strokeWeight(5);
 		stroke(0);
 		line(a.x, a.y, b.x, b.y);
+		Point button_center = new Point(b.x, b.y - 30);
 
 		for (int i = 0; i < NUM_MARKS; i++) {
 			Point p1 = new Point(a.x, a.y - (((a.y - b.y)/(NUM_MARKS - 1))*i));
@@ -88,7 +95,20 @@ public class Axis {
 			line(p1.x, p1.y, p2.x, p2.y);
 			stroke(0);
 			fill(0);
-			text(data_min + ((data_max - data_min)/(NUM_MARKS - 1))*i, p1.x - 2, p2.y - 7);
+
+			if (newClick) {
+				isFlipped();
+			}
+			/* draws flip button */
+			flip = new Button(button_center, new Dimensions(30, 15), .5f, 160, "flip");
+			flip.draw();
+
+			if (flipped) {
+				text(data_max - ((data_max - data_min)/(NUM_MARKS - 1))*i, p2.x, p2.y - 9);
+			}
+			else {
+				text(data_min + ((data_max - data_min)/(NUM_MARKS - 1))*i, p2.x, p2.y - 9);
+			}
 		}
 
 		/* labels axis */
@@ -102,18 +122,122 @@ public class Axis {
 	/* calculate coordinates on axis based on current endpoints */
 	public ArrayList<Coordinate> getPointsOnAxis() {
 		ArrayList<Coordinate> coords = new ArrayList<Coordinate>();
-		for (int i = 0; i < data.getRowCount(); i++) {
-			float value = data.getRow(i).getFloat(category);
-			float proportion = (value - data_min) / (data_max - data_min);
-			Point p = new Point(a.x, (b.y - a.y) * proportion + a.y);
-			/* sets classification */
-			int classification = data.getRow(i).getInt("class");
-			Coordinate coord = new Coordinate(p, classification);
-			coords.add(coord);
+		if (!flipped) {
+			for (int i = 0; i < data.getRowCount(); i++) {
+				float value = data.getRow(i).getFloat(category);
+				float proportion = (value - data_min) / (data_max - data_min);
+				Point p = new Point(a.x, (b.y - a.y) * proportion + a.y);
+				/* sets classification */
+				int classification = data.getRow(i).getInt("class");
+				Coordinate coord = new Coordinate(p, classification);
+				coords.add(coord);
+			}
+		}
+		else {
+			for (int i = 0; i < data.getRowCount(); i++) {
+				float value = data.getRow(i).getFloat(category);
+				float proportion = (value - data_min) / (data_max - data_min);
+				Point p = new Point(a.x, b.y - (b.y - a.y) * proportion);
+				/* sets classification */
+				int classification = data.getRow(i).getInt("class");
+				Coordinate coord = new Coordinate(p, classification);
+				coords.add(coord);
+			}
 		}
 		return coords;
 	}
+
+	public void isFlipped() {
+		flip.intersect(mouseClickX, mouseClickY);
+		if (flip.isect) {
+			newClick = false;
+			println("hello!");
+			flipped = !flipped;
+		}
+		else if (lastAxis) {
+			newClick = false;
+		}
+	}
 };
+public class Button {
+  boolean isect;
+  Point pos; 
+  Dimensions dim;
+  float roundness;
+  int c;
+  String text;
+ 
+
+  public void draw() {
+      strokeWeight(2);
+      fill(getColor()); 
+      rect(pos.x, pos.y, dim.w, dim.h, roundness); 
+
+      fill(0);
+      textSize(12); 
+      textAlign(CENTER, CENTER); 
+
+      text(text, pos.x + dim.w / 2, pos.y + dim.h / 2);
+  }
+
+  
+  Button(Point pos, Dimensions dim, float roundness, int c, String text) { /* height and width of button */
+     this.isect = false;
+     this.pos = pos;
+     this.dim = dim;
+     this.roundness = roundness;
+     this.c = c;
+     this.text = text;
+  }
+
+  
+  public void intersect (int mousex, int mousey) {
+    /* if it's within x + width and y + height */
+    if (mousex <= (pos.x + dim.w) && mousex >= pos.x && mousey <= (pos.y + dim.h) && mousey >= pos.y) {
+      isect = true;
+    }
+    else {
+      isect = false;
+    }
+  }
+  
+  public void setSelected (boolean s) {
+    isect = s;
+  }
+
+  public void setPos(Point pos) {
+    this.pos = pos;
+  }
+  
+  public void setSize (Dimensions dim) {
+    this.dim = dim;
+  }
+  
+  public void setColor (int r, int g, int b) {
+    c = color (r, g, b);
+  }
+
+  public void setColorObject (int c) {
+    this.c = c;
+  }
+  
+  
+  public void setColor (int c) {
+    this.c = c;
+  }
+  
+  public void setText (String text) {
+     this.text = text; 
+  }
+
+  public boolean getIsect() {return isect;}
+  public Point getPos() {return pos;}
+  public Dimensions getDim() {return dim;}
+  public int getColor() {return c;}
+  public float getRoundness() {return roundness;}
+  public String getText() {return text;}
+};
+
 public class ParallelCoordinatesGraph {
 	static final int NUM_CLASSES = 3;
 	int[] margins = {50, 50, 50, 50}; 
@@ -142,9 +266,13 @@ public class ParallelCoordinatesGraph {
 		for (int i = 0; i < NUM_CLASSES; i++) {
 			colors[i] = generator.generate();
 		}
+		boolean lastAxis = false;
 		for (int i = 0; i < categories.length - 1; i++) {
 	   		categories[i] = categories[i].trim();
-	   		Axis a = new Axis(categories[i], data);
+	   		if (i == categories.length - 2) {
+	   			lastAxis = true;
+	   		}
+	   		Axis a = new Axis(categories[i], data, lastAxis);
 	   		axes.add(a);
 		}
 	}
@@ -171,7 +299,7 @@ public class ParallelCoordinatesGraph {
 		if (mousePressed) {
 			stroke(160);
 			fill(200, 100);
-			rect(initHoverBox_x, initHoverBox_y, mouseX - initHoverBox_x, mouseY - initHoverBox_y);
+			rect(mouseClickX, mouseClickY, mouseX - mouseClickX, mouseY - mouseClickY);
 		}
 	}
 
@@ -311,6 +439,18 @@ public class Coordinate {
         fill(c);
         stroke(c);
         ellipse(p.x, p.y, 4, 4);
+    }
+};
+
+public class Dimensions {
+    int w, h;
+    Dimensions(int w, int h) {
+        this.w = w;
+        this.h = h;
+    }
+    public void setWH(int w, int h) {
+        this.w = w;
+        this.h = h;
     }
 };
   static public void main(String[] passedArgs) {
