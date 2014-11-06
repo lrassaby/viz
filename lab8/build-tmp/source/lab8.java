@@ -292,8 +292,8 @@ public class ParallelCoordinatesGraph {
 		/* draws lines */
 		createLines();
 		for (int i = 0; i < lineMap.size(); i++) {
-			for (int j = 0; j < lineMap.get(i).size(); j++) {
-				lineMap.get(i).get(j).draw(colors[lineMap.get(i).get(j).classification - 1], isHovered(lineMap.get(i).get(j)), lineMap.get(i));
+			for (int j = 0; j < lineMap.get(i).size(); j++) { 
+				lineMap.get(i).get(j).draw(colors[lineMap.get(i).get(j).classification - 1], isHovered(lineMap.get(i).get(j), lineMap.get(i)));
 			}
 		}
 
@@ -304,12 +304,20 @@ public class ParallelCoordinatesGraph {
 		}
 	}
 
-	public boolean isHovered(Line l) {
+	public boolean isHovered(Line l, ArrayList<Line> lines) {
 		Point mouse = new Point(mouseX, mouseY);
 		if ((distance(l.a, mouse) + distance(l.b, mouse)) - distance(l.a, l.b) < 0.05f) {
 			return true;
 		}
-		else if (mousePressed && isBoxHovered(l)) {
+		if (lines != null) {
+			for (Line line : lines) {
+				if (isHovered(line, null)) {
+					return true;
+				}
+			}
+		}
+			
+		if (mousePressed && isBoxHovered(l)) {
 			return true;
 		}
 		else {
@@ -369,18 +377,16 @@ public class Line {
 		this.classification = classification;
 	} 
 
-	public void draw(int c, boolean hovered, ArrayList<Line> lines) {
+	public void draw(int c, boolean hovered) {
 			strokeWeight(1);
 			if (hovered) {
-				stroke(255, 0, 0);
-				for (Line l : lines) {
-					line(l.a.x, l.a.y, l.b.x, l.b.y);
-				}
+				stroke(255, 0, 0, 255);
+				line(a.x, a.y, b.x, b.y);
 			}
 			else {
 				stroke(c, 120);
+				line(a.x, a.y, b.x, b.y);
 			}
-		line(a.x, a.y, b.x, b.y);
 	}
 };
 /* color generator based on golden ratio */

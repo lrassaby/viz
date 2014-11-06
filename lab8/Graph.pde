@@ -53,8 +53,8 @@ public class ParallelCoordinatesGraph {
 		/* draws lines */
 		createLines();
 		for (int i = 0; i < lineMap.size(); i++) {
-			for (int j = 0; j < lineMap.get(i).size(); j++) {
-				lineMap.get(i).get(j).draw(colors[lineMap.get(i).get(j).classification - 1], isHovered(lineMap.get(i).get(j)), lineMap.get(i));
+			for (int j = 0; j < lineMap.get(i).size(); j++) { 
+				lineMap.get(i).get(j).draw(colors[lineMap.get(i).get(j).classification - 1], isHovered(lineMap.get(i).get(j), lineMap.get(i)));
 			}
 		}
 
@@ -65,12 +65,20 @@ public class ParallelCoordinatesGraph {
 		}
 	}
 
-	public boolean isHovered(Line l) {
+	public boolean isHovered(Line l, ArrayList<Line> lines) {
 		Point mouse = new Point(mouseX, mouseY);
 		if ((distance(l.a, mouse) + distance(l.b, mouse)) - distance(l.a, l.b) < 0.05) {
 			return true;
 		}
-		else if (mousePressed && isBoxHovered(l)) {
+		if (lines != null) {
+			for (Line line : lines) {
+				if (isHovered(line, null)) {
+					return true;
+				}
+			}
+		}
+			
+		if (mousePressed && isBoxHovered(l)) {
 			return true;
 		}
 		else {

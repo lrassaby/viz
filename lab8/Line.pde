@@ -10,17 +10,15 @@ public class Line {
 		this.classification = classification;
 	} 
 
-	public void draw(color c, boolean hovered, ArrayList<Line> lines) {
+	public void draw(color c, boolean hovered) {
 			strokeWeight(1);
 			if (hovered) {
-				stroke(255, 0, 0);
-				for (Line l : lines) {
-					line(l.a.x, l.a.y, l.b.x, l.b.y);
-				}
+				stroke(255, 0, 0, 255);
+				line(a.x, a.y, b.x, b.y);
 			}
 			else {
 				stroke(c, 120);
+				line(a.x, a.y, b.x, b.y);
 			}
-		line(a.x, a.y, b.x, b.y);
 	}
 };
