@@ -18,6 +18,11 @@ ParallelCoordinatesGraph graph;
 int mouseClickX, mouseClickY;
 boolean mousePressed = false;
 boolean newClick = false;
+boolean newMouseClick = true;
+boolean densityReduction = false;
+boolean[] splines;
+int max_a = 60;
+int min_a = 50;
 
 public void setup() {
 	frame.setResizable(true);
@@ -28,6 +33,7 @@ public void setup() {
 	categories = rows[0].split(",");
 	graph = new ParallelCoordinatesGraph(categories, data);
 	graph.setup();
+	splines = new boolean[3];
 }
 
 public void draw() {
@@ -45,6 +51,38 @@ public void mouseReleased() {
 	mousePressed = false;
 	newClick = true;
 }
+
+public void mouseClicked() {
+	newMouseClick = true;
+}
+
+public void keyPressed() {
+	for (int i = 0; i < 3; i++) {
+		if (keyCode == 49 + i) {
+			splines[i] = !splines[i];
+		}
+	}
+	/* density reduction */
+	if (keyCode == 68) {
+		densityReduction = !densityReduction;
+	}
+
+	if (keyCode == 37) {
+		min_a--;
+	}
+
+	if (keyCode == 38) {
+		max_a++;
+	}
+
+	if (keyCode == 39) {
+		min_a++;
+	}
+
+	if (keyCode == 40) {
+		max_a--;
+	}
+}
 /* represents a single axis/category */
 public class Axis {
 	Point a, b; // a is bottom, b is top
@@ -52,6 +90,7 @@ public class Axis {
 	boolean flipped = false;
 	boolean lastAxis;
 	Button flip;
+	Button cat;
 	static final int NUM_MARKS = 10;
 	String category;
     Table data;
@@ -116,7 +155,8 @@ public class Axis {
 		textAlign(RIGHT);
 		textSize(11);
 		stroke(0);
-		text(category, a.x + 20, a.y + 20); 
+		cat = new Button(new Point(a.x - 40, a.y + 20), new Dimensions(80, 15), .5f, 160, category);
+		cat.draw();
 	}
 
 	/* calculate coordinates on axis based on current endpoints */
@@ -155,6 +195,16 @@ public class Axis {
 		}
 		else if (lastAxis) {
 			newClick = false;
+		}
+	}
+
+	public boolean isDimensionSelected() {
+		cat.intersect(mouseClickX, mouseClickY);
+		if (cat.isect) {
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
 };
@@ -252,6 +302,9 @@ public class ParallelCoordinatesGraph {
 	Point origin, rightxaxis;
 	String[] categories;
 	Table data;
+	boolean dimensionSelected = false;
+	int dimension;
+	boolean drawDense = true;
 
 	ParallelCoordinatesGraph(String[] categories, Table data) {
 		axes = new ArrayList<Axis>();
@@ -289,14 +342,42 @@ public class ParallelCoordinatesGraph {
 			axes.get(i).setEndpoints(margins, origin, axes.size() - 1, i);
 			axes.get(i).draw();
 		}
+
+		if (newMouseClick) {
+			for (int i = 0; i < axes.size(); i++) {
+				if (axes.get(i).isDimensionSelected()) {
+					newMouseClick = false;
+					dimensionSelected = !dimensionSelected;
+					dimension = i;
+				}
+			}
+		}
 		/* draws lines */
 		createLines();
 		for (int i = 0; i < lineMap.size(); i++) {
-			for (int j = 0; j < lineMap.get(i).size(); j++) { 
-				lineMap.get(i).get(j).draw(colors[lineMap.get(i).get(j).classification - 1], isHovered(lineMap.get(i).get(j), lineMap.get(i)));
+			if (splines[lineMap.get(i).get(0).classification - 1]) {
+				noFill();
+				beginShape();
+			}
+			if (densityReduction) {
+					drawDense = isDifferent(i);
+			} 
+			for (int j = 0; j < lineMap.get(i).size(); j++) {
+				if (!dimensionSelected && drawDense) {
+					lineMap.get(i).get(j).draw(colors[lineMap.get(i).get(j).classification - 1], isHovered(lineMap.get(i).get(j), lineMap.get(i)), j);
+				}
+				else if (drawDense) {
+					int ratio1 = 105 + (int)((data.getRow(i).getInt(dimension)/axes.get(dimension).data_max)*150);
+					int ratio2 = 20 + (int)((data.getRow(i).getInt(dimension)/axes.get(dimension).data_max)*235);
+					int toSend = color(150, ratio1, ratio2);
+					lineMap.get(i).get(j).draw(toSend, isHovered(lineMap.get(i).get(j), lineMap.get(i)), j);
+				}
+			}
+			if (splines[lineMap.get(i).get(0).classification - 1]) {
+				endShape();
 			}
 		}
-
+		drawDense = true;
 		if (mousePressed) {
 			stroke(160);
 			fill(200, 100);
@@ -364,6 +445,23 @@ public class ParallelCoordinatesGraph {
 		}
 	}
 
+	private boolean isDifferent(int k) {
+		float difference = 0;
+		for (int i = 0; i < k; i++)	{
+			difference = 0;
+			for (int j = 0; j < 3; j++) {
+				difference += abs(lineMap.get(k).get(j).a.y - lineMap.get(i).get(j).a.y);
+			}
+		}
+		if (difference < 200) {
+			return false;
+		}	
+		else {
+			return true;
+		}
+
+	}
+
 };
 /* holds two endpoints of the line and its class */
 public class Line {
@@ -377,15 +475,44 @@ public class Line {
 		this.classification = classification;
 	} 
 
-	public void draw(int c, boolean hovered) {
+	public void draw(int c, boolean hovered, int j) {
 			strokeWeight(1);
-			if (hovered) {
+			if (hovered && !splines[classification - 1]) {
 				stroke(255, 0, 0, 255);
 				line(a.x, a.y, b.x, b.y);
 			}
-			else {
-				stroke(c, 120);
+			else if (!hovered && !splines[classification - 1]) {
+				stroke(c, 100);
+				float  dist_x = a.x - b.x;
+				float dist_y = a.y - b.y;
+				float angle = (float)Math.atan(dist_y/dist_x);
+				angle *= 180/Math.PI;
+				if (angle <= max_a && angle >= min_a) {
+					stroke(0, 0, 255, 255);
+				}
 				line(a.x, a.y, b.x, b.y);
+			}
+			else if (hovered && splines[classification - 1]) {
+				stroke(255, 0, 0, 255);
+				if (j == 0) {
+					curveVertex(a.x, a.y);
+					curveVertex(a.x, a.y);
+				}
+				else if (j == 2) {
+					curveVertex(b.x, b.y);
+				}
+				curveVertex(b.x, b.y);
+			}
+			else if (!hovered && splines[classification - 1]) {
+				stroke(c, 100);
+				if (j == 0) {
+					curveVertex(a.x, a.y);
+					curveVertex(a.x, a.y);				
+				}
+				else if (j == 2) {
+					curveVertex(b.x, b.y);
+				}
+		 		curveVertex(b.x, b.y);
 			}
 	}
 };

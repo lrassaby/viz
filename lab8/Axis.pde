@@ -5,6 +5,7 @@ public class Axis {
 	boolean flipped = false;
 	boolean lastAxis;
 	Button flip;
+	Button cat;
 	static final int NUM_MARKS = 10;
 	String category;
     Table data;
@@ -69,7 +70,8 @@ public class Axis {
 		textAlign(RIGHT);
 		textSize(11);
 		stroke(0);
-		text(category, a.x + 20, a.y + 20); 
+		cat = new Button(new Point(a.x - 40, a.y + 20), new Dimensions(80, 15), .5, 160, category);
+		cat.draw();
 	}
 
 	/* calculate coordinates on axis based on current endpoints */
@@ -108,6 +110,16 @@ public class Axis {
 		}
 		else if (lastAxis) {
 			newClick = false;
+		}
+	}
+
+	public boolean isDimensionSelected() {
+		cat.intersect(mouseClickX, mouseClickY);
+		if (cat.isect) {
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
 };

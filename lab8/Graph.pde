@@ -13,6 +13,9 @@ public class ParallelCoordinatesGraph {
 	Point origin, rightxaxis;
 	String[] categories;
 	Table data;
+	boolean dimensionSelected = false;
+	int dimension;
+	boolean drawDense = true;
 
 	ParallelCoordinatesGraph(String[] categories, Table data) {
 		axes = new ArrayList<Axis>();
@@ -50,14 +53,42 @@ public class ParallelCoordinatesGraph {
 			axes.get(i).setEndpoints(margins, origin, axes.size() - 1, i);
 			axes.get(i).draw();
 		}
+
+		if (newMouseClick) {
+			for (int i = 0; i < axes.size(); i++) {
+				if (axes.get(i).isDimensionSelected()) {
+					newMouseClick = false;
+					dimensionSelected = !dimensionSelected;
+					dimension = i;
+				}
+			}
+		}
 		/* draws lines */
 		createLines();
 		for (int i = 0; i < lineMap.size(); i++) {
-			for (int j = 0; j < lineMap.get(i).size(); j++) { 
-				lineMap.get(i).get(j).draw(colors[lineMap.get(i).get(j).classification - 1], isHovered(lineMap.get(i).get(j), lineMap.get(i)));
+			if (splines[lineMap.get(i).get(0).classification - 1]) {
+				noFill();
+				beginShape();
+			}
+			if (densityReduction) {
+					drawDense = isDifferent(i);
+			} 
+			for (int j = 0; j < lineMap.get(i).size(); j++) {
+				if (!dimensionSelected && drawDense) {
+					lineMap.get(i).get(j).draw(colors[lineMap.get(i).get(j).classification - 1], isHovered(lineMap.get(i).get(j), lineMap.get(i)), j);
+				}
+				else if (drawDense) {
+					int ratio1 = 105 + (int)((data.getRow(i).getInt(dimension)/axes.get(dimension).data_max)*150);
+					int ratio2 = 20 + (int)((data.getRow(i).getInt(dimension)/axes.get(dimension).data_max)*235);
+					color toSend = color(150, ratio1, ratio2);
+					lineMap.get(i).get(j).draw(toSend, isHovered(lineMap.get(i).get(j), lineMap.get(i)), j);
+				}
+			}
+			if (splines[lineMap.get(i).get(0).classification - 1]) {
+				endShape();
 			}
 		}
-
+		drawDense = true;
 		if (mousePressed) {
 			stroke(160);
 			fill(200, 100);
@@ -123,6 +154,23 @@ public class ParallelCoordinatesGraph {
 		for (Axis a : axes) {
 			coordinates.add(a.getPointsOnAxis());
 		}
+	}
+
+	private boolean isDifferent(int k) {
+		float difference = 0;
+		for (int i = 0; i < k; i++)	{
+			difference = 0;
+			for (int j = 0; j < 3; j++) {
+				difference += abs(lineMap.get(k).get(j).a.y - lineMap.get(i).get(j).a.y);
+			}
+		}
+		if (difference < 200) {
+			return false;
+		}	
+		else {
+			return true;
+		}
+
 	}
 
 };
