@@ -132,6 +132,22 @@ public class Big_Node {
     	        rect(x+ i*BOX_SIZE, y+ j*BOX_SIZE, BOX_SIZE, BOX_SIZE);
             }
         }
+        for (int i = 0; i < num_nodes; i++) {
+                fill(255);
+                rect(x+ i*BOX_SIZE, y-BOX_SIZE, BOX_SIZE, BOX_SIZE);
+                Node n = nodes.get(i);
+                String l = String.valueOf(n.id.charAt(0));
+                fill(0);
+                text(l, x+ i*BOX_SIZE + 2, y-BOX_SIZE + 2, BOX_SIZE, BOX_SIZE);
+        }
+        for (int i = 0; i < num_nodes; i++) {
+                fill(255);
+                rect(x-BOX_SIZE, y+ i*BOX_SIZE, BOX_SIZE, BOX_SIZE);
+                Node n = nodes.get(i);
+                String l = String.valueOf(n.id.charAt(0));
+                fill(0);
+                text(l, x - BOX_SIZE + 2, y+ i*BOX_SIZE + 2, BOX_SIZE, BOX_SIZE);
+        }
 
         for (Node n : nodes) {
             for (Edge e : n.edges) {
