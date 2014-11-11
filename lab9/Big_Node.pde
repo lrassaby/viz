@@ -66,19 +66,25 @@ public class Big_Node {
         }
         text("id: " + id, x - 10, y - radius - 10, 80, 50); 
 
-        for (int j = 1; j <= num_nodes; j++) {
-            for (int i = 1; i <= num_nodes; i++) {
+        for (int j = 0; j < num_nodes; j++) {
+            for (int i = 0; i < num_nodes; i++) {
                 int o = getWeight(i, j);
                 fill(200, 0, 0, o);
     	        rect(x+ i*BOX_SIZE, y+ j*BOX_SIZE, BOX_SIZE, BOX_SIZE);
             }
         }
 
+        for (Node n : nodes) {
+            for (Edge e : n.edges) {
+                e.draw();
+            }
+        }
+
 	}
 
     public int getWeight(int i, int j) {
-        Node n = nodes.get(i-1);
-        Node b = nodes.get(j-1);
+        Node n = nodes.get(i);
+        Node b = nodes.get(j);
         if (n.inner_edges.containsKey(b.id)) {
             int w = (Integer) n.inner_edges.get(b.id);
             return int((float(w)/5) * 255);
@@ -142,6 +148,12 @@ public class Big_Node {
             }
         }
 
+        for (int i = 0; i < num_nodes; i++) {
+            Node n = nodes.get(i);
+            n.x = x + 0.5 * BOX_SIZE + BOX_SIZE * i;
+            n.y = y - BOX_SIZE;
+        }
+
         /* coerce the system towards the center */
         sum_force_x += (width/2 - this.x) * CENTER_COERSION_MULTIPLE;
         sum_force_y += (height/2 - this.y) * CENTER_COERSION_MULTIPLE;
@@ -158,13 +170,13 @@ public class Big_Node {
             y = mouseY + dy;
         }
 
-        if (x > width - BOX_SIZE*num_nodes - 1) {
-            x = width - BOX_SIZE*num_nodes;
+        if (x > width - BOX_SIZE*(num_nodes+1) - 1) {
+            x = width - BOX_SIZE*(num_nodes+1);
         } else if (x < radius) {
             x = radius;
         }
-        if (y > height - BOX_SIZE*num_nodes - 1) {
-            y = height - BOX_SIZE*num_nodes;
+        if (y > height - BOX_SIZE*(num_nodes+1) - 1) {
+            y = height - BOX_SIZE*(num_nodes+1);
         } else if (y < radius) {
             y = radius;
         }
