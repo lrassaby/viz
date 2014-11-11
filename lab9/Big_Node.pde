@@ -1,9 +1,11 @@
 public class Big_Node {
 	private ArrayList<Big_Node> big_nodes;
     public ArrayList<Node> nodes;
+    public ArrayList<D_Edge> edges;
 
 	public String id;
 	private float x, y, mass, system_mass;
+    private int num_nodes;
     private float dx, dy;
     private boolean selected;
     private float x_velocity, y_velocity; 
@@ -12,22 +14,29 @@ public class Big_Node {
     private float energy;
 	private final float AREA_MULTIPLE = 60;
 	private final float UPDATE_MULTIPLE = 10;
-    private final float COULOMB_MULTIPLE = 2e3;
+    private final float COULOMB_MULTIPLE = 2e4;
     private final float CENTER_COERSION_MULTIPLE = 1e-2;
     private final float DAMPING = 0.95;
+    private final float BOX_SIZE = 20;
 
-	public Big_Node(String id, float mass, float system_mass) {
+	public Big_Node(String id, int num_nodes, float system_mass) {
 		this.id = id;
-        this.mass = mass;
+        this.num_nodes = num_nodes;
+        this.mass = 1;
+        this.system_mass = system_mass;
         nodes = new ArrayList<Node>();
+        edges = new ArrayList<D_Edge>();
+
         big_nodes = new ArrayList<Big_Node>();
 		x_velocity = 0;
 		y_velocity = 0;
 		x_acceleration = 0;
 		y_acceleration = 0;
         energy = 0;
-		x = random(radius, width - radius);
-		y = random(radius, height - radius);
+        radius = sqrt(mass / system_mass) * AREA_MULTIPLE;
+
+		x = random(BOX_SIZE, width - num_nodes*BOX_SIZE);
+		y = random(BOX_SIZE, height - num_nodes*BOX_SIZE);
 	}
 
     public void addName(Node n) {
@@ -55,8 +64,29 @@ public class Big_Node {
             fill(154, 175, 255);
             stroke(40, 58, 127);
         }
-		ellipse(x, y, radius * 2, radius * 2);
+        text("id: " + id, x - 10, y - radius - 10, 80, 50); 
+
+        for (int j = 1; j <= num_nodes; j++) {
+            for (int i = 1; i <= num_nodes; i++) {
+                int o = getWeight(i, j);
+                fill(200, 0, 0, o);
+    	        rect(x+ i*BOX_SIZE, y+ j*BOX_SIZE, BOX_SIZE, BOX_SIZE);
+            }
+        }
+
 	}
+
+    public int getWeight(int i, int j) {
+        Node n = nodes.get(i-1);
+        Node b = nodes.get(j-1);
+        if (n.inner_edges.containsKey(b.id)) {
+            int w = (Integer) n.inner_edges.get(b.id);
+            return int((float(w)/5) * 255);
+        }
+        else {
+            return 0;
+        }
+    }
 
     public void drawHoverBox() {
         fill(180, 180, 180, 128);
@@ -72,11 +102,15 @@ public class Big_Node {
         s.addInner(b, weight);
     }
 
+    public void addDummyEdge(D_Edge e) {
+        edges.add(e);
+    }
+
     public void setNodes(ArrayList<Node> nodes) {
         this.nodes = nodes;
     }
 
-	public float coulombForce(Node node) {
+	public float coulombForce(Big_Node node) {
         float force = COULOMB_MULTIPLE / pow(distance(node), 2);
         if (force != force) { // NaN
             force = 0;
@@ -84,7 +118,7 @@ public class Big_Node {
         return force;
 	}
 
-    public float distance(Node node) {
+    public float distance(Big_Node node) {
         return max(sqrt(pow((this.x - node.x), 2) + pow((this.y - node.y), 2)), 1);
     }
 
@@ -97,7 +131,7 @@ public class Big_Node {
         float sum_force_y = 0;
 
         // coulomb's law 
-        for (Node n : nodes) {
+        for (Big_Node n : big_nodes) {
             if (n.id != this.id) {
                 float force = coulombForce(n) * UPDATE_MULTIPLE;
                 float dist = distance(n);
@@ -124,13 +158,13 @@ public class Big_Node {
             y = mouseY + dy;
         }
 
-        if (x > width - radius - 1) {
-            x = width - radius;
+        if (x > width - BOX_SIZE*num_nodes - 1) {
+            x = width - BOX_SIZE*num_nodes;
         } else if (x < radius) {
             x = radius;
         }
-        if (y > height - radius - 1) {
-            y = height - radius;
+        if (y > height - BOX_SIZE*num_nodes - 1) {
+            y = height - BOX_SIZE*num_nodes;
         } else if (y < radius) {
             y = radius;
         }

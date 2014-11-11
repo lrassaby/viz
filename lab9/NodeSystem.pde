@@ -3,11 +3,11 @@ public class NodeSystem {
   private ArrayList<Edge> edges;
   private float total_energy;
 
+
   public NodeSystem(String filename) {
     big_nodes = new ArrayList<Big_Node>();
     edges = new ArrayList<Edge>();
     readInput(filename);
-    test();
     total_energy = 0;
   }
 
@@ -18,25 +18,10 @@ public class NodeSystem {
     float energy = 0;
     Node hovernode = null;
     Node selectednode = null;
-    /*for (Node n : nodes) {
-      boolean hover = n.intersect(), selected = n.isSelected();
-      if (hover) {
-        hovernode = n;
-        n.draw(hover);
-      } else if (selected) {
-        selectednode = n;
-        n.draw(selected);
-      } else {
-        n.draw(false);
-      }
+    for (Big_Node n : big_nodes) {
+      n.draw(false);
       energy += n.energy;
-    }*/
-    if (selectednode != null) {
-      selectednode.drawHoverBox();
-    } else if (hovernode != null) {
-      hovernode.drawHoverBox();
     }
-
     total_energy = energy;
     fill(40, 58, 127);
     text("Total energy: " + total_energy, 10, 15); 
@@ -84,7 +69,7 @@ public class NodeSystem {
       // temp[1] is the # of names in the cluster
       // temp[2] is the # of inner relationships
 
-      Big_Node n = new Big_Node(temp[0], 1, num_nodes);
+      Big_Node n = new Big_Node(temp[0], parseInt(temp[1]), num_nodes);
       for (int j = 0; j < parseInt(temp[1]); j++) {
         Node l = new Node(lines[curr_line + j]);
         n.addName(l);
@@ -119,13 +104,25 @@ public class NodeSystem {
       edges.add(e);
     }
     /* add all nodes to each node */
-    for (Big_Node n : big_nodes) {
+    for (int i = 0; i < num_nodes; i++) {
+      Big_Node n = big_nodes.get(i);
       n.big_nodes = big_nodes;
+      for (int j = i + 1; j < num_nodes; j++) {
+        Big_Node b = big_nodes.get(j);
+        D_Edge e = new D_Edge(n, b, 15);
+        n.addDummyEdge(e);
+        b.addDummyEdge(e);
+      }
     }
   }
 
+}
+
+
+/*
+
   public void test() {
-    /*for (Big_Node n : big_nodes) {
+    for (Big_Node n : big_nodes) {
       println("ID: " + n.id);
       println("Children: ");
       for (Node l : n.nodes) {
@@ -137,13 +134,11 @@ public class NodeSystem {
       }
       println();
       println();
-    }*/
+    }
     println("Outer Edges:");
     for (Edge e : edges) {
       println(e.a.id + ", " + e.b.id);
     }
-}
 
-}
-
+*/
 

@@ -1,7 +1,7 @@
 public class Node {
 	private ArrayList<Edge> edges;
 	private ArrayList<Node> nodes;
-    private ArrayList<Pair> inner_edges;
+    private HashMap inner_edges;
 	private String id;
 	private float x, y, mass, system_mass;
     private float dx, dy;
@@ -17,7 +17,7 @@ public class Node {
     private final float DAMPING = 0.95;
 
 	public Node(String id) {
-        inner_edges = new ArrayList<Pair>();
+        inner_edges = new HashMap();
 		this.id = id;
 		x_velocity = 0;
 		y_velocity = 0;
@@ -31,7 +31,7 @@ public class Node {
 	}
 
     public void addInner(Node b, int weight) {
-        inner_edges.add(new Pair(b, weight));
+        inner_edges.put(b.id, weight);
     }
 
     public void setSelected(boolean selected) {
