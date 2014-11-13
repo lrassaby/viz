@@ -1,7 +1,8 @@
 public class Piechart extends CircleChart {
-
+    Boolean marking;
     Piechart(Data data, String[] categories, float chartLeftX, float chartLeftY, float chartSize) {
         super(data, categories, chartLeftX, chartLeftY, chartSize);
+        marking = true;
     }
 
     void draw (float transition_completeness, Transition transition) {
@@ -18,11 +19,12 @@ public class Piechart extends CircleChart {
 
         switch (transition) {
         case NONE:
+            if (frameCount%250 > 125) marking = !marking;
             for (int i = 0; i < angles.length; i++) {
                 fill(255);
                 strokeWeight(1);
 
-                if(data.getMark(i)) {
+                if(data.getMark(i)&&marking) {
                       fill(0, 255, 0);
                 }
          

@@ -10,6 +10,7 @@ public class Node {
   public String category;
   public Data data = null;
   public boolean marked = false;
+  boolean marking = true;
 
   private static final int XMIN = 0, XMAX = 1, YMIN = 2, YMAX = 3;
   public ArrayList<Node> children = new ArrayList<Node>();
@@ -146,6 +147,7 @@ public class Node {
   }
 
   private void drawSide(ArrayList<Rect> rectangles, Canvas canvas) {
+    if (frameCount % 250 > 125) marking = !marking;
     float x = canvas.x;
     float y = canvas.y;
     for (Rect r : rectangles) {
@@ -175,7 +177,7 @@ public class Node {
       
       //println(r.name);
       if(r.name != null) {
-        if(data.getMark(int(r.name))) {
+        if(data.getMark(int(r.name))&&marking) {
           fill(0, 255, 0);
           //println(r.name+": " + data.getValue(int(r.name)));
         }

@@ -10,8 +10,8 @@ Table table = null;
 Barchart barchart = null;
 Piechart piechart = null;
 Tree tree = null;
-int chartType = int(random(0.0, 2.99));
-//int chartType = 1;
+//int chartType = int(random(0.0, 2.99));
+int chartType = 1;
 int marked1;
 int marked2;
 
@@ -79,7 +79,7 @@ void draw() {
          **/
         stroke(0);
         strokeWeight(1);
-        fill(150);
+        fill(255);
         rectMode(CORNER);
                  /*
                   * all your charts must be inside this rectangle

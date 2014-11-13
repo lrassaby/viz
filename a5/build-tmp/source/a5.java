@@ -31,8 +31,8 @@ Table table = null;
 Barchart barchart = null;
 Piechart piechart = null;
 Tree tree = null;
-int chartType = PApplet.parseInt(random(0.0f, 2.99f));
-//int chartType = 1;
+//int chartType = int(random(0.0, 2.99));
+int chartType = 1;
 int marked1;
 int marked2;
 
@@ -100,7 +100,7 @@ public void draw() {
          **/
         stroke(0);
         strokeWeight(1);
-        fill(150);
+        fill(255);
         rectMode(CORNER);
                  /*
                   * all your charts must be inside this rectangle
@@ -325,8 +325,10 @@ public class AxisChart {
     }
 };
 public class Barchart extends AxisChart {
+    boolean marking;
     Barchart(Data data, String[] categories, float chartLeftX, float chartLeftY, float chartSize) {
         super(data, categories, chartLeftX, chartLeftY, chartSize);
+        marking = true;
     }
 
     public void draw (float transition_completeness, Transition transition) {
@@ -359,17 +361,25 @@ public class Barchart extends AxisChart {
         stroke(0);
         strokeCap(SQUARE);
 
+
         switch(transition) {
             case NONE:
+                if (frameCount%250 >125) marking = !marking;
                 for (int i = 0; i < NUM; i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
                     int y = origin.y - PApplet.parseInt(data.getValue(i) * ratio);
-                    if(data.getMark(i)) {
-                      stroke(0,255,0);
+                    
+                    //println(marking);
+                    if (marking) {
+                        if(data.getMark(i)&&marking) {
+                            stroke(0,255,0);
                       //strokeWeight(5);
                       //ellipse(x, origin.y - (int(ratio))/2, 12, 12);
-                    }
-                    else {
+                        }
+                        else {
+                            stroke(0);
+                        }
+                    } else {
                         stroke(0);
                     }
                     line(x, origin.y, x, y);
@@ -635,6 +645,7 @@ public class Node {
   public String category;
   public Data data = null;
   public boolean marked = false;
+  boolean marking = true;
 
   private static final int XMIN = 0, XMAX = 1, YMIN = 2, YMAX = 3;
   public ArrayList<Node> children = new ArrayList<Node>();
@@ -771,6 +782,7 @@ public class Node {
   }
 
   private void drawSide(ArrayList<Rect> rectangles, Canvas canvas) {
+    if (frameCount % 250 > 125) marking = !marking;
     float x = canvas.x;
     float y = canvas.y;
     for (Rect r : rectangles) {
@@ -800,7 +812,7 @@ public class Node {
       
       //println(r.name);
       if(r.name != null) {
-        if(data.getMark(PApplet.parseInt(r.name))) {
+        if(data.getMark(PApplet.parseInt(r.name))&&marking) {
           fill(0, 255, 0);
           //println(r.name+": " + data.getValue(int(r.name)));
         }
@@ -826,9 +838,10 @@ public class Node {
   }
 }
 public class Piechart extends CircleChart {
-
+    Boolean marking;
     Piechart(Data data, String[] categories, float chartLeftX, float chartLeftY, float chartSize) {
         super(data, categories, chartLeftX, chartLeftY, chartSize);
+        marking = true;
     }
 
     public void draw (float transition_completeness, Transition transition) {
@@ -845,11 +858,12 @@ public class Piechart extends CircleChart {
 
         switch (transition) {
         case NONE:
+            if (frameCount%250 > 125) marking = !marking;
             for (int i = 0; i < angles.length; i++) {
                 fill(255);
                 strokeWeight(1);
 
-                if(data.getMark(i)) {
+                if(data.getMark(i)&&marking) {
                       fill(0, 255, 0);
                 }
          

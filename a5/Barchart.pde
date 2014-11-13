@@ -1,6 +1,8 @@
 public class Barchart extends AxisChart {
+    boolean marking;
     Barchart(Data data, String[] categories, float chartLeftX, float chartLeftY, float chartSize) {
         super(data, categories, chartLeftX, chartLeftY, chartSize);
+        marking = true;
     }
 
     void draw (float transition_completeness, Transition transition) {
@@ -33,17 +35,25 @@ public class Barchart extends AxisChart {
         stroke(0);
         strokeCap(SQUARE);
 
+
         switch(transition) {
             case NONE:
+                if (frameCount%250 >125) marking = !marking;
                 for (int i = 0; i < NUM; i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
                     int y = origin.y - int(data.getValue(i) * ratio);
-                    if(data.getMark(i)) {
-                      stroke(0,255,0);
+                    
+                    //println(marking);
+                    if (marking) {
+                        if(data.getMark(i)&&marking) {
+                            stroke(0,255,0);
                       //strokeWeight(5);
                       //ellipse(x, origin.y - (int(ratio))/2, 12, 12);
-                    }
-                    else {
+                        }
+                        else {
+                            stroke(0);
+                        }
+                    } else {
                         stroke(0);
                     }
                     line(x, origin.y, x, y);
