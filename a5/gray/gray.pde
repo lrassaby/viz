@@ -11,7 +11,7 @@ Barchart barchart = null;
 Piechart piechart = null;
 Tree tree = null;
 //int chartType = int(random(0.0, 2.99));
-int chartType = 1;
+int chartType = 0;
 int marked1;
 int marked2;
 
@@ -25,7 +25,7 @@ void setup() {
     //if you have a Retina display, use the line below (looks better)
     //size((int) totalWidth, (int) totalHeight, "processing.core.PGraphicsRetina2D");
     
-    background(255);
+    background(225);
     frame.setTitle("Comp150-07 Visualization, Lab 5, Experiment");
 
     cp5 = new ControlP5(this);
@@ -66,7 +66,7 @@ void draw() {
     if (index < 0 && page1) {
         drawIntro();
         page1 = false;
-    } else if (index >= 0 && index < vis.length * NUM_TRIALS) {
+    } else if (index >= 0 && index < NUM_TRIALS) {
         if (index == 0 && page2) {
             clearIntro();
             drawTextField();
@@ -79,7 +79,7 @@ void draw() {
          **/
         stroke(0);
         strokeWeight(1);
-        fill(255);
+        fill(110);
         rectMode(CORNER);
                  /*
                   * all your charts must be inside this rectangle
@@ -109,7 +109,7 @@ void draw() {
 
         drawWarning();
 
-    } else if (index > vis.length*NUM_TRIALS - 1 && pagelast) {
+    } else if (index >NUM_TRIALS - 1 && pagelast) {
         drawThanks();
         drawClose();
         pagelast = false;
@@ -133,7 +133,7 @@ public void next() {
     } else if (num > 100) {
         warning = "Please input a number between 0 - 100!";
     } else {
-        if (index >= 0 && index < vis.length * NUM_TRIALS) {
+        if (index >= 0 && index < NUM_TRIALS) {
             float ans = parseFloat(cp5.get(Textfield.class, "answer").getText());
 
             /**
@@ -171,14 +171,14 @@ public void next() {
 
         cp5.get(Textfield.class, "answer").clear();
         index++;
-        if ((index) % vis.length == 0 ) {
-          chartType = int(random(0.0, 2.99));
-        }
-        else {
-          chartType = (chartType + 1)%(vis.length);
-        }
+        //if ((index) % vis.length == 0 ) {
+          //chartType = int(random(0.0, 2.99));
+        //}
+        //else {
+          //chartType = (chartType + 1)%(vis.length);
+        //}
 
-        if (index == vis.length*NUM_TRIALS - 1) {
+        if (index == NUM_TRIALS - 1) {
             pagelast = true;
         }
     }

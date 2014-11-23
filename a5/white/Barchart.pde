@@ -38,7 +38,7 @@ public class Barchart extends AxisChart {
 
         switch(transition) {
             case NONE:
-                if (frameCount%250 >125) marking = !marking;
+                //if (frameCount%120 >60) marking = !marking;
                 for (int i = 0; i < NUM; i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + int(sectionWidth * 0.1);
                     int y = origin.y - int(data.getValue(i) * ratio);
