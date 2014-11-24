@@ -17,7 +17,7 @@ import java.io.InputStream;
 import java.io.OutputStream; 
 import java.io.IOException; 
 
-public class a5 extends PApplet {
+public class flash extends PApplet {
 
 
 
@@ -32,7 +32,7 @@ Barchart barchart = null;
 Piechart piechart = null;
 Tree tree = null;
 //int chartType = int(random(0.0, 2.99));
-int chartType = 1;
+int chartType = 0;
 int marked1;
 int marked2;
 
@@ -87,7 +87,7 @@ public void draw() {
     if (index < 0 && page1) {
         drawIntro();
         page1 = false;
-    } else if (index >= 0 && index < vis.length * NUM_TRIALS) {
+    } else if (index >= 0 && index < NUM_TRIALS) {
         if (index == 0 && page2) {
             clearIntro();
             drawTextField();
@@ -130,7 +130,7 @@ public void draw() {
 
         drawWarning();
 
-    } else if (index > vis.length*NUM_TRIALS - 1 && pagelast) {
+    } else if (index >NUM_TRIALS - 1 && pagelast) {
         drawThanks();
         drawClose();
         pagelast = false;
@@ -154,7 +154,7 @@ public void next() {
     } else if (num > 100) {
         warning = "Please input a number between 0 - 100!";
     } else {
-        if (index >= 0 && index < vis.length * NUM_TRIALS) {
+        if (index >= 0 && index < NUM_TRIALS) {
             float ans = parseFloat(cp5.get(Textfield.class, "answer").getText());
 
             /**
@@ -192,14 +192,14 @@ public void next() {
 
         cp5.get(Textfield.class, "answer").clear();
         index++;
-        if ((index) % vis.length == 0 ) {
-          chartType = PApplet.parseInt(random(0.0f, 2.99f));
-        }
-        else {
-          chartType = (chartType + 1)%(vis.length);
-        }
+        //if ((index) % vis.length == 0 ) {
+          //chartType = int(random(0.0, 2.99));
+        //}
+        //else {
+          //chartType = (chartType + 1)%(vis.length);
+        //}
 
-        if (index == vis.length*NUM_TRIALS - 1) {
+        if (index == NUM_TRIALS - 1) {
             pagelast = true;
         }
     }
@@ -364,7 +364,7 @@ public class Barchart extends AxisChart {
 
         switch(transition) {
             case NONE:
-                if (frameCount%250 >125) marking = !marking;
+                if (frameCount%120 >60) marking = !marking;
                 for (int i = 0; i < NUM; i++) {
                     int x = origin.x + sectionWidth * i + sectionWidth / 2 + PApplet.parseInt(sectionWidth * 0.1f);
                     int y = origin.y - PApplet.parseInt(data.getValue(i) * ratio);
@@ -1400,7 +1400,7 @@ public void drawClose() {
         .align(ControlP5.CENTER, ControlP5.CENTER);
 }
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "a5" };
+    String[] appletArgs = new String[] { "flash" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {
