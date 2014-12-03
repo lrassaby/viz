@@ -34,6 +34,25 @@ class Selection {
         if (!fixed) {
             x_end = mouseX;
             y_end = mouseY;
+            if (x_start >= width - 140 && y_start <= height - 200) {
+                if (mouseX < width - 140) {
+                    x_end = width - 140;
+                }
+                if (mouseY > height - 200) {
+                    y_end = height - 200;
+                }
+            } else if (x_start <= width - 140 && y_start <= height - 200) {
+                if (mouseX > width - 140) {
+                    x_end = width - 140;
+                }
+                if (mouseY > height - 200) {
+                    y_end = height - 200;
+                }
+            } else {
+                if (mouseY < height - 200) {
+                    y_end = height - 200;
+                }
+            }
         }
     }
     public void draw() {
