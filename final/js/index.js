@@ -40,6 +40,7 @@ function start() {
             });
 
             var fills = {};
+            fills["defaultFill"] = "rgba(200,200,200, 0.3)";
             countriesById.forEach(function(d) {
                 fills[d] = countriesById.get(d).fill;
             });
@@ -47,10 +48,10 @@ function start() {
                 fills: fills,
                 data: countriesById._,
                 geographyConfig: {
-                    popupTemplate: function(geo, data) {
+                    popupTemplate: function(geo, country_data) {
                         var inner = "<div class='country-name'>" + geo.properties.name + "</div>";
-                        if (data) {
-                            inner += category.title + ': ' + data[category.title];
+                        if (country_data && country_data[category.title]) {
+                            inner += category.title + ': ' + country_data[category.title];
                             // display rank, total numbers
                         } else {
                             inner += "No data available";
