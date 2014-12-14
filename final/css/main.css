@@ -7,7 +7,7 @@
     margin: 0 auto;
 }
 body {
-    background-color: black;
+    background-color: rgb(200, 200, 200);
 }
 .header {
     text-align: center;
@@ -15,7 +15,7 @@ body {
 }
 h1 {
     font-family: "Special Elite", "Helvetica";
-    color: white;
+    color: rgb(138,7,7);
     font-size: 50px;
 }
 .selector {
@@ -36,4 +36,9 @@ h1 {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.ui-button.ui-state-active .ui-button-text {
+    color: white;
+    background-color: rgb(100, 100, 100);
 }

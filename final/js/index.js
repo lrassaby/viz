@@ -1,31 +1,37 @@
 // www.theguardian.com/news/datablog/2012/jul/22/gun-homicides-ownership-world-list
-// http://en.wikipedia.org/wiki/List_of_countries_by_intentional_homicide_rate
+// https://docs.google.com/spreadsheets/d/1xgTEAQbTGupCpBwctgQW5-Hveru33sz0a1Z5zZXDhxg/edit?usp=sharing
+// https://docs.google.com/spreadsheets/d/1BdrLCyR6kNcIM4yJDxIbullmQl6c5snXR8hhVcaR9rs/edit?usp=sharing
+// add other countries from wikipedia
 var categories = [
+// TODO: title and displaytitle
 {"id": "homicides", "title": "Homicides per 100,000", "max": 90.4},
-{"id": "firearm-homicides", "title": "Homicide by firearm rate per 100,000", "max": 68.43},
 {"id": "firearms-per-100", "title": "Average firearms per 100 people", "max": 88.8},
-{"id": "percent-homicides", "title": "% of homicides by firearm", "max": 100}];
+{"id": "percent-homicides", "title": "% of homicides by firearm", "max": 100},
+{"id": "firearm-homicides", "title": "Homicide by firearm rate per 100,000", "max": 68.43}];
 
 var initial_cat = 0;
 var dispatch;
+
 
 function start() {
     dispatch = d3.dispatch("load", "statechange");
 
     d3.csv("data/morbid.csv", function(error, countries) {
         if (error) throw error;
-        var countriesById = d3.map();
+
+        dispatch.load(countries);
+        dispatch.statechange(categories[initial_cat]);
+    });
+
+    dispatch.on("load.map", function(countries) {
         // key value store such that ALB: "Albania", ALB, 100 etc.
+        var countriesById = d3.map();
+
         countries.forEach(function(d) {
             d.fillKey = d["Code"];
             countriesById.set(d["Code"], d);
         });
        
-        dispatch.load(countriesById);
-        dispatch.statechange(categories[initial_cat]);
-    });
-
-    dispatch.on("load.map", function(countriesById) {
 
         dispatch.on("statechange.map", function(category) {
             $("#map").empty();
@@ -33,14 +39,16 @@ function start() {
             countriesById.forEach(function(c) {
                 var d = countriesById.get(c);
                 if (d[category.title]) {
+                    // TODO: convert to hsl instead, so we can avoid dullness
                     d.fill = "rgba(138,7,7," + String((parseFloat(d[category.title]) / category.max) + 0.2) + ")";
                 } else {
-                    d.fill = "rgba(200,200,200, 0.3)";
+                    d.fill = "rgba(100,100,100, 0.3)";
+                    // TODO: http://stackoverflow.com/questions/13069446/simple-fill-pattern-in-svg-diagonal-hatching
                 }
             });
 
             var fills = {};
-            fills["defaultFill"] = "rgba(200,200,200, 0.3)";
+            fills["defaultFill"] = "rgba(100,100,100, 0.3)";
             countriesById.forEach(function(d) {
                 fills[d] = countriesById.get(d).fill;
             });
@@ -72,6 +80,32 @@ function start() {
             });
         });
     });
+
+    dispatch.on("load.bubblechart", function(countries) {
+        var x = 'Average Firearms per 100 People';
+        var chart = c3.generate({
+            data: {
+                columns:[
+                    ["x"].append(countries.map(function(c) {return c[x];}))
+                ],
+                type: 'scatter'
+            },
+
+            axis: {
+                x: {
+                    label: 'Average Firearms per 100 People',
+                    tick: {
+                        fit: false
+                    }
+                },
+                y: {
+                }
+            }
+        });
+        dispatch.on("statechange.bubblechart", function(category) {
+
+        });
+    });
 }
 
 $(document).ready(function() {
@@ -90,6 +124,7 @@ $(document).ready(function() {
     maps = $(".map");
     $(window).resize(function() {
         start();
+        //TODO: keep tab selected open on resize
     });
     $("#display-choice").click(function() {
         var id = $("input:radio[name ='radio']:checked").prop("id");
@@ -104,6 +139,31 @@ $(document).ready(function() {
         }
     });
 });
+
+
+function makeBC() {
+
+    // setTimeout(function () {
+    //     chart.load({
+    //         xs: {
+    //             virginica: 'virginica_x'
+    //         },
+    //         columns: [
+    //             ["virginica_x", 3.3, 2.7, 3.0, 2.9, 3.0, 3.0, 2.5, 2.9, 2.5, 3.6, 3.2, 2.7, 3.0, 2.5, 2.8, 3.2, 3.0, 3.8, 2.6, 2.2, 3.2, 2.8, 2.8, 2.7, 3.3, 3.2, 2.8, 3.0, 2.8, 3.0, 2.8, 3.8, 2.8, 2.8, 2.6, 3.0, 3.4, 3.1, 3.0, 3.1, 3.1, 3.1, 2.7, 3.2, 3.3, 3.0, 2.5, 3.0, 3.4, 3.0],
+    //             ["virginica", 2.5, 1.9, 2.1, 1.8, 2.2, 2.1, 1.7, 1.8, 1.8, 2.5, 2.0, 1.9, 2.1, 2.0, 2.4, 2.3, 1.8, 2.2, 2.3, 1.5, 2.3, 2.0, 2.0, 1.8, 2.1, 1.8, 1.8, 1.8, 2.1, 1.6, 1.9, 2.0, 2.2, 1.5, 1.4, 2.3, 2.4, 1.8, 1.8, 2.1, 2.4, 2.3, 1.9, 2.3, 2.5, 2.3, 1.9, 2.0, 2.3, 1.8],
+    //         ]
+    //     });
+    // }, 1000);
+
+
+    // setTimeout(function () {
+    //     chart.load({
+    //         columns: [
+    //             ["virginica", 0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2, 0.4, 0.4, 0.3, 0.3, 0.3, 0.2, 0.4, 0.2, 0.5, 0.2, 0.2, 0.4, 0.2, 0.2, 0.2, 0.2, 0.4, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.2, 0.2, 0.3, 0.3, 0.2, 0.6, 0.4, 0.3, 0.2, 0.2, 0.2, 0.2],
+    //         ]
+    //     });
+    // }, 3000);
+}
 
 //Pie chart: http://bl.ocks.org/mbostock/3887235
 //Bubble chart: http://dimplejs.org/examples_viewer.html?id=bubbles_vertical_lollipop
