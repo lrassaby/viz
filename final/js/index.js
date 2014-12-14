@@ -86,7 +86,7 @@ function start() {
         var chart = c3.generate({
             data: {
                 columns:[
-                    ["x"].append(countries.map(function(c) {return c[x];}))
+                    ["x"].concat(countries.map(function(c) {return c[x];}))
                 ],
                 type: 'scatter'
             },
