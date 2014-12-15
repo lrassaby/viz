@@ -83,24 +83,29 @@ function start() {
 
     dispatch.on("load.bubblechart", function(countries) {
         var x = 'Average firearms per 100 people';
-        var y = "% of homicides by firearm";
+
+        var active_countries = countries.filter(function(d) {return d[x];} );
+        var x_cols = [x].concat(active_countries.map(function(c) {return parseFloat(c[x]);}));
+
         var chart = c3.generate({
             data: {
                 x: x,
                 columns:[
-                    [x].concat(countries.map(function(c) {return parseFloat(c[x]);})),
-                    [y].concat(countries.map(function(c) {return parseFloat(c[y]);}))
+                    x_cols
                 ],
-                // url: "data/morbid.csv",
                 type: 'scatter'
             },
             tooltip: {
-              format: {
+                format: {
                      title: function (x) {return "";},
-                     name: function(name, ratio, id, index) {return "<b>" + countries[index]["Country"]+"</b>" + "<br>" + name;}
-                 }
+                     name: function(name, ratio, id, index) {return "<b>" + active_countries[index]["Country"]+"</b>" + "<br>" + name;}
+                }
             },
-
+            point: {
+                r: function(d) {
+                    return Math.sqrt(active_countries[d.index]["Population"]) / 1000;
+                }
+            },
             axis: {
                 x: {
                     label: x,
@@ -108,16 +113,28 @@ function start() {
                         fit: false
                     },
                     max: 100
-                },
-                y: {
-                    label: y,
-                    min: 0,
-                    max: 100
                 }
             }
         });
         dispatch.on("statechange.bubblechart", function(category) {
-
+            chart.unload({
+                ids: categories.map(function(c) {return c.title != x ? c.title : null;})
+            });
+            var y = category.title;
+            chart.load({
+                x: x,
+                columns: [
+                    x_cols,
+                    [y].concat(active_countries.map(function(c) {return parseFloat(c[y]);}))
+                ],
+                axis: {
+                    y: {
+                        label: y,
+                        min: 0,
+                        max: 100
+                    }
+                }
+            });
         });
     });
 }
@@ -156,23 +173,3 @@ $(document).ready(function() {
 
 
 
-    // setTimeout(function () {
-    //     chart.load({
-    //         xs: {
-    //             virginica: 'virginica_x'
-    //         },
-    //         columns: [
-    //             ["virginica_x", 3.3, 2.7, 3.0, 2.9, 3.0, 3.0, 2.5, 2.9, 2.5, 3.6, 3.2, 2.7, 3.0, 2.5, 2.8, 3.2, 3.0, 3.8, 2.6, 2.2, 3.2, 2.8, 2.8, 2.7, 3.3, 3.2, 2.8, 3.0, 2.8, 3.0, 2.8, 3.8, 2.8, 2.8, 2.6, 3.0, 3.4, 3.1, 3.0, 3.1, 3.1, 3.1, 2.7, 3.2, 3.3, 3.0, 2.5, 3.0, 3.4, 3.0],
-    //             ["virginica", 2.5, 1.9, 2.1, 1.8, 2.2, 2.1, 1.7, 1.8, 1.8, 2.5, 2.0, 1.9, 2.1, 2.0, 2.4, 2.3, 1.8, 2.2, 2.3, 1.5, 2.3, 2.0, 2.0, 1.8, 2.1, 1.8, 1.8, 1.8, 2.1, 1.6, 1.9, 2.0, 2.2, 1.5, 1.4, 2.3, 2.4, 1.8, 1.8, 2.1, 2.4, 2.3, 1.9, 2.3, 2.5, 2.3, 1.9, 2.0, 2.3, 1.8],
-    //         ]
-    //     });
-    // }, 1000);
-
-
-    // setTimeout(function () {
-    //     chart.load({
-    //         columns: [
-    //             ["virginica", 0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2, 0.4, 0.4, 0.3, 0.3, 0.3, 0.2, 0.4, 0.2, 0.5, 0.2, 0.2, 0.4, 0.2, 0.2, 0.2, 0.2, 0.4, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.2, 0.2, 0.3, 0.3, 0.2, 0.6, 0.4, 0.3, 0.2, 0.2, 0.2, 0.2],
-    //         ]
-    //     });
-    // }, 3000);
