@@ -96,8 +96,9 @@ function start() {
             },
             tooltip: {
               format: {
-                title: function (x) { return 'Data ' + x; }
-              }
+                     title: function (x) {return "";},
+                     name: function(name, ratio, id, index) {return "<b>" + countries[index]["Country"]+"</b>" + "<br>" + name;}
+                 }
             },
 
             axis: {
@@ -110,6 +111,8 @@ function start() {
                 },
                 y: {
                     label: y,
+                    min: 0,
+                    max: 100
                 }
             }
         });
