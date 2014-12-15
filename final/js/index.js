@@ -20,7 +20,7 @@ function start() {
         if (error) throw error;
 
         dispatch.load(countries);
-        dispatch.statechange(categories[initial_cat]);
+        dispatch.statechange(getState());
     });
 
     dispatch.on("load.map", function(countries) {
@@ -139,6 +139,19 @@ function start() {
     });
 }
 
+function getState() {
+    var id = $("input:radio[name ='radio']:checked").prop("id");
+    var category;
+    categories.forEach(function (c) {
+        if (id == c.id) {
+            category = c;
+        }
+    });
+    if (category) {
+        return category;
+    }
+}
+
 $(document).ready(function() {
     var labels = "";
     categories.forEach(function(c) {
@@ -158,16 +171,7 @@ $(document).ready(function() {
         //TODO: keep tab selected open on resize
     });
     $("#display-choice").click(function() {
-        var id = $("input:radio[name ='radio']:checked").prop("id");
-        var category;
-        categories.forEach(function (c) {
-            if (id == c.id) {
-                category = c;
-            }
-        });
-        if (category) {
-            dispatch.statechange(category);
-        }
+        dispatch.statechange(getState());
     });
 });
 
