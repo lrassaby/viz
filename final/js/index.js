@@ -88,6 +88,7 @@ function start() {
                 columns:[
                     ["x"].concat(countries.map(function(c) {return c[x];}))
                 ],
+                // url: "data/morbid.csv",
                 type: 'scatter'
             },
 
