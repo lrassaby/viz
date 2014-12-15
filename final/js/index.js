@@ -82,24 +82,34 @@ function start() {
     });
 
     dispatch.on("load.bubblechart", function(countries) {
-        var x = 'Average Firearms per 100 People';
+        var x = 'Average firearms per 100 people';
+        var y = "% of homicides by firearm";
         var chart = c3.generate({
             data: {
+                x: x,
                 columns:[
-                    ["x"].concat(countries.map(function(c) {return c[x];}))
+                    [x].concat(countries.map(function(c) {return parseFloat(c[x]);})),
+                    [y].concat(countries.map(function(c) {return parseFloat(c[y]);}))
                 ],
                 // url: "data/morbid.csv",
                 type: 'scatter'
             },
+            tooltip: {
+              format: {
+                title: function (x) { return 'Data ' + x; }
+              }
+            },
 
             axis: {
                 x: {
-                    label: 'Average Firearms per 100 People',
+                    label: x,
                     tick: {
                         fit: false
-                    }
+                    },
+                    max: 100
                 },
                 y: {
+                    label: y,
                 }
             }
         });
@@ -142,7 +152,6 @@ $(document).ready(function() {
 });
 
 
-function makeBC() {
 
     // setTimeout(function () {
     //     chart.load({
@@ -164,7 +173,3 @@ function makeBC() {
     //         ]
     //     });
     // }, 3000);
-}
-
-//Pie chart: http://bl.ocks.org/mbostock/3887235
-//Bubble chart: http://dimplejs.org/examples_viewer.html?id=bubbles_vertical_lollipop
