@@ -3,17 +3,18 @@
 // https://docs.google.com/spreadsheets/d/1BdrLCyR6kNcIM4yJDxIbullmQl6c5snXR8hhVcaR9rs/edit?usp=sharing
 // add other countries from wikipedia
 var categories = [
-// TODO: title and displaytitle
-{"id": "homicides", "title": "Homicides per 100,000", "max": 90.4},
-{"id": "firearms-per-100", "title": "Average firearms per 100 people", "max": 88.8},
-{"id": "percent-homicides", "title": "% of homicides by firearm", "max": 100},
-{"id": "firearm-homicides", "title": "Homicide by firearm rate per 100,000", "max": 68.43}];
+{"id": "homicides", "title": "Homicides per 100,000", "display_title": "Number of homicides per 100,000 deaths", "max": 90.4},
+{"id": "firearms-per-100", "title": "Average firearms per 100 people", "display_title": "Average Number of Firearms per 100 People", "max": 88.8},
+{"id": "percent-homicides", "title": "% of homicides by firearm", "display_title": "Percent of Homicides Committed by Firearm", "max": 100},
+{"id": "firearm-homicides", "title": "Homicide by firearm rate per 100,000", "display_title": "Homicide by firearm rate per 100,000 deaths", "max": 68.43}];
 
 var initial_cat = 0;
 var dispatch;
 
 
 function start() {
+    var spectrum = d3.interpolateRgb(d3.rgb(175, 148, 151), d3.rgb(100, 7, 7));
+    //54, 59, 92
     dispatch = d3.dispatch("load", "statechange");
 
     d3.csv("data/morbid.csv", function(error, countries) {
@@ -40,7 +41,7 @@ function start() {
                 var d = countriesById.get(c);
                 if (d[category.title]) {
                     // TODO: convert to hsl instead, so we can avoid dullness
-                    d.fill = "rgba(138,7,7," + String((parseFloat(d[category.title]) / category.max) + 0.2) + ")";
+                    d.fill = spectrum(parseFloat(d[category.title]) / category.max);
                 } else {
                     d.fill = "rgba(100,100,100, 0.3)";
                     // TODO: http://stackoverflow.com/questions/13069446/simple-fill-pattern-in-svg-diagonal-hatching
@@ -59,7 +60,7 @@ function start() {
                     popupTemplate: function(geo, country_data) {
                         var inner = "<div class='country-name'>" + geo.properties.name + "</div>";
                         if (country_data && country_data[category.title]) {
-                            inner += category.title + ': ' + country_data[category.title];
+                            inner += category.display_title + ': ' + country_data[category.title];
                             if (country_data["Rank by rate of ownership"]) {
                                 inner += ("<br></br>World Rank by Rate of Ownership: " + country_data["Rank by rate of ownership"]);
                             }
@@ -93,7 +94,18 @@ function start() {
                 columns:[
                     x_cols
                 ],
-                type: 'scatter'
+                type: 'scatter',
+                color: function (color, d) {
+                    // d will be 'id' when called for legends
+                    var s = getState();
+                    if (typeof(d) == 'object') {
+                        if (isNaN(parseFloat(active_countries[d.index][s.title])/s.max)) {
+                            return color;
+                        }
+                        return spectrum(parseFloat(active_countries[d.index][s.title])/s.max);
+                    }
+                    return spectrum(1);
+                }
             },
             tooltip: {
                 format: {
@@ -117,15 +129,14 @@ function start() {
             }
         });
         dispatch.on("statechange.bubblechart", function(category) {
-            chart.unload({
-                ids: categories.map(function(c) {return c.title != x ? c.title : null;})
-            });
             var y = category.title;
+            var y_cols = [y].concat(active_countries.map(function(c) {return parseFloat(c[y]);}))
+
             chart.load({
                 x: x,
                 columns: [
                     x_cols,
-                    [y].concat(active_countries.map(function(c) {return parseFloat(c[y]);}))
+                    y_cols
                 ],
                 axis: {
                     y: {
@@ -134,6 +145,10 @@ function start() {
                         max: 100
                     }
                 }
+            });
+            var unloads = categories.map(function(c) { return c.title != y ? c.title : "";});
+            chart.unload({
+                ids: unloads
             });
         });
     });
@@ -156,9 +171,9 @@ $(document).ready(function() {
     var labels = "";
     categories.forEach(function(c) {
         if (c.id == categories[initial_cat].id) {
-            labels += '<input type="radio" id="' + c.id + '" checked="checked" name="radio"><label for="' + c.id + '">' + c.title + '</label></input>';
+            labels += '<input type="radio" id="' + c.id + '" checked="checked" name="radio"><label for="' + c.id + '">' + c.display_title + '</label></input>';
         } else {
-            labels += '<input type="radio" id="' + c.id + '" name="radio"><label for="' + c.id + '">' + c.title + '</label></input>';
+            labels += '<input type="radio" id="' + c.id + '" name="radio"><label for="' + c.id + '">' + c.display_title + '</label></input>';
         }
     });
     $("#display-choice").html(labels);
