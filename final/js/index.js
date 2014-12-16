@@ -16,6 +16,7 @@ function start() {
     var spectrum = d3.interpolateRgb(d3.rgb(175, 148, 151), d3.rgb(100, 7, 7));
     //54, 59, 92
     dispatch = d3.dispatch("load", "statechange");
+    $('#selection').html(getState().display_title);
 
     d3.csv("data/morbid.csv", function(error, countries) {
         if (error) throw error;
@@ -23,7 +24,6 @@ function start() {
         dispatch.load(countries);
         dispatch.statechange(getState());
     });
-
     dispatch.on("load.map", function(countries) {
         // key value store such that ALB: "Albania", ALB, 100 etc.
         var countriesById = d3.map();
@@ -89,6 +89,7 @@ function start() {
         var x_cols = [x].concat(active_countries.map(function(c) {return parseFloat(c[x]);}));
 
         var chart = c3.generate({
+            bindto: '#bubblechart',
             data: {
                 x: x,
                 columns:[
@@ -150,6 +151,20 @@ function start() {
             chart.unload({
                 ids: unloads
             });
+        });
+    });
+
+    dispatch.on("load.piechart", function(countries) {
+        var piechart = c3.generate({
+            bindto: '#piechart',
+            data: {
+                url: '/data/piechart2.csv',
+                type: 'pie'
+            },
+            legend: {
+                hide: true,
+                position: 'bottom'
+            }
         });
     });
 }
