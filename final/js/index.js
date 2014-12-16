@@ -145,6 +145,7 @@ function start() {
             var bc = d3.select("#bubblechart");
             // don't question the next line
             var y_title = x == y ? y + " " : y;
+            $("#selection").html(y);
 
             var y_cols = [y_title].concat(active_countries.map(function(c) {return parseFloat(c[y]);}));
 
