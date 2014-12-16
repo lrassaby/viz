@@ -3,10 +3,10 @@
 // https://docs.google.com/spreadsheets/d/1BdrLCyR6kNcIM4yJDxIbullmQl6c5snXR8hhVcaR9rs/edit?usp=sharing
 // add other countries from wikipedia
 var categories = [
-{"id": "homicides", "title": "Homicides per 100,000", "display_title": "Number of homicides per 100,000 deaths", "max": 90.4},
+{"id": "homicides", "title": "Homicides per 100,000", "display_title": "Number of homicides per 100,000 People per Year", "max": 90.4},
 {"id": "firearms-per-100", "title": "Average firearms per 100 people", "display_title": "Average Number of Firearms per 100 People", "max": 88.8},
 {"id": "percent-homicides", "title": "% of homicides by firearm", "display_title": "Percent of Homicides Committed by Firearm", "max": 100},
-{"id": "firearm-homicides", "title": "Homicide by firearm rate per 100,000", "display_title": "Homicide by firearm rate per 100,000 deaths", "max": 68.43}];
+{"id": "firearm-homicides", "title": "Homicide by firearm rate per 100,000", "display_title": "Homicide by firearm rate per 100,000 People per Year", "max": 68.43}];
 
 var initial_cat = 0;
 var dispatch;
@@ -144,7 +144,7 @@ function start() {
             var y = category.title;
             // don't question the next line
             var y_title = x == y ? y + " " : y;
-            $("#selection").html(y);
+            $("#selection").html(getState().display_title);
 
             var y_cols = [y_title].concat(active_countries.map(function(c) {return parseFloat(c[y]);}));
 
