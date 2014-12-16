@@ -86,7 +86,14 @@ function start() {
         var x = 'Average firearms per 100 people';
 
         var active_countries = countries.filter(function(d) {return d[x];} );
-        var x_cols = [x].concat(active_countries.map(function(c) {return parseFloat(c[x]);}));
+        //var x_cols = [x].concat(active_countries.map(function(c) {return parseFloat(c[x]);}));
+        var x_cols = [x];
+        var y_cols;
+        active_countries.forEach(function(c) {
+            if (c[x] !== "") {
+                x_cols.push(c[x]);
+            }
+        });
 
         var chart = c3.generate({
             data: {
@@ -99,10 +106,12 @@ function start() {
                     // d will be 'id' when called for legends
                     var s = getState();
                     if (typeof(d) == 'object') {
-                        if (isNaN(parseFloat(active_countries[d.index][s.title])/s.max)) {
-                            return color;
-                        }
-                        return spectrum(parseFloat(active_countries[d.index][s.title])/s.max);
+                        //if (isNaN(parseFloat(active_countries[d.index][s.title])/s.max)) {
+                        // if (isNaN(parseFloat(y_cols[d.index])/s.max)) {
+                        //     return color;
+                        // }
+                        //return spectrum(parseFloat(active_countries[d.index][s.title])/s.max);
+                        return spectrum(parseFloat(y_cols[d.index])/s.max);
                     }
                     return spectrum(1);
                 }
@@ -130,7 +139,14 @@ function start() {
         });
         dispatch.on("statechange.bubblechart", function(category) {
             var y = category.title;
-            var y_cols = [y].concat(active_countries.map(function(c) {return parseFloat(c[y]);}))
+            y_cols = [y];
+            //var y_cols = [y].concat(active_countries.map(function(c) {return parseFloat(c[y]);}))
+            active_countries.forEach(function(c){
+                if (c[y] !== "") {
+                    y_cols.push(c[y]);
+                }
+            });
+
 
             chart.load({
                 x: x,
