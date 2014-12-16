@@ -13,8 +13,16 @@ var dispatch;
 
 
 function start() {
-    var spectrum = d3.interpolateRgb(d3.rgb(175, 148, 151), d3.rgb(100, 7, 7));
-    //54, 59, 92
+    var getCountryData = function(countries, country_name) {
+        for (var i in countries) {
+            if (countries[i]["Country"] == country_name) {
+                return countries[i];
+            }
+        }
+    };
+
+    // var spectrum = d3.interpolateRgb(d3.rgb(175, 148, 151), d3.rgb(100, 7, 7));
+    var spectrum = d3.interpolateRgb(d3.rgb(200, 200, 180), d3.rgb(100, 7, 7));
     dispatch = d3.dispatch("load", "statechange");
     $('#selection').html(getState().display_title);
 
@@ -100,10 +108,11 @@ function start() {
                     // d will be 'id' when called for legends
                     var s = getState();
                     if (typeof(d) == 'object') {
-                        if (isNaN(parseFloat(active_countries[d.index][s.title])/s.max)) {
+                        var parsed = parseFloat(active_countries[d.index][s.title])/s.max;
+                        if (isNaN(parsed)) {
                             return color;
                         }
-                        return spectrum(parseFloat(active_countries[d.index][s.title])/s.max);
+                        return spectrum(parsed);
                     }
                     return spectrum(1);
                 }
@@ -131,7 +140,7 @@ function start() {
         });
         dispatch.on("statechange.bubblechart", function(category) {
             var y = category.title;
-            var y_cols = [y].concat(active_countries.map(function(c) {return parseFloat(c[y]);}))
+            var y_cols = [y].concat(active_countries.map(function(c) {return parseFloat(c[y]);}));
 
             chart.load({
                 x: x,
@@ -155,16 +164,56 @@ function start() {
     });
 
     dispatch.on("load.piechart", function(countries) {
+        var x = "Average total all civilian firearms";
+        var active_countries = countries.filter(function(d) {return d[x];});
+
+        var columns = active_countries.map(function(c) {return [c["Country"], c[x]];});
+
         var piechart = c3.generate({
             bindto: '#piechart',
             data: {
-                url: '/data/piechart2.csv',
-                type: 'pie'
+                columns: columns,
+                type: 'pie',
+                color: function (color, d) {
+                    // d will be 'id' when called for legends
+                    var s = getState();
+                    var c = getCountryData(active_countries, d.id || d);
+                    try {
+                        var parsed = parseFloat(c[s.title])/s.max;
+                        if (isNaN(parsed)) {
+                            return d3.rgb(100, 100, 100);
+                        }
+                        return spectrum(parsed);
+                    } catch (e) {
+                        return d3.rgb(100, 100, 100);
+                    }
+                }
             },
             legend: {
-                hide: true,
-                position: 'bottom'
+                show: false
             }
+        });
+        dispatch.on("statechange.piechart", function(category) {
+            piechart.load({
+                data: {
+                    columns: columns,
+                    type: 'pie',
+                    color: function (color, d) {
+                        // d will be 'id' when called for legends
+                        var s = getState();
+                        var c = getCountryData(active_countries, d.id || d);
+                        try {
+                            var parsed = parseFloat(c[s.title])/s.max;
+                            if (isNaN(parsed)) {
+                                return d3.rgb(100, 100, 100);
+                            }
+                            return spectrum(parsed);
+                        } catch (e) {
+                            return d3.rgb(100, 100, 100);
+                        }
+                    }
+                }
+            });
         });
     });
 }
