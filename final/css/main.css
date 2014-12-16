@@ -26,6 +26,9 @@ h1 {
     text-align: center;
 }
 
+#unavailable-bc {
+    text-align: center;
+}
 
 .country-name {
     font-weight: bold;

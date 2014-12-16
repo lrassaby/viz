@@ -88,6 +88,7 @@ function start() {
     });
 
     dispatch.on("load.bubblechart", function(countries) {
+
         var x = 'Average firearms per 100 people';
         var y = "Number of Homicides per 100,000 Deaths"
 
@@ -108,7 +109,7 @@ function start() {
                     if (typeof(d) == 'object') {
                         var parsed = parseFloat(active_countries[d.index][s.title])/s.max;
                         if (isNaN(parsed)) {
-                            return color;
+                            return spectrum(0.5);
                         }
                         return spectrum(parsed);
                     }
@@ -140,22 +141,38 @@ function start() {
             }
         });
         dispatch.on("statechange.bubblechart", function(category) {
-            y = category.title;
-            var y_cols = [y].concat(active_countries.map(function(c) {return parseFloat(c[y]);}));
-            $('#selection').html(getState().display_title);
-            //d3.select("#bubblechart").select(".c3-axis-y-label").text(y);
+            var y = category.title;
+            var bc = d3.select("#bubblechart");
+            // don't question the next line
+            var y_title = x == y ? y + " " : y;
+
+            var y_cols = [y_title].concat(active_countries.map(function(c) {return parseFloat(c[y]);}));
+
+
             chart.load({
                 x: x,
                 columns: [
                     x_cols,
                     y_cols
-                ]
+                ],
+                axis: {
+                    y: {
+                        label: {
+                            text: y,
+                            poition: 'outer-middle'
+                        }
+                    }
+                }
             });
             var unloads = categories.map(function(c) { return c.title != y ? c.title : "";});
+            if (x != y) {
+                unloads.push(x + " ");
+            }
             chart.unload({
                 ids: unloads
             });
         });
+        $("#bubblechart").append("<div id='unavailable-bc' style='display:none'> Unavailable data </div>");
     });
 
     dispatch.on("load.piechart", function(countries) {
@@ -176,11 +193,11 @@ function start() {
                     try {
                         var parsed = parseFloat(c[s.title])/s.max;
                         if (isNaN(parsed)) {
-                            return d3.rgb(100, 100, 100);
+                            return d3.rgb(150, 150, 150);
                         }
                         return spectrum(parsed);
                     } catch (e) {
-                        return d3.rgb(100, 100, 100);
+                        return d3.rgb(150, 150, 150);
                     }
                 }
             },
@@ -192,21 +209,7 @@ function start() {
             piechart.load({
                 data: {
                     columns: columns,
-                    type: 'pie',
-                    color: function (color, d) {
-                        // d will be 'id' when called for legends
-                        var s = getState();
-                        var c = getCountryData(active_countries, d.id || d);
-                        try {
-                            var parsed = parseFloat(c[s.title])/s.max;
-                            if (isNaN(parsed)) {
-                                return d3.rgb(150, 150, 150);
-                            }
-                            return spectrum(parsed);
-                        } catch (e) {
-                            return d3.rgb(150, 150, 150);
-                        }
-                    }
+                    type: 'pie'
                 }
             });
         });
