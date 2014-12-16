@@ -48,16 +48,14 @@ function start() {
             countriesById.forEach(function(c) {
                 var d = countriesById.get(c);
                 if (d[category.title]) {
-                    // TODO: convert to hsl instead, so we can avoid dullness
                     d.fill = spectrum(parseFloat(d[category.title]) / category.max);
                 } else {
-                    d.fill = "rgba(100,100,100, 0.3)";
-                    // TODO: http://stackoverflow.com/questions/13069446/simple-fill-pattern-in-svg-diagonal-hatching
+                    d.fill = d3.rgb(150,150,150);
                 }
             });
 
             var fills = {};
-            fills["defaultFill"] = "rgba(100,100,100, 0.3)";
+            fills["defaultFill"] = d3.rgb(150,150,150);
             countriesById.forEach(function(d) {
                 fills[d] = countriesById.get(d).fill;
             });
@@ -70,7 +68,7 @@ function start() {
                         if (country_data && country_data[category.title]) {
                             inner += category.display_title + ': ' + country_data[category.title];
                             if (country_data["Rank by rate of ownership"]) {
-                                inner += ("<br></br>World Rank by Rate of Ownership: " + country_data["Rank by rate of ownership"]);
+                                inner += ("<br>World Rank by Rate of Ownership: " + country_data["Rank by rate of ownership"]);
                             }
                             if (country_data["Average total all civilian firearms"]) {
                                 inner += ("<br>Average total all civilian firearms: " + country_data["Average total all civilian firearms"]);
@@ -114,13 +112,13 @@ function start() {
                         }
                         return spectrum(parsed);
                     }
-                    return spectrum(1);
+                    return d3.rgb(150, 150, 150);
                 }
             },
             tooltip: {
                 format: {
                      title: function (x) {return "";},
-                     name: function(name, ratio, id, index) {return "<b>" + active_countries[index]["Country"]+"</b>" + "<br>" + name;}
+                     name: function(name, ratio, id, index) {return "<div class='country-name'>" + active_countries[index]["Country"]+"</div>" + name;}
                 }
             },
             point: {
@@ -205,11 +203,11 @@ function start() {
                         try {
                             var parsed = parseFloat(c[s.title])/s.max;
                             if (isNaN(parsed)) {
-                                return d3.rgb(100, 100, 100);
+                                return d3.rgb(150, 150, 150);
                             }
                             return spectrum(parsed);
                         } catch (e) {
-                            return d3.rgb(100, 100, 100);
+                            return d3.rgb(150, 150, 150);
                         }
                     }
                 }
