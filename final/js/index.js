@@ -24,7 +24,6 @@ function start() {
     // var spectrum = d3.interpolateRgb(d3.rgb(175, 148, 151), d3.rgb(100, 7, 7));
     var spectrum = d3.interpolateRgb(d3.rgb(200, 200, 180), d3.rgb(100, 7, 7));
     dispatch = d3.dispatch("load", "statechange");
-    $('#selection').html(getState().display_title);
 
     d3.csv("data/morbid.csv", function(error, countries) {
         if (error) throw error;
@@ -90,6 +89,7 @@ function start() {
 
     dispatch.on("load.bubblechart", function(countries) {
         var x = 'Average firearms per 100 people';
+        var y = "Number of Homicides per 100,000 Deaths"
 
         var active_countries = countries.filter(function(d) {return d[x];} );
         var x_cols = [x].concat(active_countries.map(function(c) {return parseFloat(c[x]);}));
@@ -133,26 +133,23 @@ function start() {
                         fit: false
                     },
                     max: 100
+                },
+                y: {
+                    label: y
                 }
             }
         });
         dispatch.on("statechange.bubblechart", function(category) {
-            var y = category.title;
+            y = category.title;
             var y_cols = [y].concat(active_countries.map(function(c) {return parseFloat(c[y]);}));
-
+            $('#selection').html(getState().display_title);
+            //d3.select("#bubblechart").select(".c3-axis-y-label").text(y);
             chart.load({
                 x: x,
                 columns: [
                     x_cols,
                     y_cols
-                ],
-                axis: {
-                    y: {
-                        label: y,
-                        min: 0,
-                        max: 100
-                    }
-                }
+                ]
             });
             var unloads = categories.map(function(c) { return c.title != y ? c.title : "";});
             chart.unload({
