@@ -109,7 +109,7 @@ function start() {
                     if (typeof(d) == 'object') {
                         var parsed = parseFloat(active_countries[d.index][s.title])/s.max;
                         if (isNaN(parsed)) {
-                            return color;
+                            return spectrum(0.5);
                         }
                         return spectrum(parsed);
                     }
@@ -141,9 +141,11 @@ function start() {
 
             var y = category.title;
             var bc = d3.select("#bubblechart");
+            // don't question the next line
             var y_title = x == y ? y + " " : y;
 
             var y_cols = [y_title].concat(active_countries.map(function(c) {return parseFloat(c[y]);}));
+
 
             chart.load({
                 x: x,
