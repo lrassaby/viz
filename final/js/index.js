@@ -90,7 +90,7 @@ function start() {
     dispatch.on("load.bubblechart", function(countries) {
 
         var x = 'Average firearms per 100 people';
-        var y = "Number of Homicides per 100,000 Deaths";
+        var y = "Number of Homicides per 100,000 People per Year";
 
         var active_countries = countries.filter(function(d) {return d[x];} );
         var x_cols = [x].concat(active_countries.map(function(c) {return parseFloat(c[x]);}));
@@ -136,7 +136,8 @@ function start() {
                     max: 100
                 },
                 y: {
-                    label: y
+                    label: y,
+                    position: 'outer-middle'
                 }
             }
         });
