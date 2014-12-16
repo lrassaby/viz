@@ -89,6 +89,7 @@ function start() {
     });
 
     dispatch.on("load.bubblechart", function(countries) {
+
         var x = 'Average firearms per 100 people';
 
         var active_countries = countries.filter(function(d) {return d[x];} );
@@ -137,8 +138,12 @@ function start() {
             }
         });
         dispatch.on("statechange.bubblechart", function(category) {
+
             var y = category.title;
-            var y_cols = [y].concat(active_countries.map(function(c) {return parseFloat(c[y]);}));
+            var bc = d3.select("#bubblechart");
+            var y_title = x == y ? y + " " : y;
+
+            var y_cols = [y_title].concat(active_countries.map(function(c) {return parseFloat(c[y]);}));
 
             chart.load({
                 x: x,
@@ -148,17 +153,22 @@ function start() {
                 ],
                 axis: {
                     y: {
-                        label: y,
-                        min: 0,
-                        max: 100
+                        label: {
+                            text: y,
+                            poition: 'outer-middle'
+                        }
                     }
                 }
             });
             var unloads = categories.map(function(c) { return c.title != y ? c.title : "";});
+            if (x != y) {
+                unloads.push(x + " ");
+            }
             chart.unload({
                 ids: unloads
             });
         });
+        $("#bubblechart").append("<div id='unavailable-bc' style='display:none'> Unavailable data </div>");
     });
 
     dispatch.on("load.piechart", function(countries) {
@@ -179,11 +189,11 @@ function start() {
                     try {
                         var parsed = parseFloat(c[s.title])/s.max;
                         if (isNaN(parsed)) {
-                            return d3.rgb(100, 100, 100);
+                            return d3.rgb(150, 150, 150);
                         }
                         return spectrum(parsed);
                     } catch (e) {
-                        return d3.rgb(100, 100, 100);
+                        return d3.rgb(150, 150, 150);
                     }
                 }
             },
@@ -195,21 +205,7 @@ function start() {
             piechart.load({
                 data: {
                     columns: columns,
-                    type: 'pie',
-                    color: function (color, d) {
-                        // d will be 'id' when called for legends
-                        var s = getState();
-                        var c = getCountryData(active_countries, d.id || d);
-                        try {
-                            var parsed = parseFloat(c[s.title])/s.max;
-                            if (isNaN(parsed)) {
-                                return d3.rgb(150, 150, 150);
-                            }
-                            return spectrum(parsed);
-                        } catch (e) {
-                            return d3.rgb(150, 150, 150);
-                        }
-                    }
+                    type: 'pie'
                 }
             });
         });
