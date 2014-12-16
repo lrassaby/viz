@@ -90,7 +90,7 @@ function start() {
     dispatch.on("load.bubblechart", function(countries) {
 
         var x = 'Average firearms per 100 people';
-        var y = "Number of Homicides per 100,000 Deaths"
+        var y = "Number of Homicides per 100,000 Deaths";
 
         var active_countries = countries.filter(function(d) {return d[x];} );
         var x_cols = [x].concat(active_countries.map(function(c) {return parseFloat(c[x]);}));
@@ -142,7 +142,6 @@ function start() {
         });
         dispatch.on("statechange.bubblechart", function(category) {
             var y = category.title;
-            var bc = d3.select("#bubblechart");
             // don't question the next line
             var y_title = x == y ? y + " " : y;
             $("#selection").html(y);
@@ -155,15 +154,7 @@ function start() {
                 columns: [
                     x_cols,
                     y_cols
-                ],
-                axis: {
-                    y: {
-                        label: {
-                            text: y,
-                            poition: 'outer-middle'
-                        }
-                    }
-                }
+                ]
             });
             var unloads = categories.map(function(c) { return c.title != y ? c.title : "";});
             if (x != y) {
@@ -172,8 +163,8 @@ function start() {
             chart.unload({
                 ids: unloads
             });
+            chart.internal.config.axis_y_label = category.display_title;
         });
-        $("#bubblechart").append("<div id='unavailable-bc' style='display:none'> Unavailable data </div>");
     });
 
     dispatch.on("load.piechart", function(countries) {
