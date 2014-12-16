@@ -169,9 +169,23 @@ function start() {
 
     dispatch.on("load.piechart", function(countries) {
         var x = "Average total all civilian firearms";
-        var active_countries = countries.filter(function(d) {return d[x];});
+        var cutoff = 5000000;
+        var active_countries = countries.filter(function(c) {
+            var parsed = parseFloat(c[x]);
+            return !isNaN(parsed) && (parsed > cutoff);
+        });
+        var other = 0;
+        var count = 0;
+        countries.forEach(function(c) {
+            var parsed = parseFloat(c[x]);
+            if (!isNaN(parsed) && parsed <= cutoff) {
+                other += parsed;
+                count += 1;
+            }
+        });
 
         var columns = active_countries.map(function(c) {return [c["Country"], c[x]];});
+        columns.push(["Other (" + String(count) + " countries)", other]);
 
         var piechart = c3.generate({
             bindto: '#piechart',
